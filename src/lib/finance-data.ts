@@ -63,18 +63,18 @@ export const receivables: Receivable[] = [
 ];
 
 export const expenses: Expense[] = [
-  { id: "DES001", date: "2025-03-28", description: "Folha de Pagamento", category: "Pessoal", amount: 280000, type: "fixa", status: "pago" },
-  { id: "DES002", date: "2025-03-28", description: "Aluguel Sede", category: "Infraestrutura", amount: 35000, type: "fixa", status: "pago" },
-  { id: "DES003", date: "2025-03-28", description: "Energia Elétrica", category: "Infraestrutura", amount: 8500, type: "variavel", status: "pago" },
-  { id: "DES004", date: "2025-03-28", description: "Google Ads", category: "Marketing", amount: 22000, type: "variavel", status: "pendente" },
-  { id: "DES005", date: "2025-03-28", description: "Licenças Software", category: "TI", amount: 15800, type: "fixa", status: "pago" },
-  { id: "DES006", date: "2025-03-27", description: "Fornecedor TechParts", category: "Fornecedores", amount: 42500, type: "variavel", status: "pago" },
-  { id: "DES007", date: "2025-03-27", description: "Consultoria Jurídica", category: "Administrativo", amount: 18500, type: "extraordinaria", status: "pago" },
-  { id: "DES008", date: "2025-03-26", description: "Material de Escritório", category: "Administrativo", amount: 3200, type: "variavel", status: "pago" },
-  { id: "DES009", date: "2025-03-26", description: "Seguro Empresarial", category: "Seguros", amount: 12000, type: "fixa", status: "pago" },
-  { id: "DES010", date: "2025-03-25", description: "Telefonia/Internet", category: "TI", amount: 4800, type: "fixa", status: "pago" },
-  { id: "DES011", date: "2025-03-25", description: "Combustível Frota", category: "Logística", amount: 9500, type: "variavel", status: "pago" },
-  { id: "DES012", date: "2025-03-24", description: "Manutenção Equipamentos", category: "Infraestrutura", amount: 7800, type: "extraordinaria", status: "pago" },
+  { id: "DES001", date: "2025-03-28", description: "Folha de Pagamento", category: "Pessoal", amount: 280000, type: "fixa", status: "pago", country: "brasil" },
+  { id: "DES002", date: "2025-03-28", description: "Aluguel Sede", category: "Infraestrutura", amount: 35000, type: "fixa", status: "pago", country: "brasil" },
+  { id: "DES003", date: "2025-03-28", description: "Energia Elétrica", category: "Infraestrutura", amount: 8500, type: "variavel", status: "pago", country: "brasil" },
+  { id: "DES004", date: "2025-03-28", description: "Google Ads", category: "Marketing", amount: 22000, type: "variavel", status: "pendente", country: "brasil" },
+  { id: "DES005", date: "2025-03-28", description: "Licenças Software", category: "TI", amount: 15800, type: "fixa", status: "pago", country: "brasil" },
+  { id: "DES006", date: "2025-03-27", description: "Fornecedor TechParts", category: "Fornecedores", amount: 42500, type: "variavel", status: "pago", country: "brasil" },
+  { id: "DES007", date: "2025-03-27", description: "Consultoria Jurídica", category: "Administrativo", amount: 18500, type: "extraordinaria", status: "pago", country: "uruguay" },
+  { id: "DES008", date: "2025-03-26", description: "Material de Escritório", category: "Administrativo", amount: 3200, type: "variavel", status: "pago", country: "uruguay" },
+  { id: "DES009", date: "2025-03-26", description: "Seguro Empresarial", category: "Seguros", amount: 12000, type: "fixa", status: "pago", country: "uruguay" },
+  { id: "DES010", date: "2025-03-25", description: "Telefonia/Internet", category: "TI", amount: 4800, type: "fixa", status: "pago", country: "uruguay" },
+  { id: "DES011", date: "2025-03-25", description: "Combustível Frota", category: "Logística", amount: 9500, type: "variavel", status: "pago", country: "brasil" },
+  { id: "DES012", date: "2025-03-24", description: "Manutenção Equipamentos", category: "Infraestrutura", amount: 7800, type: "extraordinaria", status: "pago", country: "uruguay" },
 ];
 
 export const accountsPayable: AccountPayable[] = [
