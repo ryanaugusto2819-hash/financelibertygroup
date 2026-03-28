@@ -1,5 +1,6 @@
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { AddExpenseDialog } from "@/components/AddExpenseDialog";
+import { AIExpenseImportDialog } from "@/components/AIExpenseImportDialog";
 import { DateFilter } from "@/components/DateFilter";
 import { useFinance } from "@/context/FinanceContext";
 import { formatCurrency, formatDate, expenseCategories } from "@/lib/finance-data";
