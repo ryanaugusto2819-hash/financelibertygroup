@@ -29,7 +29,7 @@ const Expenses = () => {
   return (
     <DashboardLayout title="Custos & Despesas" subtitle="Controle detalhado de gastos">
       <div className="flex items-center justify-between mb-6">
-        <DateFilter selectedDate={selectedDate} onDateChange={setSelectedDate} />
+        <DateFilter />
         <AddExpenseDialog />
       </div>
 

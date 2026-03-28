@@ -6,47 +6,64 @@ import { AddExpenseDialog } from "@/components/AddExpenseDialog";
 import { ExpensePieChart } from "@/components/ExpensePieChart";
 import {
   formatCurrency, formatCompact, formatDate,
-  getTotalReceivable, getReceivedTotal, getTotalExpensesMonth,
-  getTotalExpensesDay, getTotalIncomeDay, getTotalOutDay, getGrossProfitDay,
-  getTotalAccountsPayable, getCashEstimate, getTotalScheduledRevenue,
-  getWeightedScheduledRevenue, dailyEntries, monthlyFlowData, receivables,
+  getTotalReceivable, getReceivedTotal,
+  getTotalAccountsPayable, dailyEntries, monthlyFlowData, receivables,
 } from "@/lib/finance-data";
 import { useFinance } from "@/context/FinanceContext";
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from "recharts";
 import {
-  DollarSign, Wallet, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight,
-  CalendarClock, PiggyBank, Landmark, BarChart3, Target,
+  DollarSign, Wallet, TrendingUp, ArrowUpRight, ArrowDownRight,
+  Landmark, Target,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useMemo } from "react";
 
 const Index = () => {
-  const { selectedDate, setSelectedDate, expenses } = useFinance();
+  const { selectedDate, dateRange, expenses } = useFinance();
 
-  const totalReceivable = getTotalReceivable();
-  const totalReceived = getReceivedTotal();
-  const totalExpensesMonth = expenses.reduce((s, e) => s + e.amount, 0);
-  const todayExpenses = expenses.filter(e => e.date === selectedDate).reduce((s, e) => s + e.amount, 0);
-  const todayIncome = getTotalIncomeDay(selectedDate);
-  const todayOut = getTotalOutDay(selectedDate);
-  const todayGrossProfit = todayIncome - todayOut;
+  // Filter data by selected period
+  const periodExpenses = useMemo(() =>
+    expenses.filter(e => e.date >= dateRange.from && e.date <= dateRange.to),
+    [expenses, dateRange]
+  );
+
+  const periodDailyEntries = useMemo(() =>
+    dailyEntries.filter(d => d.date >= dateRange.from && d.date <= dateRange.to),
+    [dateRange]
+  );
+
+  const periodIncome = periodDailyEntries.reduce((s, d) => s + d.totalIn, 0);
+  const periodOut = periodDailyEntries.reduce((s, d) => s + d.totalOut, 0);
+  const periodGrossProfit = periodIncome - periodOut;
+
+  const totalExpensesPeriod = periodExpenses.reduce((s, e) => s + e.amount, 0);
+
+  // Receivables filtered by period
+  const periodReceivables = useMemo(() =>
+    receivables.filter(r => r.dueDate >= dateRange.from && r.dueDate <= dateRange.to),
+    [dateRange]
+  );
+  const totalReceivable = periodReceivables.filter(r => r.status !== "recebido").reduce((s, r) => s + (r.amount - r.paidAmount), 0);
+  const totalReceived = periodReceivables.filter(r => r.status === "recebido" || r.status === "parcial").reduce((s, r) => s + r.paidAmount, 0);
+
   const totalPayable = getTotalAccountsPayable();
-  const scheduledExpenses = expenses.filter(e => e.status === "agendado").reduce((s, e) => s + e.amount, 0);
+  const scheduledExpenses = periodExpenses.filter(e => e.status === "agendado").reduce((s, e) => s + e.amount, 0);
   const totalPayableWithScheduled = totalPayable + scheduledExpenses;
-  const cashEstimate = getCashEstimate();
-  const scheduledTotal = getTotalScheduledRevenue();
   const currentCash = 1456200;
 
-  // Lucro bruto e líquido do mês
-  const grossProfitMonth = totalReceived - totalExpensesMonth;
-  const netProfitMonth = grossProfitMonth * 0.85; // estimativa impostos
+  // Period label
+  const isSingleDay = dateRange.from === dateRange.to;
+  const periodLabel = isSingleDay
+    ? formatDate(dateRange.from)
+    : `${formatDate(dateRange.from)} — ${formatDate(dateRange.to)}`;
 
   return (
     <DashboardLayout title="Painel Financeiro" subtitle="Controle financeiro executivo">
       {/* Date Filter */}
       <div className="flex items-center justify-between mb-6">
-        <DateFilter selectedDate={selectedDate} onDateChange={setSelectedDate} />
+        <DateFilter />
         <AddExpenseDialog />
       </div>
 
@@ -69,18 +86,18 @@ const Index = () => {
           Projeção de Receita — Cenários de Pagamento
         </h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <ScenarioCard percentage={100} totalReceivable={totalReceivable} totalExpenses={totalExpensesMonth} index={0} />
-          <ScenarioCard percentage={70} totalReceivable={totalReceivable} totalExpenses={totalExpensesMonth} index={1} highlight />
-          <ScenarioCard percentage={60} totalReceivable={totalReceivable} totalExpenses={totalExpensesMonth} index={2} />
-          <ScenarioCard percentage={50} totalReceivable={totalReceivable} totalExpenses={totalExpensesMonth} index={3} />
+          <ScenarioCard percentage={100} totalReceivable={totalReceivable} totalExpenses={totalExpensesPeriod} index={0} />
+          <ScenarioCard percentage={70} totalReceivable={totalReceivable} totalExpenses={totalExpensesPeriod} index={1} highlight />
+          <ScenarioCard percentage={60} totalReceivable={totalReceivable} totalExpenses={totalExpensesPeriod} index={2} />
+          <ScenarioCard percentage={50} totalReceivable={totalReceivable} totalExpenses={totalExpensesPeriod} index={3} />
         </div>
       </div>
 
-      {/* Daily Summary + Lucro */}
+      {/* Period Summary */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
-        <KPICard label={`Entrou Hoje (${formatDate(selectedDate)})`} value={todayIncome} prefix="R$" icon={ArrowUpRight} index={0} variant="positive" />
-        <KPICard label={`Saiu Hoje (${formatDate(selectedDate)})`} value={todayOut} prefix="R$" icon={ArrowDownRight} index={1} variant="negative" />
-        <KPICard label="Lucro Bruto do Dia" value={todayGrossProfit} prefix="R$" icon={TrendingUp} index={2} variant={todayGrossProfit >= 0 ? "positive" : "negative"} />
+        <KPICard label={`Entradas (${periodLabel})`} value={periodIncome} prefix="R$" icon={ArrowUpRight} index={0} variant="positive" />
+        <KPICard label={`Saídas (${periodLabel})`} value={periodOut} prefix="R$" icon={ArrowDownRight} index={1} variant="negative" />
+        <KPICard label={`Lucro Bruto (${isSingleDay ? "Dia" : "Período"})`} value={periodGrossProfit} prefix="R$" icon={TrendingUp} index={2} variant={periodGrossProfit >= 0 ? "positive" : "negative"} />
       </div>
 
       {/* Charts Row */}
@@ -88,9 +105,9 @@ const Index = () => {
         {/* Daily Flow Chart */}
         <div className="glass-card p-6">
           <h3 className="text-sm font-semibold text-foreground mb-1">Fluxo Diário</h3>
-          <p className="text-xs text-muted-foreground mb-4">Entradas vs Saídas — Últimos dias</p>
+          <p className="text-xs text-muted-foreground mb-4">Entradas vs Saídas — {periodLabel}</p>
           <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={dailyEntries.slice(0, 10).reverse()}>
+            <BarChart data={periodDailyEntries.slice().reverse()}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(222, 15%, 18%)" />
               <XAxis dataKey="date" tick={{ fontSize: 10, fill: "hsl(215, 15%, 55%)" }} axisLine={false} tickLine={false}
                 tickFormatter={(v) => new Date(v + "T12:00:00").toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })} />
@@ -136,19 +153,19 @@ const Index = () => {
 
       {/* Bottom Row: Expenses + Receivables */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Today's Costs */}
+        {/* Period Costs */}
         <div className="glass-card p-6">
-          <h3 className="text-sm font-semibold text-foreground mb-1">Custos do Dia</h3>
-          <p className="text-xs text-muted-foreground mb-4">{formatDate(selectedDate)}</p>
+          <h3 className="text-sm font-semibold text-foreground mb-1">Custos do Período</h3>
+          <p className="text-xs text-muted-foreground mb-4">{periodLabel}</p>
           <div className="space-y-2">
-            {expenses.filter(e => e.date === selectedDate).length === 0 && (
-              <p className="text-xs text-muted-foreground italic">Nenhum custo registrado nesta data.</p>
+            {periodExpenses.length === 0 && (
+              <p className="text-xs text-muted-foreground italic">Nenhum custo registrado neste período.</p>
             )}
-            {expenses.filter(e => e.date === selectedDate).map(e => (
+            {periodExpenses.map(e => (
               <div key={e.id} className="flex items-center justify-between py-2 border-b border-border/30 last:border-0">
                 <div>
                   <p className="text-xs font-medium text-foreground">{e.description}</p>
-                  <p className="text-[10px] text-muted-foreground">{e.category}</p>
+                  <p className="text-[10px] text-muted-foreground">{e.category} · {formatDate(e.date)}</p>
                 </div>
                 <div className="text-right">
                   <p className="text-xs font-mono font-bold text-chart-negative">{formatCurrency(e.amount)}</p>
@@ -157,8 +174,8 @@ const Index = () => {
               </div>
             ))}
             <div className="pt-2 border-t border-border flex justify-between">
-              <span className="text-xs font-semibold text-muted-foreground">Total do Dia</span>
-              <span className="text-xs font-mono font-bold text-foreground">{formatCurrency(todayExpenses)}</span>
+              <span className="text-xs font-semibold text-muted-foreground">Total do Período</span>
+              <span className="text-xs font-mono font-bold text-foreground">{formatCurrency(totalExpensesPeriod)}</span>
             </div>
           </div>
         </div>
