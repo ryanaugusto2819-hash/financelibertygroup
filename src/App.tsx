@@ -3,11 +3,13 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { FinanceProvider } from "@/context/FinanceContext";
 import Index from "./pages/Index";
-import Transactions from "./pages/Transactions";
-import Budget from "./pages/Budget";
-import CashFlow from "./pages/CashFlow";
-import Reports from "./pages/Reports";
+import Receivables from "./pages/Receivables";
+import DailyControl from "./pages/DailyControl";
+import Expenses from "./pages/Expenses";
+import AccountsPayable from "./pages/AccountsPayable";
+import Projections from "./pages/Projections";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -17,16 +19,19 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/transacoes" element={<Transactions />} />
-          <Route path="/orcamento" element={<Budget />} />
-          <Route path="/fluxo-caixa" element={<CashFlow />} />
-          <Route path="/relatorios" element={<Reports />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+      <FinanceProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/recebiveis" element={<Receivables />} />
+            <Route path="/controle-diario" element={<DailyControl />} />
+            <Route path="/despesas" element={<Expenses />} />
+            <Route path="/contas-pagar" element={<AccountsPayable />} />
+            <Route path="/projecoes" element={<Projections />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </FinanceProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
