@@ -23,7 +23,8 @@ export function DashboardLayout({ children, title, subtitle }: Props) {
                 {subtitle && <p className="text-[10px] text-muted-foreground">{subtitle}</p>}
               </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
+              <CountryFilter />
               <button className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground">
                 <Search className="w-4 h-4" />
               </button>
