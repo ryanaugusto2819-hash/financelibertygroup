@@ -32,6 +32,8 @@ const Index = () => {
   const todayOut = getTotalOutDay(selectedDate);
   const todayGrossProfit = todayIncome - todayOut;
   const totalPayable = getTotalAccountsPayable();
+  const scheduledExpenses = expenses.filter(e => e.status === "agendado").reduce((s, e) => s + e.amount, 0);
+  const totalPayableWithScheduled = totalPayable + scheduledExpenses;
   const cashEstimate = getCashEstimate();
   const scheduledTotal = getTotalScheduledRevenue();
   const currentCash = 1456200;
