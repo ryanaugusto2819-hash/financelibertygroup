@@ -18,6 +18,7 @@ export interface Expense {
   amount: number;
   type: "fixa" | "variavel" | "extraordinaria";
   status: "pago" | "pendente" | "agendado";
+  country?: "brasil" | "uruguay";
 }
 
 export interface DailyEntry {
