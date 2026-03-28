@@ -31,7 +31,10 @@ const Expenses = () => {
     <DashboardLayout title="Custos & Despesas" subtitle="Controle detalhado de gastos">
       <div className="flex items-center justify-between mb-6">
         <DateFilter />
-        <AddExpenseDialog />
+        <div className="flex gap-2">
+          <AIExpenseImportDialog />
+          <AddExpenseDialog />
+        </div>
       </div>
 
       {/* Summary */}
