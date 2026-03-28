@@ -5,6 +5,8 @@ import {
   expenseCategories 
 } from "@/lib/finance-data";
 
+export type CountryFilter = "todos" | "brasil" | "uruguay";
+
 interface FinanceContextType {
   expenses: Expense[];
   addExpense: (expense: Omit<Expense, "id">) => void;
@@ -12,6 +14,8 @@ interface FinanceContextType {
   setSelectedDate: (date: string) => void;
   dateRange: { from: string; to: string };
   setDateRange: (range: { from: string; to: string }) => void;
+  countryFilter: CountryFilter;
+  setCountryFilter: (country: CountryFilter) => void;
 }
 
 const FinanceContext = createContext<FinanceContextType | undefined>(undefined);
@@ -22,6 +26,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   const [expenses, setExpenses] = useState<Expense[]>(initialExpenses);
   const [selectedDate, setSelectedDate] = useState(today);
   const [dateRange, setDateRange] = useState({ from: today, to: today });
+  const [countryFilter, setCountryFilter] = useState<CountryFilter>("todos");
 
   const addExpense = (expense: Omit<Expense, "id">) => {
     const id = `DES${String(expenses.length + 1).padStart(3, "0")}`;
@@ -29,7 +34,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <FinanceContext.Provider value={{ expenses, addExpense, selectedDate, setSelectedDate, dateRange, setDateRange }}>
+    <FinanceContext.Provider value={{ expenses, addExpense, selectedDate, setSelectedDate, dateRange, setDateRange, countryFilter, setCountryFilter }}>
       {children}
     </FinanceContext.Provider>
   );
