@@ -1,5 +1,6 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
+import { CountryFilter } from "@/components/CountryFilter";
 import { Bell, Search } from "lucide-react";
 
 interface Props {
