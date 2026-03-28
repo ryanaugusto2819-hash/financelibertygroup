@@ -1,17 +1,22 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, useMemo, ReactNode } from "react";
 import { format } from "date-fns";
 import { 
   Expense, expenses as initialExpenses, 
   expenseCategories 
 } from "@/lib/finance-data";
 
+export type CountryFilter = "todos" | "brasil" | "uruguay";
+
 interface FinanceContextType {
   expenses: Expense[];
+  allExpenses: Expense[];
   addExpense: (expense: Omit<Expense, "id">) => void;
   selectedDate: string;
   setSelectedDate: (date: string) => void;
   dateRange: { from: string; to: string };
   setDateRange: (range: { from: string; to: string }) => void;
+  countryFilter: CountryFilter;
+  setCountryFilter: (country: CountryFilter) => void;
 }
 
 const FinanceContext = createContext<FinanceContextType | undefined>(undefined);
@@ -19,17 +24,23 @@ const FinanceContext = createContext<FinanceContextType | undefined>(undefined);
 const today = format(new Date(), "yyyy-MM-dd");
 
 export function FinanceProvider({ children }: { children: ReactNode }) {
-  const [expenses, setExpenses] = useState<Expense[]>(initialExpenses);
+  const [allExpenses, setAllExpenses] = useState<Expense[]>(initialExpenses);
   const [selectedDate, setSelectedDate] = useState(today);
   const [dateRange, setDateRange] = useState({ from: today, to: today });
+  const [countryFilter, setCountryFilter] = useState<CountryFilter>("todos");
+
+  const expenses = useMemo(() => {
+    if (countryFilter === "todos") return allExpenses;
+    return allExpenses.filter(e => e.country === countryFilter);
+  }, [allExpenses, countryFilter]);
 
   const addExpense = (expense: Omit<Expense, "id">) => {
-    const id = `DES${String(expenses.length + 1).padStart(3, "0")}`;
-    setExpenses(prev => [{ ...expense, id }, ...prev]);
+    const id = `DES${String(allExpenses.length + 1).padStart(3, "0")}`;
+    setAllExpenses(prev => [{ ...expense, id }, ...prev]);
   };
 
   return (
-    <FinanceContext.Provider value={{ expenses, addExpense, selectedDate, setSelectedDate, dateRange, setDateRange }}>
+    <FinanceContext.Provider value={{ expenses, allExpenses, addExpense, selectedDate, setSelectedDate, dateRange, setDateRange, countryFilter, setCountryFilter }}>
       {children}
     </FinanceContext.Provider>
   );
