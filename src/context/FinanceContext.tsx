@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
+import { format } from "date-fns";
 import { 
   Expense, expenses as initialExpenses, 
   expenseCategories 
@@ -15,10 +16,12 @@ interface FinanceContextType {
 
 const FinanceContext = createContext<FinanceContextType | undefined>(undefined);
 
+const today = format(new Date(), "yyyy-MM-dd");
+
 export function FinanceProvider({ children }: { children: ReactNode }) {
   const [expenses, setExpenses] = useState<Expense[]>(initialExpenses);
-  const [selectedDate, setSelectedDate] = useState("2025-03-28");
-  const [dateRange, setDateRange] = useState({ from: "2025-03-01", to: "2025-03-31" });
+  const [selectedDate, setSelectedDate] = useState(today);
+  const [dateRange, setDateRange] = useState({ from: today, to: today });
 
   const addExpense = (expense: Omit<Expense, "id">) => {
     const id = `DES${String(expenses.length + 1).padStart(3, "0")}`;

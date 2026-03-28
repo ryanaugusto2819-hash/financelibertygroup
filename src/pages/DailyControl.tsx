@@ -16,7 +16,7 @@ const DailyControl = () => {
   return (
     <DashboardLayout title="Controle Diário" subtitle="Movimentação financeira dia a dia">
       <div className="flex items-center gap-4 mb-6">
-        <DateFilter selectedDate={selectedDate} onDateChange={setSelectedDate} />
+        <DateFilter />
       </div>
 
       {/* Day KPIs */}

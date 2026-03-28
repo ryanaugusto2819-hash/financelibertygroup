@@ -6,11 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useState } from "react";
-
-interface DateFilterProps {
-  selectedDate: string;
-  onDateChange: (date: string) => void;
-}
+import { useFinance } from "@/context/FinanceContext";
 
 type FilterPreset = "hoje" | "ontem" | "7dias" | "15dias" | "30dias" | "total" | "personalizado";
 
@@ -24,56 +20,57 @@ const presets: { key: FilterPreset; label: string }[] = [
   { key: "personalizado", label: "Personalizado" },
 ];
 
-export function DateFilter({ selectedDate, onDateChange }: DateFilterProps) {
+function getToday() {
+  return new Date();
+}
+
+export function DateFilter() {
+  const { setSelectedDate, setDateRange } = useFinance();
   const [activePreset, setActivePreset] = useState<FilterPreset>("hoje");
   const [calendarOpen, setCalendarOpen] = useState(false);
-  const [date, setDate] = useState<Date | undefined>(new Date(selectedDate + "T12:00:00"));
+  const [customDate, setCustomDate] = useState<Date | undefined>(undefined);
 
-  const handlePreset = (preset: FilterPreset) => {
+  const applyPreset = (preset: FilterPreset) => {
     setActivePreset(preset);
-    const today = new Date();
+    const today = getToday();
+    const todayStr = format(today, "yyyy-MM-dd");
 
     switch (preset) {
-      case "hoje": {
-        const d = today;
-        setDate(d);
-        onDateChange(format(d, "yyyy-MM-dd"));
+      case "hoje":
+        setSelectedDate(todayStr);
+        setDateRange({ from: todayStr, to: todayStr });
         break;
-      }
       case "ontem": {
-        const d = subDays(today, 1);
-        setDate(d);
-        onDateChange(format(d, "yyyy-MM-dd"));
+        const d = format(subDays(today, 1), "yyyy-MM-dd");
+        setSelectedDate(d);
+        setDateRange({ from: d, to: d });
         break;
       }
       case "7dias": {
-        const d = subDays(today, 7);
-        setDate(d);
-        onDateChange(format(d, "yyyy-MM-dd"));
+        const from = format(subDays(today, 6), "yyyy-MM-dd");
+        setSelectedDate(todayStr);
+        setDateRange({ from, to: todayStr });
         break;
       }
       case "15dias": {
-        const d = subDays(today, 15);
-        setDate(d);
-        onDateChange(format(d, "yyyy-MM-dd"));
+        const from = format(subDays(today, 14), "yyyy-MM-dd");
+        setSelectedDate(todayStr);
+        setDateRange({ from, to: todayStr });
         break;
       }
       case "30dias": {
-        const d = subDays(today, 30);
-        setDate(d);
-        onDateChange(format(d, "yyyy-MM-dd"));
+        const from = format(subDays(today, 29), "yyyy-MM-dd");
+        setSelectedDate(todayStr);
+        setDateRange({ from, to: todayStr });
         break;
       }
-      case "total": {
-        const d = new Date("2024-01-01T12:00:00");
-        setDate(d);
-        onDateChange(format(d, "yyyy-MM-dd"));
+      case "total":
+        setSelectedDate(todayStr);
+        setDateRange({ from: "2024-01-01", to: "2099-12-31" });
         break;
-      }
-      case "personalizado": {
+      case "personalizado":
         setCalendarOpen(true);
         break;
-      }
     }
   };
 
@@ -85,7 +82,7 @@ export function DateFilter({ selectedDate, onDateChange }: DateFilterProps) {
           size="sm"
           variant={activePreset === p.key ? "default" : "outline"}
           className="text-[11px] h-7 px-2.5"
-          onClick={() => handlePreset(p.key)}
+          onClick={() => applyPreset(p.key)}
         >
           {p.label}
         </Button>
@@ -99,21 +96,23 @@ export function DateFilter({ selectedDate, onDateChange }: DateFilterProps) {
               size="sm"
               className={cn(
                 "h-7 px-2.5 text-[11px] justify-start font-normal",
-                !date && "text-muted-foreground"
+                !customDate && "text-muted-foreground"
               )}
             >
               <CalendarIcon className="mr-1.5 h-3 w-3" />
-              {date ? format(date, "dd/MM/yyyy") : "Selecionar"}
+              {customDate ? format(customDate, "dd/MM/yyyy") : "Selecionar"}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
             <Calendar
               mode="single"
-              selected={date}
+              selected={customDate}
               onSelect={(d) => {
                 if (d) {
-                  setDate(d);
-                  onDateChange(format(d, "yyyy-MM-dd"));
+                  const dateStr = format(d, "yyyy-MM-dd");
+                  setCustomDate(d);
+                  setSelectedDate(dateStr);
+                  setDateRange({ from: dateStr, to: dateStr });
                   setCalendarOpen(false);
                 }
               }}
