@@ -77,12 +77,10 @@ const Index = () => {
       </div>
 
       {/* Daily Summary + Lucro */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
         <KPICard label={`Entrou Hoje (${formatDate(selectedDate)})`} value={todayIncome} prefix="R$" icon={ArrowUpRight} index={0} variant="positive" />
         <KPICard label={`Saiu Hoje (${formatDate(selectedDate)})`} value={todayOut} prefix="R$" icon={ArrowDownRight} index={1} variant="negative" />
         <KPICard label="Lucro Bruto do Dia" value={todayGrossProfit} prefix="R$" icon={TrendingUp} index={2} variant={todayGrossProfit >= 0 ? "positive" : "negative"} />
-        <KPICard label="Lucro Bruto (Mês)" value={grossProfitMonth} prefix="R$" icon={TrendingUp} index={3} variant={grossProfitMonth >= 0 ? "positive" : "negative"} />
-        <KPICard label="Lucro Líquido (Mês)" value={netProfitMonth} prefix="R$" icon={Target} index={4} variant={netProfitMonth >= 0 ? "positive" : "negative"} />
       </div>
 
       {/* Charts Row */}
