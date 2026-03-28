@@ -27,10 +27,8 @@ import {
 
 const mainItems = [
   { title: "Painel", url: "/", icon: LayoutDashboard },
-  { title: "Capital em Giro", url: "/recebiveis", icon: DollarSign },
-  { title: "Controle Diário", url: "/controle-diario", icon: CalendarClock },
-  { title: "Custos & Despesas", url: "/despesas", icon: ArrowLeftRight },
-  { title: "Contas a Pagar", url: "/contas-pagar", icon: Target },
+  { title: "Receitas", url: "/recebiveis", icon: DollarSign },
+  { title: "Despesas", url: "/despesas", icon: ArrowLeftRight },
   { title: "Projeções", url: "/projecoes", icon: TrendingUp },
 ];
 
