@@ -1,5 +1,5 @@
 import { DashboardLayout } from "@/components/DashboardLayout";
-import { DailyFlowTable } from "@/components/DailyFlowTable";
+
 import { DateFilter } from "@/components/DateFilter";
 import { useFinance } from "@/context/FinanceContext";
 import { dailyEntries, formatCurrency, formatCompact, formatDate } from "@/lib/finance-data";

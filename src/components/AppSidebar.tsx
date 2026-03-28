@@ -6,6 +6,9 @@ import {
   TrendingUp,
   Settings,
   Wallet,
+  DollarSign,
+  CalendarClock,
+  BarChart3,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -23,11 +26,12 @@ import {
 } from "@/components/ui/sidebar";
 
 const mainItems = [
-  { title: "Dashboard", url: "/", icon: LayoutDashboard },
-  { title: "Transações", url: "/transacoes", icon: ArrowLeftRight },
-  { title: "Orçamento", url: "/orcamento", icon: Target },
-  { title: "Fluxo de Caixa", url: "/fluxo-caixa", icon: TrendingUp },
-  { title: "Relatórios", url: "/relatorios", icon: PieChart },
+  { title: "Painel", url: "/", icon: LayoutDashboard },
+  { title: "Capital em Giro", url: "/recebiveis", icon: DollarSign },
+  { title: "Controle Diário", url: "/controle-diario", icon: CalendarClock },
+  { title: "Custos & Despesas", url: "/despesas", icon: ArrowLeftRight },
+  { title: "Contas a Pagar", url: "/contas-pagar", icon: Target },
+  { title: "Projeções", url: "/projecoes", icon: TrendingUp },
 ];
 
 export function AppSidebar() {
@@ -45,7 +49,7 @@ export function AppSidebar() {
           {!collapsed && (
             <div>
               <p className="text-sm font-bold text-foreground tracking-tight">FinanceOS</p>
-              <p className="text-[10px] text-muted-foreground uppercase tracking-widest">CFO Suite</p>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Controle Financeiro</p>
             </div>
           )}
         </div>
