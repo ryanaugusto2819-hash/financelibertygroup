@@ -51,13 +51,12 @@ const Index = () => {
       </div>
 
       {/* Main KPIs */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
         <KPICard label="Receita em Caixa" value={currentCash} prefix="R$" icon={Wallet} index={0} variant="positive" />
         <KPICard label="Receita Agendada" value={scheduledTotal} prefix="R$" icon={CalendarClock} index={1} />
         <KPICard label="Total a Pagar + Agendadas" value={totalPayableWithScheduled} prefix="R$" icon={Landmark} index={2} variant="negative" />
         <KPICard label="Saldo (Caixa - Obrigações)" value={currentCash - totalPayableWithScheduled} prefix="R$" icon={Target} index={3} variant={(currentCash - totalPayableWithScheduled) >= 0 ? "positive" : "negative"} />
-        <KPICard label={`Lucro Bruto do Dia`} value={todayGrossProfit} prefix="R$" icon={TrendingUp} index={4} variant={todayGrossProfit >= 0 ? "positive" : "negative"} />
-        <KPICard label="Estimativa de Caixa" value={cashEstimate} prefix="R$" icon={PiggyBank} index={5} variant="positive" />
+        <KPICard label="Estimativa de Caixa" value={cashEstimate} prefix="R$" icon={PiggyBank} index={4} variant="positive" />
       </div>
 
       {/* Cenários de Pagamento */}
@@ -74,11 +73,12 @@ const Index = () => {
       </div>
 
       {/* Daily Summary + Lucro */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
         <KPICard label={`Entrou Hoje (${formatDate(selectedDate)})`} value={todayIncome} prefix="R$" icon={ArrowUpRight} index={0} variant="positive" />
         <KPICard label={`Saiu Hoje (${formatDate(selectedDate)})`} value={todayOut} prefix="R$" icon={ArrowDownRight} index={1} variant="negative" />
-        <KPICard label="Lucro Bruto (Mês)" value={grossProfitMonth} prefix="R$" icon={TrendingUp} index={2} variant={grossProfitMonth >= 0 ? "positive" : "negative"} />
-        <KPICard label="Lucro Líquido (Mês)" value={netProfitMonth} prefix="R$" icon={Target} index={3} variant={netProfitMonth >= 0 ? "positive" : "negative"} />
+        <KPICard label="Lucro Bruto do Dia" value={todayGrossProfit} prefix="R$" icon={TrendingUp} index={2} variant={todayGrossProfit >= 0 ? "positive" : "negative"} />
+        <KPICard label="Lucro Bruto (Mês)" value={grossProfitMonth} prefix="R$" icon={TrendingUp} index={3} variant={grossProfitMonth >= 0 ? "positive" : "negative"} />
+        <KPICard label="Lucro Líquido (Mês)" value={netProfitMonth} prefix="R$" icon={Target} index={4} variant={netProfitMonth >= 0 ? "positive" : "negative"} />
       </div>
 
       {/* Charts Row */}
