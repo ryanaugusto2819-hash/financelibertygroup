@@ -1,88 +1,134 @@
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { ScenarioCard } from "@/components/ScenarioCard";
-import { receivables, formatCurrency, formatDate, getTotalReceivable, getTotalExpensesMonth } from "@/lib/finance-data";
+import { formatCurrency, formatDate, formatCompact, getTotalExpensesMonth } from "@/lib/finance-data";
 import { Badge } from "@/components/ui/badge";
+import { useLibertyData } from "@/hooks/useLibertyData";
+import { useFinance } from "@/context/FinanceContext";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from "recharts";
-import { formatCompact } from "@/lib/finance-data";
+import { KPICard } from "@/components/KPICard";
+import { DollarSign, Wallet, Clock, XCircle } from "lucide-react";
+
+const statusColor: Record<string, string> = {
+  pago: "hsl(152, 60%, 48%)",
+  pendente: "hsl(40, 90%, 58%)",
+  cancelado: "hsl(0, 72%, 55%)",
+  reembolso: "hsl(0, 72%, 55%)",
+};
+
+const statusBadgeVariant = (status: string) => {
+  if (status === "pago") return "default" as const;
+  if (status === "cancelado" || status === "reembolso") return "destructive" as const;
+  return "secondary" as const;
+};
 
 const Receivables = () => {
-  const totalReceivable = getTotalReceivable();
+  const { dateRange } = useFinance();
+  const { data, isLoading, error } = useLibertyData(dateRange.from, dateRange.to);
   const totalExpenses = getTotalExpensesMonth();
 
-  const byStatus = [
-    { name: "A Receber", value: receivables.filter(r => r.status === "a_receber").reduce((s, r) => s + r.amount - r.paidAmount, 0), fill: "hsl(210, 80%, 55%)" },
-    { name: "Atrasado", value: receivables.filter(r => r.status === "atrasado").reduce((s, r) => s + r.amount - r.paidAmount, 0), fill: "hsl(0, 72%, 55%)" },
-    { name: "Parcial", value: receivables.filter(r => r.status === "parcial").reduce((s, r) => s + r.amount - r.paidAmount, 0), fill: "hsl(40, 90%, 58%)" },
-    { name: "Recebido", value: receivables.filter(r => r.status === "recebido").reduce((s, r) => s + r.paidAmount, 0), fill: "hsl(152, 60%, 48%)" },
-  ];
+  const summary = data?.summary;
+  const pedidos = data?.pedidos ?? [];
+
+  const byStatus = summary ? [
+    { name: "Pago", value: summary.totalPago, fill: statusColor.pago },
+    { name: "Pendente", value: summary.totalPendente, fill: statusColor.pendente },
+    { name: "Cancelado", value: summary.totalCancelado, fill: statusColor.cancelado },
+  ] : [];
 
   return (
-    <DashboardLayout title="Capital em Giro" subtitle="Gestão de recebíveis e projeções">
-      {/* Scenarios */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-        <ScenarioCard percentage={100} totalReceivable={totalReceivable} totalExpenses={totalExpenses} index={0} />
-        <ScenarioCard percentage={70} totalReceivable={totalReceivable} totalExpenses={totalExpenses} index={1} highlight />
-        <ScenarioCard percentage={60} totalReceivable={totalReceivable} totalExpenses={totalExpenses} index={2} />
-        <ScenarioCard percentage={50} totalReceivable={totalReceivable} totalExpenses={totalExpenses} index={3} />
-      </div>
-
-      {/* Chart */}
-      <div className="glass-card p-6 mb-6">
-        <h3 className="text-sm font-semibold text-foreground mb-4">Recebíveis por Status</h3>
-        <ResponsiveContainer width="100%" height={220}>
-          <BarChart data={byStatus} layout="vertical">
-            <CartesianGrid strokeDasharray="3 3" stroke="hsl(222, 15%, 18%)" />
-            <XAxis type="number" tick={{ fontSize: 10, fill: "hsl(215, 15%, 55%)" }} axisLine={false} tickLine={false} tickFormatter={formatCompact} />
-            <YAxis dataKey="name" type="category" tick={{ fontSize: 11, fill: "hsl(215, 15%, 55%)" }} axisLine={false} tickLine={false} width={80} />
-            <Tooltip contentStyle={{ backgroundColor: "hsl(222, 20%, 11%)", border: "1px solid hsl(222, 15%, 18%)", borderRadius: "8px", fontSize: "11px" }}
-              formatter={(value: number) => [formatCurrency(value), ""]} />
-            <Bar dataKey="value" radius={[0, 4, 4, 0]}>
-              {byStatus.map((entry, i) => (
-                <rect key={i} fill={entry.fill} />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-
-      {/* Table */}
-      <div className="glass-card p-6">
-        <h3 className="text-sm font-semibold text-foreground mb-4">Detalhamento de Recebíveis</h3>
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs">
-            <thead>
-              <tr className="border-b border-border text-muted-foreground">
-                <th className="text-left pb-3 font-medium">Cliente</th>
-                <th className="text-left pb-3 font-medium">Descrição</th>
-                <th className="text-left pb-3 font-medium">Vencimento</th>
-                <th className="text-right pb-3 font-medium">Valor</th>
-                <th className="text-right pb-3 font-medium">Recebido</th>
-                <th className="text-right pb-3 font-medium">Saldo</th>
-                <th className="text-center pb-3 font-medium">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {receivables.map(r => (
-                <tr key={r.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
-                  <td className="py-3 font-medium text-foreground">{r.client}</td>
-                  <td className="py-3 text-muted-foreground">{r.description}</td>
-                  <td className="py-3 font-mono text-muted-foreground">{formatDate(r.dueDate)}</td>
-                  <td className="py-3 text-right font-mono font-medium text-foreground">{formatCurrency(r.amount)}</td>
-                  <td className="py-3 text-right font-mono text-chart-positive">{formatCurrency(r.paidAmount)}</td>
-                  <td className="py-3 text-right font-mono font-bold text-chart-info">{formatCurrency(r.amount - r.paidAmount)}</td>
-                  <td className="py-3 text-center">
-                    <Badge variant={r.status === "recebido" ? "default" : r.status === "atrasado" ? "destructive" : "secondary"} className="text-[10px]">
-                      {r.status.replace("_", " ")}
-                    </Badge>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+    <DashboardLayout title="Capital em Giro" subtitle="Receita real do LibertyPainel">
+      {/* KPIs */}
+      {isLoading ? (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+          {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-24 rounded-xl" />)}
         </div>
-      </div>
+      ) : error ? (
+        <div className="glass-card p-6 mb-6 text-center text-destructive text-sm">
+          Erro ao carregar dados: {error.message}
+        </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+            <KPICard label="Receita Total" value={summary?.totalValor ?? 0} prefix="R$" icon={DollarSign} index={0} />
+            <KPICard label="Recebido" value={summary?.totalPago ?? 0} prefix="R$" icon={Wallet} index={1} variant="positive" />
+            <KPICard label="Pendente" value={summary?.totalPendente ?? 0} prefix="R$" icon={Clock} index={2} variant="warning" />
+            <KPICard label="Cancelado" value={summary?.totalCancelado ?? 0} prefix="R$" icon={XCircle} index={3} variant="negative" />
+          </div>
+
+          {/* Scenarios */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+            <ScenarioCard percentage={100} totalReceivable={summary?.totalPendente ?? 0} totalExpenses={totalExpenses} index={0} />
+            <ScenarioCard percentage={70} totalReceivable={summary?.totalPendente ?? 0} totalExpenses={totalExpenses} index={1} highlight />
+            <ScenarioCard percentage={60} totalReceivable={summary?.totalPendente ?? 0} totalExpenses={totalExpenses} index={2} />
+            <ScenarioCard percentage={50} totalReceivable={summary?.totalPendente ?? 0} totalExpenses={totalExpenses} index={3} />
+          </div>
+
+          {/* Chart */}
+          <div className="glass-card p-6 mb-6">
+            <h3 className="text-sm font-semibold text-foreground mb-4">Receita por Status</h3>
+            <ResponsiveContainer width="100%" height={220}>
+              <BarChart data={byStatus} layout="vertical">
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(222, 15%, 18%)" />
+                <XAxis type="number" tick={{ fontSize: 10, fill: "hsl(215, 15%, 55%)" }} axisLine={false} tickLine={false} tickFormatter={formatCompact} />
+                <YAxis dataKey="name" type="category" tick={{ fontSize: 11, fill: "hsl(215, 15%, 55%)" }} axisLine={false} tickLine={false} width={80} />
+                <Tooltip contentStyle={{ backgroundColor: "hsl(222, 20%, 11%)", border: "1px solid hsl(222, 15%, 18%)", borderRadius: "8px", fontSize: "11px" }}
+                  formatter={(value: number) => [formatCurrency(value), ""]} />
+                <Bar dataKey="value" radius={[0, 4, 4, 0]}>
+                  {byStatus.map((entry, i) => (
+                    <rect key={i} fill={entry.fill} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Table */}
+          <div className="glass-card p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-semibold text-foreground">Pedidos ({summary?.total ?? 0})</h3>
+              <span className="text-xs text-muted-foreground">{summary?.countPagos} pagos · {summary?.countPendentes} pendentes</span>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="border-b border-border text-muted-foreground">
+                    <th className="text-left pb-3 font-medium">Cliente</th>
+                    <th className="text-left pb-3 font-medium">Produto</th>
+                    <th className="text-left pb-3 font-medium">País</th>
+                    <th className="text-left pb-3 font-medium">Data</th>
+                    <th className="text-right pb-3 font-medium">Valor</th>
+                    <th className="text-center pb-3 font-medium">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {pedidos.map(p => (
+                    <tr key={p.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
+                      <td className="py-3 font-medium text-foreground">{p.nome}</td>
+                      <td className="py-3 text-muted-foreground">{p.produto}</td>
+                      <td className="py-3 text-muted-foreground">{p.pais === "brasil" ? "🇧🇷" : p.pais === "uruguay" ? "🇺🇾" : p.pais}</td>
+                      <td className="py-3 font-mono text-muted-foreground">{formatDate(p.data_entrada)}</td>
+                      <td className="py-3 text-right font-mono font-medium text-foreground">{formatCurrency(p.valor)}</td>
+                      <td className="py-3 text-center">
+                        <Badge variant={statusBadgeVariant(p.status_pagamento)} className="text-[10px]">
+                          {p.status_pagamento}
+                        </Badge>
+                      </td>
+                    </tr>
+                  ))}
+                  {pedidos.length === 0 && (
+                    <tr>
+                      <td colSpan={6} className="py-8 text-center text-muted-foreground italic">Nenhum pedido encontrado no período.</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
+      )}
     </DashboardLayout>
   );
 };
