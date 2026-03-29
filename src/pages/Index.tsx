@@ -15,7 +15,7 @@ import {
 } from "recharts";
 import {
   DollarSign, Wallet, TrendingUp, ArrowUpRight, ArrowDownRight,
-  Landmark, Target, Pencil, Check, X,
+  Landmark, Target, Pencil, Check, X, Banknote,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useMemo, useState } from "react";
@@ -86,7 +86,7 @@ const Index = () => {
       </div>
 
       {/* Main KPIs */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-6">
         {editingCash ? (
           <div className="glass-card p-4 flex flex-col gap-2">
             <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Receita em Caixa</span>
@@ -118,6 +118,7 @@ const Index = () => {
         )}
         <KPICard label="Total a Pagar + Agendadas" value={totalPayableWithScheduled} prefix="R$" icon={Landmark} index={1} variant="negative" />
         <KPICard label="Saldo (Caixa - Obrigações)" value={currentCash - totalPayableWithScheduled} prefix="R$" icon={Target} index={2} variant={(currentCash - totalPayableWithScheduled) >= 0 ? "positive" : "negative"} />
+        <KPICard label="Saque Disponível" value={Math.max(0, currentCash - totalPayableWithScheduled)} prefix="R$" icon={Banknote} index={3} variant="positive" />
       </div>
 
       {/* Receita */}
