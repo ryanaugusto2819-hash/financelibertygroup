@@ -10,6 +10,8 @@ interface FinanceContextType {
   expenses: Expense[];
   allExpenses: Expense[];
   addExpense: (expense: Omit<Expense, "id">) => void;
+  updateExpense: (id: string, data: Partial<Omit<Expense, "id">>) => void;
+  deleteExpense: (id: string) => void;
   addAutoExpenses: (autoExpenses: Omit<Expense, "id">[]) => void;
   registerFbAdsPayment: (amount: number, source: PaymentSource) => void;
   fbAdsAccumulated: number;
@@ -76,6 +78,14 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     setAllExpenses(prev => [{ ...expense, id }, ...prev]);
   };
 
+  const updateExpense = useCallback((id: string, data: Partial<Omit<Expense, "id">>) => {
+    setAllExpenses(prev => prev.map(e => e.id === id ? { ...e, ...data } : e));
+  }, []);
+
+  const deleteExpense = useCallback((id: string) => {
+    setAllExpenses(prev => prev.filter(e => e.id !== id));
+  }, []);
+
   const addAutoExpenses = useCallback((autoExpenses: Omit<Expense, "id">[]) => {
     setAllExpenses(prev => {
       // Remove old auto-generated, add new ones
@@ -114,7 +124,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   }, [fbAdsPaid]);
 
   return (
-    <FinanceContext.Provider value={{ expenses, allExpenses, addExpense, addAutoExpenses, registerFbAdsPayment, fbAdsAccumulated, fbAdsPaid, selectedDate, setSelectedDate, dateRange, setDateRange, countryFilter, setCountryFilter, manualCash, setManualCash, manualSaque, setManualSaque }}>
+    <FinanceContext.Provider value={{ expenses, allExpenses, addExpense, updateExpense, deleteExpense, addAutoExpenses, registerFbAdsPayment, fbAdsAccumulated, fbAdsPaid, selectedDate, setSelectedDate, dateRange, setDateRange, countryFilter, setCountryFilter, manualCash, setManualCash, manualSaque, setManualSaque }}>
       {children}
     </FinanceContext.Provider>
   );
