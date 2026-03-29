@@ -107,7 +107,8 @@ const Index = () => {
       </div>
 
       {/* Main KPIs */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-3 mb-6">
+        <KPICard label="Receita em Caixa + Saque" value={currentCash + saqueDisponivel} prefix="R$" icon={DollarSign} index={0} variant="positive" />
         {editingCash ? (
           <div className="glass-card p-4 flex flex-col gap-2">
             <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Receita em Caixa</span>
