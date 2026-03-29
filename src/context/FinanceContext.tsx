@@ -25,15 +25,16 @@ interface FinanceContextType {
   setCountryFilter: (country: CountryFilter) => void;
   manualCash: number | null;
   setManualCash: (value: number | null) => void;
-  manualSaque: number | null;
-  setManualSaque: (value: number | null) => void;
+  manualSaqueBR: number | null;
+  setManualSaqueBR: (value: number | null) => void;
+  manualSaqueUY: number | null;
+  setManualSaqueUY: (value: number | null) => void;
 }
 
 const FinanceContext = createContext<FinanceContextType | undefined>(undefined);
 
 const today = getTodayBR();
 
-// Convert DB row to Expense
 function rowToExpense(row: any): Expense {
   return {
     id: row.id,
@@ -51,7 +52,6 @@ function rowToExpense(row: any): Expense {
 
 export function FinanceProvider({ children }: { children: ReactNode }) {
   const [allExpenses, setAllExpenses] = useState<Expense[]>(initialExpenses);
-  const [dbLoaded, setDbLoaded] = useState(false);
   const [selectedDate, setSelectedDate] = useState(today);
   const [dateRange, setDateRange] = useState({ from: today, to: today });
   const [countryFilter, setCountryFilter] = useState<CountryFilter>("todos");
@@ -63,48 +63,48 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     const stored = localStorage.getItem("manualCash");
     return stored ? Number(stored) : null;
   });
-  const [manualSaque, setManualSaqueState] = useState<number | null>(() => {
-    const stored = localStorage.getItem("manualSaque");
+  const [manualSaqueBR, setManualSaqueBRState] = useState<number | null>(() => {
+    const stored = localStorage.getItem("manualSaqueBR");
+    return stored ? Number(stored) : null;
+  });
+  const [manualSaqueUY, setManualSaqueUYState] = useState<number | null>(() => {
+    const stored = localStorage.getItem("manualSaqueUY");
     return stored ? Number(stored) : null;
   });
 
-  // Load expenses from DB on mount
   useEffect(() => {
     const loadExpenses = async () => {
       const { data, error } = await supabase
         .from("expenses")
         .select("*")
         .order("created_at", { ascending: false });
-      
       if (!error && data && data.length > 0) {
         setAllExpenses(data.map(rowToExpense));
       }
-      setDbLoaded(true);
     };
     loadExpenses();
   }, []);
 
   const setManualCash = (value: number | null) => {
     setManualCashState(value);
-    if (value !== null) {
-      localStorage.setItem("manualCash", String(value));
-    } else {
-      localStorage.removeItem("manualCash");
-    }
+    if (value !== null) localStorage.setItem("manualCash", String(value));
+    else localStorage.removeItem("manualCash");
   };
-
-  const setManualSaque = (value: number | null) => {
-    setManualSaqueState(value);
-    if (value !== null) {
-      localStorage.setItem("manualSaque", String(value));
-    } else {
-      localStorage.removeItem("manualSaque");
-    }
+  const setManualSaqueBR = (value: number | null) => {
+    setManualSaqueBRState(value);
+    if (value !== null) localStorage.setItem("manualSaqueBR", String(value));
+    else localStorage.removeItem("manualSaqueBR");
+  };
+  const setManualSaqueUY = (value: number | null) => {
+    setManualSaqueUYState(value);
+    if (value !== null) localStorage.setItem("manualSaqueUY", String(value));
+    else localStorage.removeItem("manualSaqueUY");
   };
 
   const expenses = useMemo(() => {
     if (countryFilter === "todos") return allExpenses;
-    return allExpenses.filter(e => e.country === countryFilter);
+    // Include expenses that match the country OR have no country (shared) OR country is "ambos"
+    return allExpenses.filter(e => !e.country || e.country === countryFilter || (e as any).country === "ambos");
   }, [allExpenses, countryFilter]);
 
   const addExpense = useCallback(async (expense: Omit<Expense, "id">) => {
@@ -127,17 +127,13 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     if (!error && data) {
       setAllExpenses(prev => [rowToExpense(data), ...prev]);
     } else {
-      // Fallback to local
       const id = `DES${String(Date.now()).slice(-6)}`;
       setAllExpenses(prev => [{ ...expense, id }, ...prev]);
     }
   }, []);
 
   const updateExpense = useCallback(async (id: string, updates: Partial<Omit<Expense, "id">>) => {
-    // Update locally immediately
     setAllExpenses(prev => prev.map(e => e.id === id ? { ...e, ...updates } : e));
-
-    // Persist to DB
     const dbUpdates: any = {};
     if (updates.description !== undefined) dbUpdates.description = updates.description;
     if (updates.amount !== undefined) dbUpdates.amount = updates.amount;
@@ -147,7 +143,6 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     if (updates.date !== undefined) dbUpdates.date = updates.date;
     if (updates.country !== undefined) dbUpdates.country = updates.country;
     if (updates.paymentSource !== undefined) dbUpdates.payment_source = updates.paymentSource;
-
     await supabase.from("expenses").update(dbUpdates).eq("id", id);
   }, []);
 
@@ -177,7 +172,6 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     const newPaid = fbAdsPaid + amount;
     setFbAdsPaid(newPaid);
     localStorage.setItem("fbAdsPaid", String(newPaid));
-
     const expenseData = {
       date: today,
       description: `Pagamento Facebook ADS`,
@@ -187,23 +181,15 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       status: "pago" as const,
       paymentSource: source,
     };
-
-    // Save to DB
     const { data, error } = await supabase
       .from("expenses")
       .insert({
-        date: expenseData.date,
-        description: expenseData.description,
-        category: expenseData.category,
-        amount: expenseData.amount,
-        type: expenseData.type,
-        status: expenseData.status,
-        payment_source: source,
-        is_auto_generated: false,
+        date: expenseData.date, description: expenseData.description, category: expenseData.category,
+        amount: expenseData.amount, type: expenseData.type, status: expenseData.status,
+        payment_source: source, is_auto_generated: false,
       })
       .select()
       .single();
-
     if (!error && data) {
       setAllExpenses(prev => [rowToExpense(data), ...prev]);
     } else {
@@ -213,7 +199,15 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   }, [fbAdsPaid]);
 
   return (
-    <FinanceContext.Provider value={{ expenses, allExpenses, addExpense, updateExpense, deleteExpense, addAutoExpenses, registerFbAdsPayment, fbAdsAccumulated, fbAdsPaid, selectedDate, setSelectedDate, dateRange, setDateRange, countryFilter, setCountryFilter, manualCash, setManualCash, manualSaque, setManualSaque }}>
+    <FinanceContext.Provider value={{
+      expenses, allExpenses, addExpense, updateExpense, deleteExpense, addAutoExpenses,
+      registerFbAdsPayment, fbAdsAccumulated, fbAdsPaid,
+      selectedDate, setSelectedDate, dateRange, setDateRange,
+      countryFilter, setCountryFilter,
+      manualCash, setManualCash,
+      manualSaqueBR, setManualSaqueBR,
+      manualSaqueUY, setManualSaqueUY,
+    }}>
       {children}
     </FinanceContext.Provider>
   );

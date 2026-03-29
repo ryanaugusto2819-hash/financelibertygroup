@@ -39,6 +39,8 @@ export interface LibertySummary {
 interface LibertyResponse {
   pedidos: LibertyPedido[];
   summary: LibertySummary;
+  summaryBrasil: LibertySummary;
+  summaryUruguay: LibertySummary;
 }
 
 export function useLibertyData(from?: string, to?: string) {
@@ -51,6 +53,6 @@ export function useLibertyData(from?: string, to?: string) {
       if (error) throw error;
       return data as LibertyResponse;
     },
-    staleTime: 1000 * 60 * 5, // 5 min cache
+    staleTime: 1000 * 60 * 5,
   });
 }
