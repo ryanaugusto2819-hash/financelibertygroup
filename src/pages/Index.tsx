@@ -77,9 +77,18 @@ const Index = () => {
     setEditingCash(false);
   };
 
-  const handleCancelEditCash = () => {
-    setEditingCash(false);
+  const handleCancelEditCash = () => setEditingCash(false);
+
+  const handleStartEditSaque = () => {
+    setSaqueInput(String(saqueDisponivel));
+    setEditingSaque(true);
   };
+  const handleSaveSaque = () => {
+    const val = parseFloat(saqueInput.replace(/[^\d.,\-]/g, "").replace(",", "."));
+    if (!isNaN(val)) setManualSaque(val);
+    setEditingSaque(false);
+  };
+  const handleCancelEditSaque = () => setEditingSaque(false);
 
   // Period label
   const isSingleDay = dateRange.from === dateRange.to;
