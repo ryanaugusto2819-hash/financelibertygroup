@@ -67,9 +67,13 @@ const Index = () => {
   const currentCash = manualCash !== null ? manualCash : (periodIncome - periodOut);
   // Total Frete from Liberty
   const totalFrete = summary?.totalFrete ?? 0;
-  // Custo Produtos: quantidade de itens pagos × R$13
+  // Custo Produtos: quantidade vendida × R$13
   const totalQuantidadePagos = summary?.totalQuantidadePagos ?? 0;
   const custoProdutos = totalQuantidadePagos * 13;
+  // Salários fixos → diária: soma despesas fixas / 30 × dias do período
+  const totalSalariosFixos = expenses.filter(e => e.type === "fixa").reduce((s, e) => s + e.amount, 0);
+  const diasPeriodo = Math.max(1, Math.round((new Date(dateRange.to).getTime() - new Date(dateRange.from).getTime()) / (1000 * 60 * 60 * 24)) + 1);
+  const custoDiarias = (totalSalariosFixos / 30) * diasPeriodo;
   // Saque = manual ou (Cartão + Boleto) - 5% de taxa - Frete
   const saqueDisponivel = manualSaque !== null ? manualSaque : Math.max(0, totalRecebidoCartaoBoleto * 0.95 - totalFrete);
 
