@@ -6,10 +6,10 @@ import { AddExpenseDialog } from "@/components/AddExpenseDialog";
 import { ExpensePieChart } from "@/components/ExpensePieChart";
 import {
   formatCurrency, formatCompact, formatDate,
-  getTotalReceivable, getReceivedTotal,
-  getTotalAccountsPayable, dailyEntries, monthlyFlowData, receivables,
+  getTotalAccountsPayable, dailyEntries, monthlyFlowData,
 } from "@/lib/finance-data";
 import { useFinance } from "@/context/FinanceContext";
+import { useLibertyData } from "@/hooks/useLibertyData";
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from "recharts";
@@ -19,9 +19,11 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useMemo } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Index = () => {
   const { selectedDate, dateRange, expenses } = useFinance();
+  const { data: libertyData, isLoading: libertyLoading } = useLibertyData(dateRange.from, dateRange.to);
 
   // Filter data by selected period
   const periodExpenses = useMemo(() =>
@@ -40,18 +42,16 @@ const Index = () => {
 
   const totalExpensesPeriod = periodExpenses.reduce((s, e) => s + e.amount, 0);
 
-  // Receivables filtered by period
-  const periodReceivables = useMemo(() =>
-    receivables.filter(r => r.dueDate >= dateRange.from && r.dueDate <= dateRange.to),
-    [dateRange]
-  );
-  const totalReceivable = periodReceivables.filter(r => r.status !== "recebido").reduce((s, r) => s + (r.amount - r.paidAmount), 0);
-  const totalReceived = periodReceivables.filter(r => r.status === "recebido" || r.status === "parcial").reduce((s, r) => s + r.paidAmount, 0);
+  // Real data from LibertyPainel
+  const summary = libertyData?.summary;
+  const pedidos = libertyData?.pedidos ?? [];
+  const totalReceivable = summary?.totalPendente ?? 0;
+  const totalReceived = summary?.totalPago ?? 0;
 
   const totalPayable = getTotalAccountsPayable();
   const scheduledExpenses = periodExpenses.filter(e => e.status === "agendado").reduce((s, e) => s + e.amount, 0);
   const totalPayableWithScheduled = totalPayable + scheduledExpenses;
-  const currentCash = 1456200;
+  const currentCash = totalReceived > 0 ? totalReceived : 1456200;
 
   // Period label
   const isSingleDay = dateRange.from === dateRange.to;
@@ -186,20 +186,25 @@ const Index = () => {
         {/* Capital em Giro */}
         <div className="glass-card p-6">
           <h3 className="text-sm font-semibold text-foreground mb-1">Capital em Giro — A Receber</h3>
-          <p className="text-xs text-muted-foreground mb-4">Top clientes pendentes</p>
+          <p className="text-xs text-muted-foreground mb-4">Top clientes pendentes (LibertyPainel)</p>
           <div className="space-y-2">
-            {receivables.filter(r => r.status !== "recebido").slice(0, 6).map(r => (
-              <div key={r.id} className="flex items-center justify-between py-2 border-b border-border/30 last:border-0">
+            {libertyLoading ? (
+              <div className="space-y-3">{[...Array(4)].map((_, i) => <Skeleton key={i} className="h-10 rounded" />)}</div>
+            ) : pedidos.filter(p => p.status_pagamento === "pendente").slice(0, 6).map(p => (
+              <div key={p.id} className="flex items-center justify-between py-2 border-b border-border/30 last:border-0">
                 <div>
-                  <p className="text-xs font-medium text-foreground">{r.client}</p>
-                  <p className="text-[10px] text-muted-foreground">Venc: {formatDate(r.dueDate)}</p>
+                  <p className="text-xs font-medium text-foreground">{p.nome}</p>
+                  <p className="text-[10px] text-muted-foreground">{p.produto} · {p.pais === "brasil" ? "🇧🇷" : p.pais === "uruguay" ? "🇺🇾" : p.pais}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-xs font-mono font-bold text-chart-info">{formatCurrency(r.amount - r.paidAmount)}</p>
-                  <Badge variant={r.status === "atrasado" ? "destructive" : "secondary"} className="text-[9px] mt-0.5">{r.status.replace("_", " ")}</Badge>
+                  <p className="text-xs font-mono font-bold text-chart-info">{formatCurrency(p.valor)}</p>
+                  <Badge variant="secondary" className="text-[9px] mt-0.5">{p.status_pagamento}</Badge>
                 </div>
               </div>
             ))}
+            {!libertyLoading && pedidos.filter(p => p.status_pagamento === "pendente").length === 0 && (
+              <p className="text-xs text-muted-foreground italic">Nenhum pedido pendente.</p>
+            )}
           </div>
         </div>
       </div>
