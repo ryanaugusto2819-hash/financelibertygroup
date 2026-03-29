@@ -22,6 +22,7 @@ export function AddExpenseDialog() {
     type: "variavel" as "fixa" | "variavel" | "extraordinaria",
     status: "pendente" as "pago" | "pendente" | "agendado",
     paymentSource: "nao_paga" as "caixa" | "saque" | "nao_paga",
+    country: "" as "" | "brasil" | "uruguay",
   });
 
   const [salaryForm, setSalaryForm] = useState({
@@ -30,6 +31,7 @@ export function AddExpenseDialog() {
     amount: "",
     date: new Date().toISOString().split("T")[0],
     status: "pendente" as "pago" | "pendente" | "agendado",
+    country: "ambos" as "brasil" | "uruguay" | "ambos",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -46,10 +48,11 @@ export function AddExpenseDialog() {
       type: form.type,
       status: form.status,
       paymentSource: form.paymentSource,
+      country: form.country || undefined,
     });
     toast.success("Custo lançado com sucesso!");
     setOpen(false);
-    setForm({ description: "", category: "", amount: "", date: new Date().toISOString().split("T")[0], type: "variavel", status: "pendente", paymentSource: "nao_paga" });
+    setForm({ description: "", category: "", amount: "", date: new Date().toISOString().split("T")[0], type: "variavel", status: "pendente", paymentSource: "nao_paga", country: "" });
   };
 
   const handleSalarySubmit = (e: React.FormEvent) => {
@@ -58,9 +61,10 @@ export function AddExpenseDialog() {
       toast.error("Preencha nome e valor do salário");
       return;
     }
+    const countryLabel = salaryForm.country === "brasil" ? "🇧🇷" : salaryForm.country === "uruguay" ? "🇺🇾" : "🇧🇷🇺🇾";
     const desc = salaryForm.role
-      ? `Salário - ${salaryForm.employeeName} (${salaryForm.role})`
-      : `Salário - ${salaryForm.employeeName}`;
+      ? `Salário - ${salaryForm.employeeName} (${salaryForm.role}) ${countryLabel}`
+      : `Salário - ${salaryForm.employeeName} ${countryLabel}`;
     addExpense({
       description: desc,
       category: "Salários",
@@ -68,10 +72,11 @@ export function AddExpenseDialog() {
       date: salaryForm.date,
       type: "fixa",
       status: salaryForm.status,
+      country: salaryForm.country as any,
     });
     toast.success("Salário lançado com sucesso!");
     setOpen(false);
-    setSalaryForm({ employeeName: "", role: "", amount: "", date: new Date().toISOString().split("T")[0], status: "pendente" });
+    setSalaryForm({ employeeName: "", role: "", amount: "", date: new Date().toISOString().split("T")[0], status: "pendente", country: "ambos" });
   };
 
   return (
@@ -116,7 +121,7 @@ export function AddExpenseDialog() {
                   <Input id="amount" type="number" min="0" step="0.01" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} placeholder="0,00" />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-3">
                 <div className="space-y-2">
                   <Label htmlFor="date">Data</Label>
                   <Input id="date" type="date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} />
@@ -129,6 +134,17 @@ export function AddExpenseDialog() {
                       <SelectItem value="fixa">Fixa</SelectItem>
                       <SelectItem value="variavel">Variável</SelectItem>
                       <SelectItem value="extraordinaria">Extra</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>País</Label>
+                  <Select value={form.country || "none"} onValueChange={v => setForm(f => ({ ...f, country: v === "none" ? "" : v as any }))}>
+                    <SelectTrigger><SelectValue placeholder="Todos" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Todos</SelectItem>
+                      <SelectItem value="brasil">🇧🇷 Brasil</SelectItem>
+                      <SelectItem value="uruguay">🇺🇾 Uruguay</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -177,7 +193,7 @@ export function AddExpenseDialog() {
                   <Input id="salaryAmount" type="number" min="0" step="0.01" value={salaryForm.amount} onChange={e => setSalaryForm(f => ({ ...f, amount: e.target.value }))} placeholder="0,00" />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-3">
                 <div className="space-y-2">
                   <Label htmlFor="salaryDate">Data</Label>
                   <Input id="salaryDate" type="date" value={salaryForm.date} onChange={e => setSalaryForm(f => ({ ...f, date: e.target.value }))} />
@@ -193,9 +209,21 @@ export function AddExpenseDialog() {
                     </SelectContent>
                   </Select>
                 </div>
+                <div className="space-y-2">
+                  <Label>País</Label>
+                  <Select value={salaryForm.country} onValueChange={v => setSalaryForm(f => ({ ...f, country: v as any }))}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ambos">🇧🇷🇺🇾 Ambos</SelectItem>
+                      <SelectItem value="brasil">🇧🇷 Brasil</SelectItem>
+                      <SelectItem value="uruguay">🇺🇾 Uruguay</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               <p className="text-[10px] text-muted-foreground">
                 Salários são lançados como despesa <strong>fixa</strong> e divididos por 30 dias nas projeções.
+                Funcionários com "Ambos" aparecem nos dois filtros de país.
               </p>
               <Button type="submit" className="w-full">Lançar Salário</Button>
             </form>
