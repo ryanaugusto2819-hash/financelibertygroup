@@ -61,8 +61,8 @@ const Index = () => {
   const totalPayableWithScheduled = totalPayable + scheduledExpenses;
   // Caixa = manual ou (Entradas - Saídas) — PIX já está incluso nas entradas
   const currentCash = manualCash !== null ? manualCash : (periodIncome - periodOut);
-  // Saque = Cartão + Boleto - Obrigações
-  const saqueDisponivel = Math.max(0, totalRecebidoCartaoBoleto);
+  // Saque = (Cartão + Boleto) - 5% de taxa
+  const saqueDisponivel = Math.max(0, totalRecebidoCartaoBoleto * 0.95);
 
   const handleStartEditCash = () => {
     setCashInput(String(currentCash));
