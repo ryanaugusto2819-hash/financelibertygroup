@@ -10,6 +10,10 @@ interface FinanceContextType {
   expenses: Expense[];
   allExpenses: Expense[];
   addExpense: (expense: Omit<Expense, "id">) => void;
+  addAutoExpenses: (autoExpenses: Omit<Expense, "id">[]) => void;
+  registerFbAdsPayment: (amount: number, source: PaymentSource) => void;
+  fbAdsAccumulated: number;
+  fbAdsPaid: number;
   selectedDate: string;
   setSelectedDate: (date: string) => void;
   dateRange: { from: string; to: string };
