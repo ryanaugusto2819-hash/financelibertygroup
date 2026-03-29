@@ -12,7 +12,8 @@ interface Props {
 
 export function ScenarioCard({ percentage, totalReceivable, totalExpenses, adsSpend = 0, index, highlight }: Props) {
   const projected = totalReceivable * (percentage / 100);
-  const totalCosts = totalExpenses + adsSpend;
+  const adsWithTax = adsSpend * 1.12;
+  const totalCosts = totalExpenses + adsWithTax;
   const profit = projected - totalCosts;
   const isPositive = profit >= 0;
 
