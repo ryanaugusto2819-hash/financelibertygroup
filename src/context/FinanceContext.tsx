@@ -35,6 +35,10 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     const stored = localStorage.getItem("manualCash");
     return stored ? Number(stored) : null;
   });
+  const [manualSaque, setManualSaqueState] = useState<number | null>(() => {
+    const stored = localStorage.getItem("manualSaque");
+    return stored ? Number(stored) : null;
+  });
 
   const setManualCash = (value: number | null) => {
     setManualCashState(value);
@@ -42,6 +46,15 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       localStorage.setItem("manualCash", String(value));
     } else {
       localStorage.removeItem("manualCash");
+    }
+  };
+
+  const setManualSaque = (value: number | null) => {
+    setManualSaqueState(value);
+    if (value !== null) {
+      localStorage.setItem("manualSaque", String(value));
+    } else {
+      localStorage.removeItem("manualSaque");
     }
   };
 
