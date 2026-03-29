@@ -26,6 +26,7 @@ import { Input } from "@/components/ui/input";
 const Index = () => {
   const { selectedDate, dateRange, expenses, manualCash, setManualCash, manualSaque, setManualSaque } = useFinance();
   const { data: libertyData, isLoading: libertyLoading } = useLibertyData(dateRange.from, dateRange.to);
+  const { data: adsData, isLoading: adsLoading } = useAdsSpend(dateRange.from, dateRange.to);
   const [editingCash, setEditingCash] = useState(false);
   const [cashInput, setCashInput] = useState("");
   const [editingSaque, setEditingSaque] = useState(false);
