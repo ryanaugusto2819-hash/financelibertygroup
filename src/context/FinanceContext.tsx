@@ -35,6 +35,10 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   const [selectedDate, setSelectedDate] = useState(today);
   const [dateRange, setDateRange] = useState({ from: today, to: today });
   const [countryFilter, setCountryFilter] = useState<CountryFilter>("todos");
+  const [fbAdsPaid, setFbAdsPaid] = useState<number>(() => {
+    const stored = localStorage.getItem("fbAdsPaid");
+    return stored ? Number(stored) : 0;
+  });
   const [manualCash, setManualCashState] = useState<number | null>(() => {
     const stored = localStorage.getItem("manualCash");
     return stored ? Number(stored) : null;
