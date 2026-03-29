@@ -67,6 +67,9 @@ const Index = () => {
   const currentCash = manualCash !== null ? manualCash : (periodIncome - periodOut);
   // Total Frete from Liberty
   const totalFrete = summary?.totalFrete ?? 0;
+  // Custo Produtos: quantidade de itens pagos × R$13
+  const totalQuantidadePagos = summary?.totalQuantidadePagos ?? 0;
+  const custoProdutos = totalQuantidadePagos * 13;
   // Saque = manual ou (Cartão + Boleto) - 5% de taxa - Frete
   const saqueDisponivel = manualSaque !== null ? manualSaque : Math.max(0, totalRecebidoCartaoBoleto * 0.95 - totalFrete);
 
