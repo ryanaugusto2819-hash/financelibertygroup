@@ -197,10 +197,19 @@ const Index = () => {
       </div>
 
       {/* Period Summary */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
         <KPICard label={`Entradas (${periodLabel})`} value={periodIncome + totalRecebidoCartaoBoleto} prefix="R$" icon={ArrowUpRight} index={0} variant="positive" />
         <KPICard label={`Saídas (${periodLabel})`} value={periodOut + totalFrete} prefix="R$" icon={ArrowDownRight} index={1} variant="negative" />
         <KPICard label={`Lucro Líquido (${isSingleDay ? "Dia" : "Período"})`} value={periodGrossProfit * 0.85} prefix="R$" icon={TrendingUp} index={2} variant={periodGrossProfit >= 0 ? "positive" : "negative"} />
+        {/* Custo Produtos */}
+        <div className="cfo-card p-5 accent-amber">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Custo Produtos</p>
+            <div className="icon-box icon-box-amber"><Package size={18} /></div>
+          </div>
+          <p className="text-2xl font-bold font-mono tracking-tight text-foreground">{formatCurrency(custoProdutos)}</p>
+          <p className="text-[10px] text-muted-foreground mt-1">{totalQuantidadePagos} un × R$ 13,00</p>
+        </div>
       </div>
 
       {/* Charts Row */}

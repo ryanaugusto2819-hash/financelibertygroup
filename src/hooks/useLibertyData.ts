@@ -33,6 +33,7 @@ export interface LibertySummary {
   countPagosCartao: number;
   countPagosBoleto: number;
   totalFrete: number;
+  totalQuantidadePagos: number;
 }
 
 interface LibertyResponse {
