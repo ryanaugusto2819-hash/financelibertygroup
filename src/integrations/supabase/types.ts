@@ -14,7 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      expenses: {
+        Row: {
+          amount: number
+          category: string
+          country: string | null
+          created_at: string
+          date: string
+          description: string
+          id: string
+          is_auto_generated: boolean
+          payment_source: string | null
+          status: string
+          type: string
+        }
+        Insert: {
+          amount?: number
+          category: string
+          country?: string | null
+          created_at?: string
+          date: string
+          description: string
+          id?: string
+          is_auto_generated?: boolean
+          payment_source?: string | null
+          status?: string
+          type?: string
+        }
+        Update: {
+          amount?: number
+          category?: string
+          country?: string | null
+          created_at?: string
+          date?: string
+          description?: string
+          id?: string
+          is_auto_generated?: boolean
+          payment_source?: string | null
+          status?: string
+          type?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
