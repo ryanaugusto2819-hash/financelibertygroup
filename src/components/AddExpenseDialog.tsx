@@ -45,10 +45,11 @@ export function AddExpenseDialog() {
       date: form.date,
       type: form.type,
       status: form.status,
+      paymentSource: form.paymentSource,
     });
     toast.success("Custo lançado com sucesso!");
     setOpen(false);
-    setForm({ description: "", category: "", amount: "", date: new Date().toISOString().split("T")[0], type: "variavel", status: "pendente" });
+    setForm({ description: "", category: "", amount: "", date: new Date().toISOString().split("T")[0], type: "variavel", status: "pendente", paymentSource: "nao_paga" });
   };
 
   const handleSalarySubmit = (e: React.FormEvent) => {
