@@ -21,7 +21,7 @@ const presets: { key: FilterPreset; label: string }[] = [
 ];
 
 function getToday() {
-  return new Date();
+  return getNowBR();
 }
 
 export function DateFilter() {
