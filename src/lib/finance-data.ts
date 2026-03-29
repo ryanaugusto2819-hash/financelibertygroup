@@ -60,7 +60,7 @@ export const scheduledRevenues: ScheduledRevenue[] = [];
 export const dailyEntries: DailyEntry[] = [];
 
 export const expenseCategories = [
-  "Pessoal", "Infraestrutura", "Marketing", "TI", "Fornecedores", 
+  "Pessoal", "Salários", "Infraestrutura", "Marketing", "TI", "Fornecedores", 
   "Administrativo", "Seguros", "Logística", "Impostos", "Outros"
 ];
 
