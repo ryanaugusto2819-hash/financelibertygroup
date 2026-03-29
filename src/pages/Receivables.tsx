@@ -54,7 +54,7 @@ const Receivables = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
             <KPICard label="Receita Total" value={summary?.totalValor ?? 0} prefix="R$" icon={DollarSign} index={0} />
             <KPICard label="Recebido" value={summary?.totalPago ?? 0} prefix="R$" icon={Wallet} index={1} variant="positive" />
-            <KPICard label="Pendente" value={summary?.totalPendente ?? 0} prefix="R$" icon={Clock} index={2} variant="neutral" />
+            <KPICard label="Pendente" value={summary?.totalPendente ?? 0} prefix="R$" icon={Clock} index={2} <KPICard label="Pendente" value={summary?.totalPendente ?? 0} prefix="R$" icon={Clock} index={2} variant="warning" /> />
             <KPICard label="Cancelado" value={summary?.totalCancelado ?? 0} prefix="R$" icon={XCircle} index={3} variant="negative" />
           </div>
 
