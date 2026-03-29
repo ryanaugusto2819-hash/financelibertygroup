@@ -46,7 +46,13 @@ export function ScenarioCard({ percentage, totalReceivable, totalExpenses, adsSp
       </div>
       <p className="text-lg font-bold font-mono text-foreground mb-1">{formatCurrency(projected)}</p>
       <p className="text-[10px] text-muted-foreground mb-3">Receita Projetada</p>
-      <div className="border-t border-border/50 pt-3">
+      <div className="border-t border-border/50 pt-3 space-y-1">
+        {adsSpend > 0 && (
+          <div className="flex justify-between items-center">
+            <span className="text-[10px] text-muted-foreground">Custo Anúncios</span>
+            <span className="text-xs font-bold font-mono text-chart-negative">{formatCurrency(adsSpend)}</span>
+          </div>
+        )}
         <div className="flex justify-between items-center">
           <span className="text-[10px] text-muted-foreground">Lucro Projetado</span>
           <span className={`text-xs font-bold font-mono ${isPositive ? "text-chart-positive" : "text-chart-negative"}`}>
