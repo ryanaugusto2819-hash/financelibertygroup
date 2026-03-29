@@ -16,7 +16,7 @@ import {
 } from "recharts";
 import {
   DollarSign, Wallet, TrendingUp, ArrowUpRight, ArrowDownRight,
-  Landmark, Target, Pencil, Check, X, Banknote, Megaphone,
+  Landmark, Target, Pencil, Check, X, Banknote,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useMemo, useState } from "react";
