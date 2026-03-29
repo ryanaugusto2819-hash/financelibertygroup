@@ -1,10 +1,9 @@
 import React, { createContext, useContext, useState, useMemo, ReactNode } from "react";
-import { format } from "date-fns";
+import { getTodayBR } from "@/lib/finance-data";
 import { 
   Expense, expenses as initialExpenses, 
   expenseCategories 
 } from "@/lib/finance-data";
-
 export type CountryFilter = "todos" | "brasil" | "uruguay";
 
 interface FinanceContextType {
@@ -21,7 +20,7 @@ interface FinanceContextType {
 
 const FinanceContext = createContext<FinanceContextType | undefined>(undefined);
 
-const today = format(new Date(), "yyyy-MM-dd");
+const today = getTodayBR();
 
 export function FinanceProvider({ children }: { children: ReactNode }) {
   const [allExpenses, setAllExpenses] = useState<Expense[]>(initialExpenses);

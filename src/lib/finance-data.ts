@@ -124,6 +124,29 @@ export function getNetProfit(): number {
   return gross - taxes;
 }
 
+// ============= Timezone Helpers =============
+
+/** Returns today's date as yyyy-MM-dd in America/Sao_Paulo timezone */
+export function getTodayBR(): string {
+  const now = new Date();
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Sao_Paulo",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(now);
+  const y = parts.find(p => p.type === "year")!.value;
+  const m = parts.find(p => p.type === "month")!.value;
+  const d = parts.find(p => p.type === "day")!.value;
+  return `${y}-${m}-${d}`;
+}
+
+/** Returns a Date object representing "now" in Sao Paulo (for date-fns math) */
+export function getNowBR(): Date {
+  const brStr = new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" });
+  return new Date(brStr);
+}
+
 // ============= Formatting =============
 
 export function formatCurrency(value: number): string {

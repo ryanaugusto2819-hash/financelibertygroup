@@ -7,9 +7,9 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useState } from "react";
 import { useFinance } from "@/context/FinanceContext";
+import { getNowBR, getTodayBR } from "@/lib/finance-data";
 
 type FilterPreset = "hoje" | "ontem" | "7dias" | "15dias" | "30dias" | "total" | "personalizado";
-
 const presets: { key: FilterPreset; label: string }[] = [
   { key: "hoje", label: "Hoje" },
   { key: "ontem", label: "Ontem" },
@@ -21,7 +21,7 @@ const presets: { key: FilterPreset; label: string }[] = [
 ];
 
 function getToday() {
-  return new Date();
+  return getNowBR();
 }
 
 export function DateFilter() {
@@ -33,7 +33,7 @@ export function DateFilter() {
   const applyPreset = (preset: FilterPreset) => {
     setActivePreset(preset);
     const today = getToday();
-    const todayStr = format(today, "yyyy-MM-dd");
+    const todayStr = getTodayBR();
 
     switch (preset) {
       case "hoje":
