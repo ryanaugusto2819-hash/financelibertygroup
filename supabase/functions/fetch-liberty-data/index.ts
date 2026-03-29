@@ -23,7 +23,7 @@ serve(async (req) => {
     // Fetch pedidos (orders) from LibertyPainel
     let query = libertyClient
       .from("pedidos")
-      .select("id, nome, produto, valor, quantidade, status_pagamento, data_entrada, data_pagamento, pais, vendedor, departamento, cidade, forma_pagamento")
+      .select("id, nome, produto, valor, quantidade, status_pagamento, data_entrada, data_pagamento, pais, vendedor, departamento, cidade, forma_pagamento, valor_frete")
       .order("data_entrada", { ascending: false });
 
     if (from) query = query.gte("data_entrada", from);
