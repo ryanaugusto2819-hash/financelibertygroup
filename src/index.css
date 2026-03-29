@@ -367,3 +367,19 @@
     }
   }
 }
+/* Aplica accent-purple em todos os cards do projeto */
+[class*="rounded"][class*="border"][class*="bg-card"]::before,
+[class*="rounded-xl"][class*="border"]::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #7c3aed, #a78bfa);
+}
+[class*="rounded-xl"][class*="border"] {
+  position: relative;
+  overflow: hidden;
+}
