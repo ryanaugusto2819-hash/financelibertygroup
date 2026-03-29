@@ -16,7 +16,7 @@ import {
 } from "recharts";
 import {
   DollarSign, Wallet, TrendingUp, ArrowUpRight, ArrowDownRight,
-  Landmark, Target, Pencil, Check, X, Banknote, Megaphone,
+  Landmark, Target, Pencil, Check, X, Banknote,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useMemo, useState } from "react";
@@ -170,14 +170,6 @@ const Index = () => {
         )}
       </div>
 
-      {/* Gastos com Anúncio */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-6">
-        <KPICard label="Gasto com Anúncios" value={adsData?.totalSpend ?? 0} prefix="R$" icon={Megaphone} index={0} variant="negative" />
-        <KPICard label="Impressões" value={adsData?.totalImpressions ?? 0} icon={Megaphone} index={1} />
-        <KPICard label="Cliques" value={adsData?.totalClicks ?? 0} icon={Megaphone} index={2} />
-        <KPICard label="Custo por Lead" value={adsData?.costPerLead ?? 0} prefix="R$" icon={Megaphone} index={3} />
-      </div>
-
       {/* Receita */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
         <KPICard label="Receita Total (Faturamento)" value={summary?.totalValor ?? 0} prefix="R$" icon={DollarSign} index={0} />
@@ -191,10 +183,10 @@ const Index = () => {
           Projeção de Receita — Cenários de Pagamento
         </h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <ScenarioCard percentage={100} totalReceivable={totalReceivable} totalExpenses={totalExpensesPeriod} index={0} />
-          <ScenarioCard percentage={70} totalReceivable={totalReceivable} totalExpenses={totalExpensesPeriod} index={1} highlight />
-          <ScenarioCard percentage={60} totalReceivable={totalReceivable} totalExpenses={totalExpensesPeriod} index={2} />
-          <ScenarioCard percentage={50} totalReceivable={totalReceivable} totalExpenses={totalExpensesPeriod} index={3} />
+          <ScenarioCard percentage={100} totalReceivable={totalReceivable} totalExpenses={totalExpensesPeriod} adsSpend={adsData?.totalSpend ?? 0} index={0} />
+          <ScenarioCard percentage={70} totalReceivable={totalReceivable} totalExpenses={totalExpensesPeriod} adsSpend={adsData?.totalSpend ?? 0} index={1} highlight />
+          <ScenarioCard percentage={60} totalReceivable={totalReceivable} totalExpenses={totalExpensesPeriod} adsSpend={adsData?.totalSpend ?? 0} index={2} />
+          <ScenarioCard percentage={50} totalReceivable={totalReceivable} totalExpenses={totalExpensesPeriod} adsSpend={adsData?.totalSpend ?? 0} index={3} />
         </div>
       </div>
 
