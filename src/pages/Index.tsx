@@ -15,11 +15,12 @@ import {
 } from "recharts";
 import {
   DollarSign, Wallet, TrendingUp, ArrowUpRight, ArrowDownRight,
-  Landmark, Target,
+  Landmark, Target, Pencil, Check, X,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
 
 const Index = () => {
   const { selectedDate, dateRange, expenses } = useFinance();
