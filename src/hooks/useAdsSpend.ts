@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
-export interface AdsSpendData {
+export interface AdsCountryData {
   totalSpend: number;
   totalImpressions: number;
   totalClicks: number;
@@ -17,6 +17,11 @@ export interface AdsSpendData {
   }[];
   byDate: Record<string, number>;
   totalAds: number;
+}
+
+export interface AdsSpendData extends AdsCountryData {
+  brasil: AdsCountryData;
+  uruguay: AdsCountryData;
 }
 
 export function useAdsSpend(from?: string, to?: string) {
