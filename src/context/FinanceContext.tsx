@@ -71,6 +71,11 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     return allExpenses.filter(e => e.country === countryFilter);
   }, [allExpenses, countryFilter]);
 
+  const addExpense = (expense: Omit<Expense, "id">) => {
+    const id = `DES${String(allExpenses.length + 1).padStart(3, "0")}`;
+    setAllExpenses(prev => [{ ...expense, id }, ...prev]);
+  };
+
   const addAutoExpenses = useCallback((autoExpenses: Omit<Expense, "id">[]) => {
     setAllExpenses(prev => {
       // Remove old auto-generated, add new ones
