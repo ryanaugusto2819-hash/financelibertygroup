@@ -12,7 +12,8 @@ interface Props {
 
 export function ScenarioCard({ percentage, totalReceivable, totalExpenses, adsSpend = 0, index, highlight }: Props) {
   const projected = totalReceivable * (percentage / 100);
-  const totalCosts = totalExpenses + adsSpend;
+  const adsWithTax = adsSpend * 1.12;
+  const totalCosts = totalExpenses + adsWithTax;
   const profit = projected - totalCosts;
   const isPositive = profit >= 0;
 
@@ -47,10 +48,10 @@ export function ScenarioCard({ percentage, totalReceivable, totalExpenses, adsSp
       <p className="text-lg font-bold font-mono text-foreground mb-1">{formatCurrency(projected)}</p>
       <p className="text-[10px] text-muted-foreground mb-3">Receita Projetada</p>
       <div className="border-t border-border/50 pt-3 space-y-1">
-        {adsSpend > 0 && (
+        {adsWithTax > 0 && (
           <div className="flex justify-between items-center">
-            <span className="text-[10px] text-muted-foreground">Custo Anúncios</span>
-            <span className="text-xs font-bold font-mono text-chart-negative">{formatCurrency(adsSpend)}</span>
+            <span className="text-[10px] text-muted-foreground">Custo Anúncios (+12%)</span>
+            <span className="text-xs font-bold font-mono text-chart-negative">{formatCurrency(adsWithTax)}</span>
           </div>
         )}
         <div className="flex justify-between items-center">
