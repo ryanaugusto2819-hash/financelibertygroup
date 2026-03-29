@@ -21,6 +21,7 @@ export function AddExpenseDialog() {
     date: new Date().toISOString().split("T")[0],
     type: "variavel" as "fixa" | "variavel" | "extraordinaria",
     status: "pendente" as "pago" | "pendente" | "agendado",
+    paymentSource: "nao_paga" as "caixa" | "saque" | "nao_paga",
   });
 
   const [salaryForm, setSalaryForm] = useState({
