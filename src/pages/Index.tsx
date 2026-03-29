@@ -193,10 +193,10 @@ const Index = () => {
           Projeção de Receita — Cenários de Pagamento
         </h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <ScenarioCard percentage={100} totalReceivable={totalReceivable} totalExpenses={totalExpensesPeriod} adsSpend={adsData?.totalSpend ?? 0} shippingCost={totalFrete} productCost={custoProdutos} index={0} />
-          <ScenarioCard percentage={70} totalReceivable={totalReceivable} totalExpenses={totalExpensesPeriod} adsSpend={adsData?.totalSpend ?? 0} shippingCost={totalFrete} productCost={custoProdutos} index={1} highlight />
-          <ScenarioCard percentage={60} totalReceivable={totalReceivable} totalExpenses={totalExpensesPeriod} adsSpend={adsData?.totalSpend ?? 0} shippingCost={totalFrete} productCost={custoProdutos} index={2} />
-          <ScenarioCard percentage={50} totalReceivable={totalReceivable} totalExpenses={totalExpensesPeriod} adsSpend={adsData?.totalSpend ?? 0} shippingCost={totalFrete} productCost={custoProdutos} index={3} />
+          <ScenarioCard percentage={100} totalReceivable={totalReceivable} totalExpenses={totalExpensesPeriod} adsSpend={adsData?.totalSpend ?? 0} shippingCost={totalFrete} productCost={custoProdutos} dailySalaryCost={custoDiarias} index={0} />
+          <ScenarioCard percentage={70} totalReceivable={totalReceivable} totalExpenses={totalExpensesPeriod} adsSpend={adsData?.totalSpend ?? 0} shippingCost={totalFrete} productCost={custoProdutos} dailySalaryCost={custoDiarias} index={1} highlight />
+          <ScenarioCard percentage={60} totalReceivable={totalReceivable} totalExpenses={totalExpensesPeriod} adsSpend={adsData?.totalSpend ?? 0} shippingCost={totalFrete} productCost={custoProdutos} dailySalaryCost={custoDiarias} index={2} />
+          <ScenarioCard percentage={50} totalReceivable={totalReceivable} totalExpenses={totalExpensesPeriod} adsSpend={adsData?.totalSpend ?? 0} shippingCost={totalFrete} productCost={custoProdutos} dailySalaryCost={custoDiarias} index={3} />
         </div>
       </div>
 
