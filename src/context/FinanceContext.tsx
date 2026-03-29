@@ -124,7 +124,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   }, [fbAdsPaid]);
 
   return (
-    <FinanceContext.Provider value={{ expenses, allExpenses, addExpense, addAutoExpenses, registerFbAdsPayment, fbAdsAccumulated, fbAdsPaid, selectedDate, setSelectedDate, dateRange, setDateRange, countryFilter, setCountryFilter, manualCash, setManualCash, manualSaque, setManualSaque }}>
+    <FinanceContext.Provider value={{ expenses, allExpenses, addExpense, updateExpense, deleteExpense, addAutoExpenses, registerFbAdsPayment, fbAdsAccumulated, fbAdsPaid, selectedDate, setSelectedDate, dateRange, setDateRange, countryFilter, setCountryFilter, manualCash, setManualCash, manualSaque, setManualSaque }}>
       {children}
     </FinanceContext.Provider>
   );
