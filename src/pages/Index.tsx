@@ -74,10 +74,11 @@ const Index = () => {
         <KPICard label="Saldo (Caixa - Obrigações)" value={currentCash - totalPayableWithScheduled} prefix="R$" icon={Target} index={2} variant={(currentCash - totalPayableWithScheduled) >= 0 ? "positive" : "negative"} />
       </div>
 
-      {/* Receita Gerada e Recebida */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
-        <KPICard label="Receita Total Gerada (A Receber)" value={totalReceivable} prefix="R$" icon={DollarSign} index={0} />
-        <KPICard label="Receita Total Já Recebida" value={totalReceived} prefix="R$" icon={Wallet} index={1} variant="positive" />
+      {/* Receita */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+        <KPICard label="Receita Total (Faturamento)" value={summary?.totalValor ?? 0} prefix="R$" icon={DollarSign} index={0} />
+        <KPICard label="Receita A Receber" value={totalReceivable} prefix="R$" icon={TrendingUp} index={1} variant="warning" />
+        <KPICard label="Receita Já Recebida" value={totalReceived} prefix="R$" icon={Wallet} index={2} variant="positive" />
       </div>
 
       {/* Cenários de Pagamento */}
