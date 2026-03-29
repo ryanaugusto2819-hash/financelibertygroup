@@ -23,7 +23,7 @@ serve(async (req) => {
     // Fetch pedidos (orders) from LibertyPainel
     let query = libertyClient
       .from("pedidos")
-      .select("id, nome, produto, valor, quantidade, status_pagamento, data_entrada, data_pagamento, pais, vendedor, departamento, cidade")
+      .select("id, nome, produto, valor, quantidade, status_pagamento, data_entrada, data_pagamento, pais, vendedor, departamento, cidade, forma_pagamento")
       .order("data_entrada", { ascending: false });
 
     if (from) query = query.gte("data_entrada", from);
@@ -46,6 +46,15 @@ serve(async (req) => {
     const cancelados = pedidos?.filter(p => p.status_pagamento === "cancelado" || p.status_pagamento === "reembolso") ?? [];
     const totalCancelado = cancelados.reduce((s, p) => s + (p.valor || 0), 0);
 
+    // Breakdown by payment method
+    const pagosPix = pagos.filter(p => (p.forma_pagamento || "").toLowerCase() === "pix");
+    const pagosCartao = pagos.filter(p => (p.forma_pagamento || "").toLowerCase() === "cartao" || (p.forma_pagamento || "").toLowerCase() === "cartão");
+    const pagosBoleto = pagos.filter(p => (p.forma_pagamento || "").toLowerCase() === "boleto");
+
+    const totalPagoPix = pagosPix.reduce((s, p) => s + (p.valor || 0), 0);
+    const totalPagoCartao = pagosCartao.reduce((s, p) => s + (p.valor || 0), 0);
+    const totalPagoBoleto = pagosBoleto.reduce((s, p) => s + (p.valor || 0), 0);
+
     return new Response(JSON.stringify({
       pedidos: pedidos ?? [],
       summary: {
@@ -57,6 +66,12 @@ serve(async (req) => {
         countPagos: pagos.length,
         countPendentes: pendentes.length,
         countCancelados: cancelados.length,
+        totalPagoPix,
+        totalPagoCartao,
+        totalPagoBoleto,
+        countPagosPix: pagosPix.length,
+        countPagosCartao: pagosCartao.length,
+        countPagosBoleto: pagosBoleto.length,
       },
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

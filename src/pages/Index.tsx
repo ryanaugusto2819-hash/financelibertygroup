@@ -51,10 +51,18 @@ const Index = () => {
   const totalReceivable = summary?.totalPendente ?? 0;
   const totalReceived = summary?.totalPago ?? 0;
 
+  // PIX recebido → vai direto para Caixa
+  const totalRecebidoPix = summary?.totalPagoPix ?? 0;
+  // Cartão + Boleto → vai para Saque Disponível
+  const totalRecebidoCartaoBoleto = (summary?.totalPagoCartao ?? 0) + (summary?.totalPagoBoleto ?? 0);
+
   const totalPayable = getTotalAccountsPayable();
   const scheduledExpenses = periodExpenses.filter(e => e.status === "agendado").reduce((s, e) => s + e.amount, 0);
   const totalPayableWithScheduled = totalPayable + scheduledExpenses;
-  const currentCash = manualCash !== null ? manualCash : (totalReceived > 0 ? totalReceived : 0);
+  // Caixa = manual ou PIX recebido
+  const currentCash = manualCash !== null ? manualCash : totalRecebidoPix;
+  // Saque = Cartão + Boleto - Obrigações
+  const saqueDisponivel = Math.max(0, totalRecebidoCartaoBoleto);
 
   const handleStartEditCash = () => {
     setCashInput(String(currentCash));
@@ -118,7 +126,7 @@ const Index = () => {
         )}
         <KPICard label="Total a Pagar + Agendadas" value={totalPayableWithScheduled} prefix="R$" icon={Landmark} index={1} variant="negative" />
         <KPICard label="Saldo (Caixa - Obrigações)" value={currentCash - totalPayableWithScheduled} prefix="R$" icon={Target} index={2} variant={(currentCash - totalPayableWithScheduled) >= 0 ? "positive" : "negative"} />
-        <KPICard label="Saque Disponível" value={Math.max(0, currentCash - totalPayableWithScheduled)} prefix="R$" icon={Banknote} index={3} variant="positive" />
+        <KPICard label="Saque Disponível (Cartão + Boleto)" value={saqueDisponivel} prefix="R$" icon={Banknote} index={3} variant="positive" />
       </div>
 
       {/* Receita */}
