@@ -12,14 +12,9 @@ serve(async (req) => {
   }
 
   try {
-    const libertyUrl = Deno.env.get("LIBERTY_SUPABASE_URL")?.trim();
-    const libertyKey = Deno.env.get("LIBERTY_SUPABASE_ANON_KEY")?.trim();
-
-    console.log("Liberty URL length:", libertyUrl?.length, "starts with https:", libertyUrl?.startsWith("https"));
-
-    if (!libertyUrl || !libertyKey) {
-      throw new Error("LibertyPainel credentials not configured");
-    }
+    // LibertyPainel Supabase credentials (public anon key - safe to use)
+    const libertyUrl = "https://gwvhvvmghkpgtiofnivo.supabase.co";
+    const libertyKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd3dmh2dm1naGtwZ3Rpb2ZuaXZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzMDEyNTIsImV4cCI6MjA4Nzg3NzI1Mn0.mdyn-P2fWruiwjDKincla1PI3UVcMMnCGQPW5IAIb5g";
 
     const libertyClient = createClient(libertyUrl, libertyKey);
 
