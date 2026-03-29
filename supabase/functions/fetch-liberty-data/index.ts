@@ -12,8 +12,10 @@ serve(async (req) => {
   }
 
   try {
-    const libertyUrl = Deno.env.get("LIBERTY_SUPABASE_URL");
-    const libertyKey = Deno.env.get("LIBERTY_SUPABASE_ANON_KEY");
+    const libertyUrl = Deno.env.get("LIBERTY_SUPABASE_URL")?.trim();
+    const libertyKey = Deno.env.get("LIBERTY_SUPABASE_ANON_KEY")?.trim();
+
+    console.log("Liberty URL length:", libertyUrl?.length, "starts with https:", libertyUrl?.startsWith("https"));
 
     if (!libertyUrl || !libertyKey) {
       throw new Error("LibertyPainel credentials not configured");
