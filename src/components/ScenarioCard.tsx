@@ -8,14 +8,15 @@ interface Props {
   adsSpend?: number;
   shippingCost?: number;
   productCost?: number;
+  dailySalaryCost?: number;
   index: number;
   highlight?: boolean;
 }
 
-export function ScenarioCard({ percentage, totalReceivable, totalExpenses, adsSpend = 0, shippingCost = 0, productCost = 0, index, highlight }: Props) {
+export function ScenarioCard({ percentage, totalReceivable, totalExpenses, adsSpend = 0, shippingCost = 0, productCost = 0, dailySalaryCost = 0, index, highlight }: Props) {
   const projected = totalReceivable * (percentage / 100);
   const adsWithTax = adsSpend * 1.12;
-  const totalCosts = totalExpenses + adsWithTax + shippingCost + productCost;
+  const totalCosts = totalExpenses + adsWithTax + shippingCost + productCost + dailySalaryCost;
   const profit = projected - totalCosts;
   const isPositive = profit >= 0;
 
