@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useState, useMemo, ReactNode } from "react";
-import { getTodayBR } from "@/lib/finance-data";
 import { 
   Expense, expenses as initialExpenses, 
-  expenseCategories 
+  expenseCategories, getTodayBR
 } from "@/lib/finance-data";
+
 export type CountryFilter = "todos" | "brasil" | "uruguay";
 
 interface FinanceContextType {
