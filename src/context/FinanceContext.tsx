@@ -1,7 +1,7 @@
-import React, { createContext, useContext, useState, useMemo, ReactNode } from "react";
+import React, { createContext, useContext, useState, useMemo, useCallback, ReactNode } from "react";
 import { 
   Expense, expenses as initialExpenses, 
-  expenseCategories, getTodayBR
+  expenseCategories, getTodayBR, PaymentSource
 } from "@/lib/finance-data";
 
 export type CountryFilter = "todos" | "brasil" | "uruguay";
