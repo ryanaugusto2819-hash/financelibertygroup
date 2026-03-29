@@ -14,6 +14,7 @@ export interface LibertyPedido {
   vendedor: string | null;
   departamento: string;
   cidade: string;
+  forma_pagamento?: string;
 }
 
 export interface LibertySummary {
@@ -25,6 +26,12 @@ export interface LibertySummary {
   countPagos: number;
   countPendentes: number;
   countCancelados: number;
+  totalPagoPix: number;
+  totalPagoCartao: number;
+  totalPagoBoleto: number;
+  countPagosPix: number;
+  countPagosCartao: number;
+  countPagosBoleto: number;
 }
 
 interface LibertyResponse {
