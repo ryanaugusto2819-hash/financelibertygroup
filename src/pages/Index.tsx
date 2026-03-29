@@ -65,8 +65,10 @@ const Index = () => {
   const totalPayableWithScheduled = totalPayable + scheduledExpenses;
   // Caixa = manual ou (Entradas - Saídas) — PIX já está incluso nas entradas
   const currentCash = manualCash !== null ? manualCash : (periodIncome - periodOut);
-  // Saque = manual ou (Cartão + Boleto) - 5% de taxa
-  const saqueDisponivel = manualSaque !== null ? manualSaque : Math.max(0, totalRecebidoCartaoBoleto * 0.95);
+  // Total Frete from Liberty
+  const totalFrete = summary?.totalFrete ?? 0;
+  // Saque = manual ou (Cartão + Boleto) - 5% de taxa - Frete
+  const saqueDisponivel = manualSaque !== null ? manualSaque : Math.max(0, totalRecebidoCartaoBoleto * 0.95 - totalFrete);
 
   const handleStartEditCash = () => {
     setCashInput(String(currentCash));
@@ -194,7 +196,7 @@ const Index = () => {
       {/* Period Summary */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
         <KPICard label={`Entradas (${periodLabel})`} value={periodIncome} prefix="R$" icon={ArrowUpRight} index={0} variant="positive" />
-        <KPICard label={`Saídas (${periodLabel})`} value={periodOut} prefix="R$" icon={ArrowDownRight} index={1} variant="negative" />
+        <KPICard label={`Saídas (${periodLabel})`} value={periodOut + totalFrete} prefix="R$" icon={ArrowDownRight} index={1} variant="negative" />
         <KPICard label={`Lucro Líquido (${isSingleDay ? "Dia" : "Período"})`} value={periodGrossProfit * 0.85} prefix="R$" icon={TrendingUp} index={2} variant={periodGrossProfit >= 0 ? "positive" : "negative"} />
       </div>
 
