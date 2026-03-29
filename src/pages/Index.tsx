@@ -59,8 +59,8 @@ const Index = () => {
   const totalPayable = getTotalAccountsPayable();
   const scheduledExpenses = periodExpenses.filter(e => e.status === "agendado").reduce((s, e) => s + e.amount, 0);
   const totalPayableWithScheduled = totalPayable + scheduledExpenses;
-  // Caixa = manual ou (PIX recebido + Entradas - Saídas)
-  const currentCash = manualCash !== null ? manualCash : (totalRecebidoPix + periodIncome - periodOut);
+  // Caixa = manual ou (Entradas - Saídas) — PIX já está incluso nas entradas
+  const currentCash = manualCash !== null ? manualCash : (periodIncome - periodOut);
   // Saque = Cartão + Boleto - Obrigações
   const saqueDisponivel = Math.max(0, totalRecebidoCartaoBoleto);
 
