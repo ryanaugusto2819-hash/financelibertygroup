@@ -20,7 +20,7 @@ interface FinanceContextType {
 
 const FinanceContext = createContext<FinanceContextType | undefined>(undefined);
 
-const today = format(new Date(), "yyyy-MM-dd");
+const today = getTodayBR();
 
 export function FinanceProvider({ children }: { children: ReactNode }) {
   const [allExpenses, setAllExpenses] = useState<Expense[]>(initialExpenses);
