@@ -183,10 +183,10 @@ const Index = () => {
           Projeção de Receita — Cenários de Pagamento
         </h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <ScenarioCard percentage={100} totalReceivable={totalReceivable} totalExpenses={totalExpensesPeriod} adsSpend={adsData?.totalSpend ?? 0} index={0} />
-          <ScenarioCard percentage={70} totalReceivable={totalReceivable} totalExpenses={totalExpensesPeriod} adsSpend={adsData?.totalSpend ?? 0} index={1} highlight />
-          <ScenarioCard percentage={60} totalReceivable={totalReceivable} totalExpenses={totalExpensesPeriod} adsSpend={adsData?.totalSpend ?? 0} index={2} />
-          <ScenarioCard percentage={50} totalReceivable={totalReceivable} totalExpenses={totalExpensesPeriod} adsSpend={adsData?.totalSpend ?? 0} index={3} />
+          <ScenarioCard percentage={100} totalReceivable={totalReceivable} totalExpenses={totalExpensesPeriod} adsSpend={adsData?.totalSpend ?? 0} shippingCost={summary?.totalFrete ?? 0} index={0} />
+          <ScenarioCard percentage={70} totalReceivable={totalReceivable} totalExpenses={totalExpensesPeriod} adsSpend={adsData?.totalSpend ?? 0} shippingCost={summary?.totalFrete ?? 0} index={1} highlight />
+          <ScenarioCard percentage={60} totalReceivable={totalReceivable} totalExpenses={totalExpensesPeriod} adsSpend={adsData?.totalSpend ?? 0} shippingCost={summary?.totalFrete ?? 0} index={2} />
+          <ScenarioCard percentage={50} totalReceivable={totalReceivable} totalExpenses={totalExpensesPeriod} adsSpend={adsData?.totalSpend ?? 0} shippingCost={summary?.totalFrete ?? 0} index={3} />
         </div>
       </div>
 

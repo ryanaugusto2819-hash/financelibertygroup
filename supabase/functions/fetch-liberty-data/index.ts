@@ -23,7 +23,7 @@ serve(async (req) => {
     // Fetch pedidos (orders) from LibertyPainel
     let query = libertyClient
       .from("pedidos")
-      .select("id, nome, produto, valor, quantidade, status_pagamento, data_entrada, data_pagamento, pais, vendedor, departamento, cidade, forma_pagamento")
+      .select("id, nome, produto, valor, quantidade, status_pagamento, data_entrada, data_pagamento, pais, vendedor, departamento, cidade, forma_pagamento, valor_frete")
       .order("data_entrada", { ascending: false });
 
     if (from) query = query.gte("data_entrada", from);
@@ -55,6 +55,9 @@ serve(async (req) => {
     const totalPagoCartao = pagosCartao.reduce((s, p) => s + (p.valor || 0), 0);
     const totalPagoBoleto = pagosBoleto.reduce((s, p) => s + (p.valor || 0), 0);
 
+    // Total shipping costs
+    const totalFrete = pedidos?.reduce((s, p) => s + (p.valor_frete || 0), 0) ?? 0;
+
     return new Response(JSON.stringify({
       pedidos: pedidos ?? [],
       summary: {
@@ -72,6 +75,7 @@ serve(async (req) => {
         countPagosPix: pagosPix.length,
         countPagosCartao: pagosCartao.length,
         countPagosBoleto: pagosBoleto.length,
+        totalFrete,
       },
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
