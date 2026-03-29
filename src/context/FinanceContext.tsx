@@ -16,6 +16,8 @@ interface FinanceContextType {
   setDateRange: (range: { from: string; to: string }) => void;
   countryFilter: CountryFilter;
   setCountryFilter: (country: CountryFilter) => void;
+  manualCash: number | null;
+  setManualCash: (value: number | null) => void;
 }
 
 const FinanceContext = createContext<FinanceContextType | undefined>(undefined);
