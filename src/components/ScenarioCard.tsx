@@ -5,13 +5,15 @@ interface Props {
   percentage: number;
   totalReceivable: number;
   totalExpenses: number;
+  adsSpend?: number;
   index: number;
   highlight?: boolean;
 }
 
-export function ScenarioCard({ percentage, totalReceivable, totalExpenses, index, highlight }: Props) {
+export function ScenarioCard({ percentage, totalReceivable, totalExpenses, adsSpend = 0, index, highlight }: Props) {
   const projected = totalReceivable * (percentage / 100);
-  const profit = projected - totalExpenses;
+  const totalCosts = totalExpenses + adsSpend;
+  const profit = projected - totalCosts;
   const isPositive = profit >= 0;
 
   const accentClass =
