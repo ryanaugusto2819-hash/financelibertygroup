@@ -54,7 +54,22 @@ const Index = () => {
   const totalPayable = getTotalAccountsPayable();
   const scheduledExpenses = periodExpenses.filter(e => e.status === "agendado").reduce((s, e) => s + e.amount, 0);
   const totalPayableWithScheduled = totalPayable + scheduledExpenses;
-  const currentCash = totalReceived > 0 ? totalReceived : 1456200;
+  const currentCash = manualCash !== null ? manualCash : (totalReceived > 0 ? totalReceived : 0);
+
+  const handleStartEditCash = () => {
+    setCashInput(String(currentCash));
+    setEditingCash(true);
+  };
+
+  const handleSaveCash = () => {
+    const val = parseFloat(cashInput.replace(/[^\d.,\-]/g, "").replace(",", "."));
+    if (!isNaN(val)) setManualCash(val);
+    setEditingCash(false);
+  };
+
+  const handleCancelEditCash = () => {
+    setEditingCash(false);
+  };
 
   // Period label
   const isSingleDay = dateRange.from === dateRange.to;
