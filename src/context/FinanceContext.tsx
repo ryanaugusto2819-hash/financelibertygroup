@@ -16,6 +16,8 @@ interface FinanceContextType {
   setDateRange: (range: { from: string; to: string }) => void;
   countryFilter: CountryFilter;
   setCountryFilter: (country: CountryFilter) => void;
+  manualCash: number | null;
+  setManualCash: (value: number | null) => void;
 }
 
 const FinanceContext = createContext<FinanceContextType | undefined>(undefined);
@@ -27,6 +29,19 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   const [selectedDate, setSelectedDate] = useState(today);
   const [dateRange, setDateRange] = useState({ from: today, to: today });
   const [countryFilter, setCountryFilter] = useState<CountryFilter>("todos");
+  const [manualCash, setManualCashState] = useState<number | null>(() => {
+    const stored = localStorage.getItem("manualCash");
+    return stored ? Number(stored) : null;
+  });
+
+  const setManualCash = (value: number | null) => {
+    setManualCashState(value);
+    if (value !== null) {
+      localStorage.setItem("manualCash", String(value));
+    } else {
+      localStorage.removeItem("manualCash");
+    }
+  };
 
   const expenses = useMemo(() => {
     if (countryFilter === "todos") return allExpenses;
@@ -39,7 +54,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <FinanceContext.Provider value={{ expenses, allExpenses, addExpense, selectedDate, setSelectedDate, dateRange, setDateRange, countryFilter, setCountryFilter }}>
+    <FinanceContext.Provider value={{ expenses, allExpenses, addExpense, selectedDate, setSelectedDate, dateRange, setDateRange, countryFilter, setCountryFilter, manualCash, setManualCash }}>
       {children}
     </FinanceContext.Provider>
   );

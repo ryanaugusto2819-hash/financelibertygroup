@@ -15,15 +15,18 @@ import {
 } from "recharts";
 import {
   DollarSign, Wallet, TrendingUp, ArrowUpRight, ArrowDownRight,
-  Landmark, Target,
+  Landmark, Target, Pencil, Check, X,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
 
 const Index = () => {
-  const { selectedDate, dateRange, expenses } = useFinance();
+  const { selectedDate, dateRange, expenses, manualCash, setManualCash } = useFinance();
   const { data: libertyData, isLoading: libertyLoading } = useLibertyData(dateRange.from, dateRange.to);
+  const [editingCash, setEditingCash] = useState(false);
+  const [cashInput, setCashInput] = useState("");
 
   // Filter data by selected period
   const periodExpenses = useMemo(() =>
@@ -51,7 +54,22 @@ const Index = () => {
   const totalPayable = getTotalAccountsPayable();
   const scheduledExpenses = periodExpenses.filter(e => e.status === "agendado").reduce((s, e) => s + e.amount, 0);
   const totalPayableWithScheduled = totalPayable + scheduledExpenses;
-  const currentCash = totalReceived > 0 ? totalReceived : 1456200;
+  const currentCash = manualCash !== null ? manualCash : (totalReceived > 0 ? totalReceived : 0);
+
+  const handleStartEditCash = () => {
+    setCashInput(String(currentCash));
+    setEditingCash(true);
+  };
+
+  const handleSaveCash = () => {
+    const val = parseFloat(cashInput.replace(/[^\d.,\-]/g, "").replace(",", "."));
+    if (!isNaN(val)) setManualCash(val);
+    setEditingCash(false);
+  };
+
+  const handleCancelEditCash = () => {
+    setEditingCash(false);
+  };
 
   // Period label
   const isSingleDay = dateRange.from === dateRange.to;
@@ -69,7 +87,35 @@ const Index = () => {
 
       {/* Main KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
-        <KPICard label="Receita em Caixa" value={currentCash} prefix="R$" icon={Wallet} index={0} variant="positive" />
+        {editingCash ? (
+          <div className="glass-card p-4 flex flex-col gap-2">
+            <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Receita em Caixa</span>
+            <div className="flex items-center gap-2">
+              <Input
+                type="text"
+                value={cashInput}
+                onChange={e => setCashInput(e.target.value)}
+                onKeyDown={e => { if (e.key === "Enter") handleSaveCash(); if (e.key === "Escape") handleCancelEditCash(); }}
+                className="h-8 text-sm font-mono"
+                autoFocus
+                placeholder="Ex: 150000"
+              />
+              <button onClick={handleSaveCash} className="text-chart-positive hover:opacity-80"><Check className="h-4 w-4" /></button>
+              <button onClick={handleCancelEditCash} className="text-destructive hover:opacity-80"><X className="h-4 w-4" /></button>
+            </div>
+          </div>
+        ) : (
+          <div className="relative group">
+            <KPICard label="Receita em Caixa" value={currentCash} prefix="R$" icon={Wallet} index={0} variant="positive" />
+            <button
+              onClick={handleStartEditCash}
+              className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-muted"
+              title="Editar valor manualmente"
+            >
+              <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+            </button>
+          </div>
+        )}
         <KPICard label="Total a Pagar + Agendadas" value={totalPayableWithScheduled} prefix="R$" icon={Landmark} index={1} variant="negative" />
         <KPICard label="Saldo (Caixa - Obrigações)" value={currentCash - totalPayableWithScheduled} prefix="R$" icon={Target} index={2} variant={(currentCash - totalPayableWithScheduled) >= 0 ? "positive" : "negative"} />
       </div>
