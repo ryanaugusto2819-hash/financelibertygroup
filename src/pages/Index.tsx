@@ -6,10 +6,10 @@ import { AddExpenseDialog } from "@/components/AddExpenseDialog";
 import { ExpensePieChart } from "@/components/ExpensePieChart";
 import {
   formatCurrency, formatCompact, formatDate,
-  getTotalReceivable, getReceivedTotal,
-  getTotalAccountsPayable, dailyEntries, monthlyFlowData, receivables,
+  getTotalAccountsPayable, dailyEntries, monthlyFlowData,
 } from "@/lib/finance-data";
 import { useFinance } from "@/context/FinanceContext";
+import { useLibertyData } from "@/hooks/useLibertyData";
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from "recharts";
@@ -19,9 +19,11 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useMemo } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Index = () => {
   const { selectedDate, dateRange, expenses } = useFinance();
+  const { data: libertyData, isLoading: libertyLoading } = useLibertyData(dateRange.from, dateRange.to);
 
   // Filter data by selected period
   const periodExpenses = useMemo(() =>
@@ -40,18 +42,16 @@ const Index = () => {
 
   const totalExpensesPeriod = periodExpenses.reduce((s, e) => s + e.amount, 0);
 
-  // Receivables filtered by period
-  const periodReceivables = useMemo(() =>
-    receivables.filter(r => r.dueDate >= dateRange.from && r.dueDate <= dateRange.to),
-    [dateRange]
-  );
-  const totalReceivable = periodReceivables.filter(r => r.status !== "recebido").reduce((s, r) => s + (r.amount - r.paidAmount), 0);
-  const totalReceived = periodReceivables.filter(r => r.status === "recebido" || r.status === "parcial").reduce((s, r) => s + r.paidAmount, 0);
+  // Real data from LibertyPainel
+  const summary = libertyData?.summary;
+  const pedidos = libertyData?.pedidos ?? [];
+  const totalReceivable = summary?.totalPendente ?? 0;
+  const totalReceived = summary?.totalPago ?? 0;
 
   const totalPayable = getTotalAccountsPayable();
   const scheduledExpenses = periodExpenses.filter(e => e.status === "agendado").reduce((s, e) => s + e.amount, 0);
   const totalPayableWithScheduled = totalPayable + scheduledExpenses;
-  const currentCash = 1456200;
+  const currentCash = totalReceived > 0 ? totalReceived : 1456200;
 
   // Period label
   const isSingleDay = dateRange.from === dateRange.to;
