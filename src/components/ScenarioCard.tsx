@@ -8,14 +8,15 @@ interface Props {
   adsSpend?: number;
   shippingCost?: number;
   productCost?: number;
+  dailySalaryCost?: number;
   index: number;
   highlight?: boolean;
 }
 
-export function ScenarioCard({ percentage, totalReceivable, totalExpenses, adsSpend = 0, shippingCost = 0, productCost = 0, index, highlight }: Props) {
+export function ScenarioCard({ percentage, totalReceivable, totalExpenses, adsSpend = 0, shippingCost = 0, productCost = 0, dailySalaryCost = 0, index, highlight }: Props) {
   const projected = totalReceivable * (percentage / 100);
   const adsWithTax = adsSpend * 1.12;
-  const totalCosts = totalExpenses + adsWithTax + shippingCost + productCost;
+  const totalCosts = totalExpenses + adsWithTax + shippingCost + productCost + dailySalaryCost;
   const profit = projected - totalCosts;
   const isPositive = profit >= 0;
 
@@ -66,6 +67,12 @@ export function ScenarioCard({ percentage, totalReceivable, totalExpenses, adsSp
           <span className="text-[10px] text-muted-foreground">Custo Produtos</span>
           <span className="text-xs font-bold font-mono text-chart-negative">{formatCurrency(productCost)}</span>
         </div>
+        {dailySalaryCost > 0 && (
+          <div className="flex justify-between items-center">
+            <span className="text-[10px] text-muted-foreground">Diárias Salários</span>
+            <span className="text-xs font-bold font-mono text-chart-negative">{formatCurrency(dailySalaryCost)}</span>
+          </div>
+        )}
         <div className="flex justify-between items-center">
           <span className="text-[10px] text-muted-foreground">Lucro Projetado</span>
           <span className={`text-xs font-bold font-mono ${isPositive ? "text-chart-positive" : "text-chart-negative"}`}>
