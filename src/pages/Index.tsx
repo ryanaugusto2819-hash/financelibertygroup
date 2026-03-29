@@ -126,7 +126,7 @@ const Index = () => {
         )}
         <KPICard label="Total a Pagar + Agendadas" value={totalPayableWithScheduled} prefix="R$" icon={Landmark} index={1} variant="negative" />
         <KPICard label="Saldo (Caixa - Obrigações)" value={currentCash - totalPayableWithScheduled} prefix="R$" icon={Target} index={2} variant={(currentCash - totalPayableWithScheduled) >= 0 ? "positive" : "negative"} />
-        <KPICard label="Saque Disponível" value={Math.max(0, currentCash - totalPayableWithScheduled)} prefix="R$" icon={Banknote} index={3} variant="positive" />
+        <KPICard label="Saque Disponível (Cartão + Boleto)" value={saqueDisponivel} prefix="R$" icon={Banknote} index={3} variant="positive" />
       </div>
 
       {/* Receita */}
