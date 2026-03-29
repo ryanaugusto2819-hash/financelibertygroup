@@ -78,6 +78,14 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     setAllExpenses(prev => [{ ...expense, id }, ...prev]);
   };
 
+  const updateExpense = useCallback((id: string, data: Partial<Omit<Expense, "id">>) => {
+    setAllExpenses(prev => prev.map(e => e.id === id ? { ...e, ...data } : e));
+  }, []);
+
+  const deleteExpense = useCallback((id: string) => {
+    setAllExpenses(prev => prev.filter(e => e.id !== id));
+  }, []);
+
   const addAutoExpenses = useCallback((autoExpenses: Omit<Expense, "id">[]) => {
     setAllExpenses(prev => {
       // Remove old auto-generated, add new ones
