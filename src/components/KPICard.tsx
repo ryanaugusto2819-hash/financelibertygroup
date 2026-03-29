@@ -13,33 +13,63 @@ interface KPICardProps {
   variant?: "default" | "positive" | "negative" | "warning";
 }
 
-export function KPICard({ label, value, change, prefix, suffix, icon: Icon, index, variant = "default" }: KPICardProps) {
+export function KPICard({
+  label,
+  value,
+  change,
+  prefix,
+  suffix,
+  icon: Icon,
+  index,
+  variant = "default",
+}: KPICardProps) {
   const isPositive = (change ?? 0) >= 0;
 
-  const displayValue = prefix === "R$"
-    ? formatCurrency(value)
-    : `${value.toLocaleString("pt-BR")}${suffix || ""}`;
+  const displayValue = prefix === "R$" ? formatCurrency(value) : `${value.toLocaleString("pt-BR")}${suffix || ""}`;
 
-  const borderClass = variant === "positive" ? "border-chart-positive/20" :
-    variant === "negative" ? "border-chart-negative/20" :
-    variant === "warning" ? "border-chart-warning/20" : "";
+  const accentClass =
+    variant === "positive"
+      ? "accent-green"
+      : variant === "negative"
+        ? "accent-red"
+        : variant === "warning"
+          ? "accent-amber"
+          : "accent-purple";
+
+  const iconBoxClass =
+    variant === "positive"
+      ? "icon-box-green"
+      : variant === "negative"
+        ? "icon-box-red"
+        : variant === "warning"
+          ? "icon-box-amber"
+          : "icon-box-purple";
+
+  const valueColor =
+    variant === "positive"
+      ? "text-chart-positive"
+      : variant === "negative"
+        ? "text-chart-negative"
+        : variant === "warning"
+          ? "text-chart-warning"
+          : "text-foreground";
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.06, duration: 0.4 }}
-      className={`glass-card p-4 group hover:border-primary/30 transition-all duration-300 ${borderClass}`}
+      className={`cfo-card p-5 group ${accentClass}`}
     >
-      <div className="flex items-center justify-between mb-2">
-        <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
-          {label}
-        </p>
-        {Icon && <Icon className="w-3.5 h-3.5 text-muted-foreground" />}
+      <div className="flex items-center justify-between mb-3">
+        <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{label}</p>
+        {Icon && (
+          <div className={`icon-box ${iconBoxClass}`}>
+            <Icon size={18} />
+          </div>
+        )}
       </div>
-      <p className="text-xl font-bold text-foreground font-mono tracking-tight">
-        {displayValue}
-      </p>
+      <p className={`text-2xl font-bold font-mono tracking-tight ${valueColor}`}>{displayValue}</p>
       {change !== undefined && (
         <div className="flex items-center gap-1 mt-1.5">
           {isPositive ? (
@@ -47,8 +77,11 @@ export function KPICard({ label, value, change, prefix, suffix, icon: Icon, inde
           ) : (
             <TrendingDown className="w-3 h-3 text-chart-negative" />
           )}
-          <span className={`text-[10px] font-medium font-mono ${isPositive ? "text-chart-positive" : "text-chart-negative"}`}>
-            {isPositive ? "+" : ""}{change}%
+          <span
+            className={`text-[10px] font-medium font-mono ${isPositive ? "text-chart-positive" : "text-chart-negative"}`}
+          >
+            {isPositive ? "+" : ""}
+            {change}%
           </span>
         </div>
       )}
