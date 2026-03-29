@@ -21,6 +21,7 @@ export function AddExpenseDialog() {
     date: new Date().toISOString().split("T")[0],
     type: "variavel" as "fixa" | "variavel" | "extraordinaria",
     status: "pendente" as "pago" | "pendente" | "agendado",
+    paymentSource: "nao_paga" as "caixa" | "saque" | "nao_paga",
   });
 
   const [salaryForm, setSalaryForm] = useState({
@@ -44,10 +45,11 @@ export function AddExpenseDialog() {
       date: form.date,
       type: form.type,
       status: form.status,
+      paymentSource: form.paymentSource,
     });
     toast.success("Custo lançado com sucesso!");
     setOpen(false);
-    setForm({ description: "", category: "", amount: "", date: new Date().toISOString().split("T")[0], type: "variavel", status: "pendente" });
+    setForm({ description: "", category: "", amount: "", date: new Date().toISOString().split("T")[0], type: "variavel", status: "pendente", paymentSource: "nao_paga" });
   };
 
   const handleSalarySubmit = (e: React.FormEvent) => {
@@ -114,7 +116,7 @@ export function AddExpenseDialog() {
                   <Input id="amount" type="number" min="0" step="0.01" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} placeholder="0,00" />
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
                   <Label htmlFor="date">Data</Label>
                   <Input id="date" type="date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} />
@@ -130,6 +132,8 @@ export function AddExpenseDialog() {
                     </SelectContent>
                   </Select>
                 </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
                   <Label>Status</Label>
                   <Select value={form.status} onValueChange={v => setForm(f => ({ ...f, status: v as any }))}>
@@ -138,6 +142,17 @@ export function AddExpenseDialog() {
                       <SelectItem value="pago">Pago</SelectItem>
                       <SelectItem value="pendente">Pendente</SelectItem>
                       <SelectItem value="agendado">Agendado</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Saiu de onde?</Label>
+                  <Select value={form.paymentSource} onValueChange={v => setForm(f => ({ ...f, paymentSource: v as any }))}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="caixa">Conta Bancária (Caixa)</SelectItem>
+                      <SelectItem value="saque">Saque Pendente</SelectItem>
+                      <SelectItem value="nao_paga">Não Paga</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
