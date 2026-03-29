@@ -23,10 +23,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 
 const Index = () => {
-  const { selectedDate, dateRange, expenses, manualCash, setManualCash } = useFinance();
+  const { selectedDate, dateRange, expenses, manualCash, setManualCash, manualSaque, setManualSaque } = useFinance();
   const { data: libertyData, isLoading: libertyLoading } = useLibertyData(dateRange.from, dateRange.to);
   const [editingCash, setEditingCash] = useState(false);
   const [cashInput, setCashInput] = useState("");
+  const [editingSaque, setEditingSaque] = useState(false);
+  const [saqueInput, setSaqueInput] = useState("");
 
   // Filter data by selected period
   const periodExpenses = useMemo(() =>
@@ -61,8 +63,8 @@ const Index = () => {
   const totalPayableWithScheduled = totalPayable + scheduledExpenses;
   // Caixa = manual ou (Entradas - Saídas) — PIX já está incluso nas entradas
   const currentCash = manualCash !== null ? manualCash : (periodIncome - periodOut);
-  // Saque = (Cartão + Boleto) - 5% de taxa
-  const saqueDisponivel = Math.max(0, totalRecebidoCartaoBoleto * 0.95);
+  // Saque = manual ou (Cartão + Boleto) - 5% de taxa
+  const saqueDisponivel = manualSaque !== null ? manualSaque : Math.max(0, totalRecebidoCartaoBoleto * 0.95);
 
   const handleStartEditCash = () => {
     setCashInput(String(currentCash));
@@ -75,9 +77,18 @@ const Index = () => {
     setEditingCash(false);
   };
 
-  const handleCancelEditCash = () => {
-    setEditingCash(false);
+  const handleCancelEditCash = () => setEditingCash(false);
+
+  const handleStartEditSaque = () => {
+    setSaqueInput(String(saqueDisponivel));
+    setEditingSaque(true);
   };
+  const handleSaveSaque = () => {
+    const val = parseFloat(saqueInput.replace(/[^\d.,\-]/g, "").replace(",", "."));
+    if (!isNaN(val)) setManualSaque(val);
+    setEditingSaque(false);
+  };
+  const handleCancelEditSaque = () => setEditingSaque(false);
 
   // Period label
   const isSingleDay = dateRange.from === dateRange.to;
@@ -126,7 +137,35 @@ const Index = () => {
         )}
         <KPICard label="Total a Pagar + Agendadas" value={totalPayableWithScheduled} prefix="R$" icon={Landmark} index={1} variant="negative" />
         <KPICard label="Saldo (Caixa - Obrigações)" value={currentCash - totalPayableWithScheduled} prefix="R$" icon={Target} index={2} variant={(currentCash - totalPayableWithScheduled) >= 0 ? "positive" : "negative"} />
-        <KPICard label="Saque Disponível (Cartão + Boleto)" value={saqueDisponivel} prefix="R$" icon={Banknote} index={3} variant="positive" />
+        {editingSaque ? (
+          <div className="glass-card p-4 flex flex-col gap-2">
+            <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Saque Disponível</span>
+            <div className="flex items-center gap-2">
+              <Input
+                type="text"
+                value={saqueInput}
+                onChange={e => setSaqueInput(e.target.value)}
+                onKeyDown={e => { if (e.key === "Enter") handleSaveSaque(); if (e.key === "Escape") handleCancelEditSaque(); }}
+                className="h-8 text-sm font-mono"
+                autoFocus
+                placeholder="Ex: 50000"
+              />
+              <button onClick={handleSaveSaque} className="text-chart-positive hover:opacity-80"><Check className="h-4 w-4" /></button>
+              <button onClick={handleCancelEditSaque} className="text-destructive hover:opacity-80"><X className="h-4 w-4" /></button>
+            </div>
+          </div>
+        ) : (
+          <div className="relative group">
+            <KPICard label="Saque Disponível (Cartão + Boleto)" value={saqueDisponivel} prefix="R$" icon={Banknote} index={3} variant="positive" />
+            <button
+              onClick={handleStartEditSaque}
+              className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-muted"
+              title="Editar valor manualmente"
+            >
+              <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Receita */}

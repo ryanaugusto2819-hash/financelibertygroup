@@ -18,6 +18,8 @@ interface FinanceContextType {
   setCountryFilter: (country: CountryFilter) => void;
   manualCash: number | null;
   setManualCash: (value: number | null) => void;
+  manualSaque: number | null;
+  setManualSaque: (value: number | null) => void;
 }
 
 const FinanceContext = createContext<FinanceContextType | undefined>(undefined);
@@ -33,6 +35,10 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     const stored = localStorage.getItem("manualCash");
     return stored ? Number(stored) : null;
   });
+  const [manualSaque, setManualSaqueState] = useState<number | null>(() => {
+    const stored = localStorage.getItem("manualSaque");
+    return stored ? Number(stored) : null;
+  });
 
   const setManualCash = (value: number | null) => {
     setManualCashState(value);
@@ -40,6 +46,15 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       localStorage.setItem("manualCash", String(value));
     } else {
       localStorage.removeItem("manualCash");
+    }
+  };
+
+  const setManualSaque = (value: number | null) => {
+    setManualSaqueState(value);
+    if (value !== null) {
+      localStorage.setItem("manualSaque", String(value));
+    } else {
+      localStorage.removeItem("manualSaque");
     }
   };
 
@@ -54,7 +69,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <FinanceContext.Provider value={{ expenses, allExpenses, addExpense, selectedDate, setSelectedDate, dateRange, setDateRange, countryFilter, setCountryFilter, manualCash, setManualCash }}>
+    <FinanceContext.Provider value={{ expenses, allExpenses, addExpense, selectedDate, setSelectedDate, dateRange, setDateRange, countryFilter, setCountryFilter, manualCash, setManualCash, manualSaque, setManualSaque }}>
       {children}
     </FinanceContext.Provider>
   );
