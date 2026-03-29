@@ -65,8 +65,10 @@ const Index = () => {
   const totalPayableWithScheduled = totalPayable + scheduledExpenses;
   // Caixa = manual ou (Entradas - Saídas) — PIX já está incluso nas entradas
   const currentCash = manualCash !== null ? manualCash : (periodIncome - periodOut);
-  // Saque = manual ou (Cartão + Boleto) - 5% de taxa
-  const saqueDisponivel = manualSaque !== null ? manualSaque : Math.max(0, totalRecebidoCartaoBoleto * 0.95);
+  // Total Frete from Liberty
+  const totalFrete = summary?.totalFrete ?? 0;
+  // Saque = manual ou (Cartão + Boleto) - 5% de taxa - Frete
+  const saqueDisponivel = manualSaque !== null ? manualSaque : Math.max(0, totalRecebidoCartaoBoleto * 0.95 - totalFrete);
 
   const handleStartEditCash = () => {
     setCashInput(String(currentCash));
