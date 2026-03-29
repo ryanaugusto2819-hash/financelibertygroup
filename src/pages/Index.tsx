@@ -170,14 +170,6 @@ const Index = () => {
         )}
       </div>
 
-      {/* Gastos com Anúncio */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-6">
-        <KPICard label="Gasto com Anúncios" value={adsData?.totalSpend ?? 0} prefix="R$" icon={Megaphone} index={0} variant="negative" />
-        <KPICard label="Impressões" value={adsData?.totalImpressions ?? 0} icon={Megaphone} index={1} />
-        <KPICard label="Cliques" value={adsData?.totalClicks ?? 0} icon={Megaphone} index={2} />
-        <KPICard label="Custo por Lead" value={adsData?.costPerLead ?? 0} prefix="R$" icon={Megaphone} index={3} />
-      </div>
-
       {/* Receita */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
         <KPICard label="Receita Total (Faturamento)" value={summary?.totalValor ?? 0} prefix="R$" icon={DollarSign} index={0} />
