@@ -79,6 +79,7 @@ serve(async (req) => {
         countPagosCartao: pagosCartao.length,
         countPagosBoleto: pagosBoleto.length,
         totalFrete,
+        totalQuantidadePagos,
       },
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
