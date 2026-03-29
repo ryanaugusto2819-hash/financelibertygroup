@@ -54,7 +54,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <FinanceContext.Provider value={{ expenses, allExpenses, addExpense, selectedDate, setSelectedDate, dateRange, setDateRange, countryFilter, setCountryFilter }}>
+    <FinanceContext.Provider value={{ expenses, allExpenses, addExpense, selectedDate, setSelectedDate, dateRange, setDateRange, countryFilter, setCountryFilter, manualCash, setManualCash }}>
       {children}
     </FinanceContext.Provider>
   );
