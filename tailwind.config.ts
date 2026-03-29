@@ -7,13 +7,15 @@ export default {
   theme: {
     container: { center: true, padding: "2rem", screens: { "2xl": "1400px" } },
     extend: {
-      colors: chart: {
-  positive: "hsl(var(--success))",
-  negative: "hsl(var(--destructive))",
-  warning: "hsl(var(--warning))",
-  info: "hsl(var(--info))",
-  muted: "hsl(var(--muted-foreground))",
-},
+      colors: {
+        chart: {
+          positive: "hsl(var(--success))",
+          negative: "hsl(var(--destructive))",
+          warning: "hsl(var(--warning))",
+          info: "hsl(var(--info))",
+          muted: "hsl(var(--muted-foreground))",
+        },
+      },
 
       borderRadius: {
         lg: "var(--radius)",
