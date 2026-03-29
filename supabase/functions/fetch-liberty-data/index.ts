@@ -58,6 +58,9 @@ serve(async (req) => {
     // Total shipping costs
     const totalFrete = pedidos?.reduce((s, p) => s + (p.valor_frete || 0), 0) ?? 0;
 
+    // Total quantity of paid orders
+    const totalQuantidadePagos = pagos.reduce((s, p) => s + (p.quantidade || 0), 0);
+
     return new Response(JSON.stringify({
       pedidos: pedidos ?? [],
       summary: {
@@ -76,6 +79,7 @@ serve(async (req) => {
         countPagosCartao: pagosCartao.length,
         countPagosBoleto: pagosBoleto.length,
         totalFrete,
+        totalQuantidadePagos,
       },
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

@@ -16,7 +16,7 @@ import {
 } from "recharts";
 import {
   DollarSign, Wallet, TrendingUp, ArrowUpRight, ArrowDownRight,
-  Landmark, Target, Pencil, Check, X, Banknote,
+  Landmark, Target, Pencil, Check, X, Banknote, Package,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useMemo, useState } from "react";
@@ -67,6 +67,9 @@ const Index = () => {
   const currentCash = manualCash !== null ? manualCash : (periodIncome - periodOut);
   // Total Frete from Liberty
   const totalFrete = summary?.totalFrete ?? 0;
+  // Custo Produtos: quantidade de itens pagos × R$13
+  const totalQuantidadePagos = summary?.totalQuantidadePagos ?? 0;
+  const custoProdutos = totalQuantidadePagos * 13;
   // Saque = manual ou (Cartão + Boleto) - 5% de taxa - Frete
   const saqueDisponivel = manualSaque !== null ? manualSaque : Math.max(0, totalRecebidoCartaoBoleto * 0.95 - totalFrete);
 
@@ -194,10 +197,19 @@ const Index = () => {
       </div>
 
       {/* Period Summary */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
         <KPICard label={`Entradas (${periodLabel})`} value={periodIncome + totalRecebidoCartaoBoleto} prefix="R$" icon={ArrowUpRight} index={0} variant="positive" />
         <KPICard label={`Saídas (${periodLabel})`} value={periodOut + totalFrete} prefix="R$" icon={ArrowDownRight} index={1} variant="negative" />
         <KPICard label={`Lucro Líquido (${isSingleDay ? "Dia" : "Período"})`} value={periodGrossProfit * 0.85} prefix="R$" icon={TrendingUp} index={2} variant={periodGrossProfit >= 0 ? "positive" : "negative"} />
+        {/* Custo Produtos */}
+        <div className="cfo-card p-5 accent-amber">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Custo Produtos</p>
+            <div className="icon-box icon-box-amber"><Package size={18} /></div>
+          </div>
+          <p className="text-2xl font-bold font-mono tracking-tight text-foreground">{formatCurrency(custoProdutos)}</p>
+          <p className="text-[10px] text-muted-foreground mt-1">{totalQuantidadePagos} un × R$ 13,00</p>
+        </div>
       </div>
 
       {/* Charts Row */}
