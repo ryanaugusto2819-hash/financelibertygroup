@@ -10,12 +10,13 @@ import {
 } from "@/lib/finance-data";
 import { useFinance } from "@/context/FinanceContext";
 import { useLibertyData } from "@/hooks/useLibertyData";
+import { useAdsSpend } from "@/hooks/useAdsSpend";
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from "recharts";
 import {
   DollarSign, Wallet, TrendingUp, ArrowUpRight, ArrowDownRight,
-  Landmark, Target, Pencil, Check, X, Banknote,
+  Landmark, Target, Pencil, Check, X, Banknote, Megaphone,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useMemo, useState } from "react";
@@ -25,6 +26,7 @@ import { Input } from "@/components/ui/input";
 const Index = () => {
   const { selectedDate, dateRange, expenses, manualCash, setManualCash, manualSaque, setManualSaque } = useFinance();
   const { data: libertyData, isLoading: libertyLoading } = useLibertyData(dateRange.from, dateRange.to);
+  const { data: adsData, isLoading: adsLoading } = useAdsSpend(dateRange.from, dateRange.to);
   const [editingCash, setEditingCash] = useState(false);
   const [cashInput, setCashInput] = useState("");
   const [editingSaque, setEditingSaque] = useState(false);
@@ -166,6 +168,14 @@ const Index = () => {
             </button>
           </div>
         )}
+      </div>
+
+      {/* Gastos com Anúncio */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-6">
+        <KPICard label="Gasto com Anúncios" value={adsData?.totalSpend ?? 0} prefix="R$" icon={Megaphone} index={0} variant="negative" />
+        <KPICard label="Impressões" value={adsData?.totalImpressions ?? 0} icon={Megaphone} index={1} />
+        <KPICard label="Cliques" value={adsData?.totalClicks ?? 0} icon={Megaphone} index={2} />
+        <KPICard label="Custo por Lead" value={adsData?.costPerLead ?? 0} prefix="R$" icon={Megaphone} index={3} />
       </div>
 
       {/* Receita */}
