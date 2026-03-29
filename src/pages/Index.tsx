@@ -10,6 +10,7 @@ import {
 } from "@/lib/finance-data";
 import { useFinance } from "@/context/FinanceContext";
 import { useLibertyData } from "@/hooks/useLibertyData";
+import { useAdsSpend } from "@/hooks/useAdsSpend";
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from "recharts";
