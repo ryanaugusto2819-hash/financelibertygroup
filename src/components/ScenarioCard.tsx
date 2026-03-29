@@ -62,6 +62,12 @@ export function ScenarioCard({ percentage, totalReceivable, totalExpenses, adsSp
             <span className="text-xs font-bold font-mono text-chart-negative">{formatCurrency(shippingCost)}</span>
           </div>
         )}
+        {productCost > 0 && (
+          <div className="flex justify-between items-center">
+            <span className="text-[10px] text-muted-foreground">Custo Produtos</span>
+            <span className="text-xs font-bold font-mono text-chart-negative">{formatCurrency(productCost)}</span>
+          </div>
+        )}
         <div className="flex justify-between items-center">
           <span className="text-[10px] text-muted-foreground">Lucro Projetado</span>
           <span className={`text-xs font-bold font-mono ${isPositive ? "text-chart-positive" : "text-chart-negative"}`}>
