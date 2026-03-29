@@ -23,10 +23,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 
 const Index = () => {
-  const { selectedDate, dateRange, expenses, manualCash, setManualCash } = useFinance();
+  const { selectedDate, dateRange, expenses, manualCash, setManualCash, manualSaque, setManualSaque } = useFinance();
   const { data: libertyData, isLoading: libertyLoading } = useLibertyData(dateRange.from, dateRange.to);
   const [editingCash, setEditingCash] = useState(false);
   const [cashInput, setCashInput] = useState("");
+  const [editingSaque, setEditingSaque] = useState(false);
+  const [saqueInput, setSaqueInput] = useState("");
 
   // Filter data by selected period
   const periodExpenses = useMemo(() =>
