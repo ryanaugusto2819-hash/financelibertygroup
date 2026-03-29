@@ -18,6 +18,8 @@ interface FinanceContextType {
   setCountryFilter: (country: CountryFilter) => void;
   manualCash: number | null;
   setManualCash: (value: number | null) => void;
+  manualSaque: number | null;
+  setManualSaque: (value: number | null) => void;
 }
 
 const FinanceContext = createContext<FinanceContextType | undefined>(undefined);
