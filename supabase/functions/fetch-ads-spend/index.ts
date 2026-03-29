@@ -47,8 +47,8 @@ function aggregateMetrics(metrics: any[]) {
 // Detect country from campaign name (e.g. "BR - ..." or "UY - ...")
 function getCampaignCountry(name: string): "brasil" | "uruguay" | "unknown" {
   const n = (name || "").toLowerCase();
-  if (n.startsWith("br ") || n.startsWith("br-") || n.startsWith("br_") || n.includes("brasil")) return "brasil";
-  if (n.startsWith("uy ") || n.startsWith("uy-") || n.startsWith("uy_") || n.includes("uruguay")) return "uruguay";
+  if (n.startsWith("(br") || n.startsWith("br ") || n.startsWith("br-") || n.startsWith("br_") || n.includes("brasil")) return "brasil";
+  if (n.startsWith("(uy") || n.startsWith("uy ") || n.startsWith("uy-") || n.startsWith("uy_") || n.includes("uruguay")) return "uruguay";
   return "unknown";
 }
 

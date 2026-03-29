@@ -68,8 +68,14 @@ serve(async (req) => {
     }
 
     const allPedidos = pedidos ?? [];
-    const brasilPedidos = allPedidos.filter(p => (p.pais || "").toLowerCase() === "brasil");
-    const uruguayPedidos = allPedidos.filter(p => (p.pais || "").toLowerCase() === "uruguay");
+    const brasilPedidos = allPedidos.filter(p => {
+      const pais = (p.pais || "").toLowerCase();
+      return pais === "br" || pais === "brasil";
+    });
+    const uruguayPedidos = allPedidos.filter(p => {
+      const pais = (p.pais || "").toLowerCase();
+      return pais === "uy" || pais === "uruguay";
+    });
 
     return new Response(JSON.stringify({
       pedidos: allPedidos,
