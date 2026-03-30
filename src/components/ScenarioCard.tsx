@@ -61,12 +61,12 @@ export function ScenarioCard({ percentage, totalReceivable, totalExpenses, adsSp
         )}
         {shippingCost > 0 && (
           <div className="flex justify-between items-center">
-            <span className="text-[10px] text-muted-foreground">Total Frete</span>
+            <span className="text-[10px] text-muted-foreground">Total Frete ({shippingCount}x)</span>
             <span className="text-xs font-bold font-mono text-chart-negative">{formatCurrency(shippingCost)}</span>
           </div>
         )}
         <div className="flex justify-between items-center">
-          <span className="text-[10px] text-muted-foreground">Custo Produtos</span>
+          <span className="text-[10px] text-muted-foreground">Custo Produtos ({productCount}x)</span>
           <span className="text-xs font-bold font-mono text-chart-negative">{formatCurrency(productCost)}</span>
         </div>
         {dailySalaryCost > 0 && (
