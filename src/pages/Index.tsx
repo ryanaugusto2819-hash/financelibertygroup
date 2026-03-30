@@ -1,4 +1,5 @@
 import { DashboardLayout } from "@/components/DashboardLayout";
+import { motion } from "framer-motion";
 import { KPICard } from "@/components/KPICard";
 import { ScenarioCard } from "@/components/ScenarioCard";
 import { DateFilter } from "@/components/DateFilter";
@@ -284,7 +285,33 @@ const Index = () => {
       {/* Receita */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
         <KPICard label="Receita Total (Faturamento)" value={summary?.totalValor ?? 0} prefix="R$" icon={DollarSign} index={0} />
-        <KPICard label="Receita A Receber" value={totalReceivable} prefix="R$" icon={TrendingUp} index={1} variant="warning" />
+
+        {/* Receita Agendada - styled card with badge and order count */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.06, duration: 0.4 }}
+          className="cfo-card p-5 accent-amber"
+        >
+          <div className="flex items-center justify-between mb-3">
+            <div className="icon-box icon-box-amber">
+              <TrendingUp size={18} />
+            </div>
+            <Badge variant="outline" className="text-[10px] font-bold uppercase tracking-wider border-chart-warning text-chart-warning">
+              Agendado
+            </Badge>
+          </div>
+          <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+            Receita Agendada (Faturamento)
+          </p>
+          <p className="text-2xl font-bold font-mono tracking-tight text-chart-warning">
+            {formatCurrency(totalReceivable)}
+          </p>
+          <p className="text-[10px] text-muted-foreground mt-1">
+            {summary?.countPendentes ?? 0} pedidos no período
+          </p>
+        </motion.div>
+
         <KPICard label="Receita Já Recebida" value={totalReceived} prefix="R$" icon={Wallet} index={2} variant="positive" />
       </div>
 
