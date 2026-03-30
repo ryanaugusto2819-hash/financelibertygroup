@@ -32,6 +32,7 @@ export function AddExpenseDialog() {
     date: new Date().toISOString().split("T")[0],
     status: "pendente" as "pago" | "pendente" | "agendado",
     country: "ambos" as "brasil" | "uruguay" | "ambos",
+    frequency: "mensal" as "mensal" | "quinzenal",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
