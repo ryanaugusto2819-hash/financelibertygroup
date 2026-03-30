@@ -81,10 +81,11 @@ serve(async (req) => {
       throw new Error(`Failed to fetch data: ${error.message}`);
     }
 
-    // Deduplicate by nome (trimmed+lowercased) + data_entrada + valor
+    // Deduplicate by telefone + data_entrada (same person, same day)
     const seen = new Set<string>();
     const dedupedPedidos = (pedidos ?? []).filter(p => {
-      const key = `${(p.nome || "").trim().toLowerCase()}|${p.data_entrada}|${p.valor}`;
+      const tel = (p.telefone || "").trim();
+      const key = tel ? `${tel}|${p.data_entrada}` : `${(p.nome || "").trim().toLowerCase()}|${p.data_entrada}|${p.valor}`;
       if (seen.has(key)) return false;
       seen.add(key);
       return true;
