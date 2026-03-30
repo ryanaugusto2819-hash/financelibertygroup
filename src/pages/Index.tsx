@@ -334,19 +334,7 @@ const Index = () => {
         <KPICard label={`Entradas (${periodLabel})`} value={periodIncome + totalRecebidoCartaoBoleto} prefix="R$" icon={ArrowUpRight} index={0} variant="positive" />
         <KPICard label={`Saídas (${periodLabel})`} value={periodOut + totalFrete} prefix="R$" icon={ArrowDownRight} index={1} variant="negative" />
         <KPICard label={`Lucro Líquido (${isSingleDay ? "Dia" : "Período"})`} value={periodGrossProfit * 0.85} prefix="R$" icon={TrendingUp} index={2} variant={periodGrossProfit >= 0 ? "positive" : "negative"} />
-        <div className="cfo-card p-5 accent-amber">
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Custo Produtos</p>
-            <div className="icon-box icon-box-amber"><Package size={18} /></div>
-          </div>
-          <p className="text-2xl font-bold font-mono tracking-tight text-foreground">{formatCurrency(custoProdutos)}</p>
-          <p className="text-[10px] text-muted-foreground mt-1">
-            {countryFilter === "todos"
-              ? `${quantidadeBR} un × R$13 (BR) + ${quantidadeUY} un × R$5 (UY)`
-              : `${totalQuantidadePagos} un × ${custoUnitarioLabel}`
-            }
-          </p>
-        </div>
+        <KPICard label={`Despesas do Período`} value={totalExpensesPeriod} prefix="R$" icon={Landmark} index={3} variant="negative" />
       </div>
 
       {/* Charts Row */}
