@@ -54,13 +54,13 @@ serve(async (req) => {
 
     let query = libertyClient
       .from("pedidos")
-      .select("id, nome, produto, valor, quantidade, status_pagamento, data_entrada, data_pagamento, pais, vendedor, departamento, cidade, forma_pagamento, valor_frete")
+      .select("*")
       .order("data_entrada", { ascending: false });
 
     if (from) query = query.gte("data_entrada", from);
-    if (to) query = query.lte("data_entrada", to + "T23:59:59");
+    if (to) query = query.lte("data_entrada", to);
 
-    const { data: pedidos, error } = await query.limit(1000);
+    const { data: pedidos, error } = await query.limit(2000);
 
     if (error) {
       console.error("Error fetching pedidos:", error);
