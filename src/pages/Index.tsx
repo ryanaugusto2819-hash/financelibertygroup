@@ -12,12 +12,13 @@ import {
 import { useFinance } from "@/context/FinanceContext";
 import { useLibertyData } from "@/hooks/useLibertyData";
 import { useAdsSpend } from "@/hooks/useAdsSpend";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from "recharts";
 import {
   DollarSign, Wallet, TrendingUp, ArrowUpRight, ArrowDownRight,
-  Landmark, Target, Pencil, Check, X, Banknote, Package,
+  Landmark, Target, Pencil, Check, X, Banknote, Package, RefreshCw,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useMemo, useState } from "react";
@@ -38,6 +39,8 @@ const Index = () => {
   } = useFinance();
   const { data: libertyData, isLoading: libertyLoading } = useLibertyData(dateRange.from, dateRange.to);
   const { data: adsData, isLoading: adsLoading } = useAdsSpend(dateRange.from, dateRange.to);
+  const queryClient = useQueryClient();
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [editingCash, setEditingCash] = useState(false);
   const [cashInput, setCashInput] = useState("");
   const [editingSaqueBR, setEditingSaqueBR] = useState(false);
@@ -178,7 +181,22 @@ const Index = () => {
     <DashboardLayout title="Painel Financeiro" subtitle="Controle financeiro executivo">
       <div className="flex items-center justify-between mb-6">
         <DateFilter />
-        <AddExpenseDialog />
+        <div className="flex items-center gap-2">
+          <button
+            onClick={async () => {
+              setIsRefreshing(true);
+              await queryClient.invalidateQueries({ queryKey: ["liberty-data"] });
+              await queryClient.invalidateQueries({ queryKey: ["ads-spend"] });
+              setIsRefreshing(false);
+            }}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors text-xs font-medium"
+            title="Atualizar dados"
+          >
+            <RefreshCw className={`h-3.5 w-3.5 ${isRefreshing ? "animate-spin" : ""}`} />
+            Atualizar
+          </button>
+          <AddExpenseDialog />
+        </div>
       </div>
 
       {/* Main KPIs */}
