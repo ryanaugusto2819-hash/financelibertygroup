@@ -56,6 +56,30 @@ export type Database = {
         }
         Relationships: []
       }
+      finance_manual_values: {
+        Row: {
+          created_at: string
+          id: string
+          key: string
+          updated_at: string
+          value: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          key: string
+          updated_at?: string
+          value?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          key?: string
+          updated_at?: string
+          value?: number | null
+        }
+        Relationships: []
+      }
       revenues: {
         Row: {
           amount: number
