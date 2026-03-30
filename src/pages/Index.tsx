@@ -18,7 +18,7 @@ import {
 } from "recharts";
 import {
   DollarSign, Wallet, TrendingUp, ArrowUpRight, ArrowDownRight,
-  Landmark, Target, Pencil, Check, X, Banknote, Package, RefreshCw,
+  Landmark, Target, Pencil, Check, X, Banknote, Package, RefreshCw, ChevronDown,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useMemo, useState } from "react";
