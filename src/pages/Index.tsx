@@ -107,8 +107,11 @@ const Index = () => {
   const totalRecebidoCartaoBoleto = (summary?.totalPagoCartao ?? 0) + (summary?.totalPagoBoleto ?? 0);
 
   const totalPayable = getTotalAccountsPayable();
-  const scheduledExpenses = periodExpenses.filter(e => e.status === "agendado").reduce((s, e) => s + e.amount, 0);
-  const totalPayableWithScheduled = totalPayable + scheduledExpenses;
+  const pendingExpensesList = useMemo(() => expenses.filter(e => e.status === "pendente"), [expenses]);
+  const scheduledExpensesList = useMemo(() => expenses.filter(e => e.status === "agendado"), [expenses]);
+  const totalPendingExpenses = pendingExpensesList.reduce((s, e) => s + e.amount, 0);
+  const scheduledExpenses = scheduledExpensesList.reduce((s, e) => s + e.amount, 0);
+  const totalPayableWithScheduled = totalPendingExpenses + scheduledExpenses;
   const currentCash = manualCash !== null ? manualCash : (periodIncome - periodOut);
 
   // Frete: Brasil uses API data, Uruguay uses fixed R$35 per unit
