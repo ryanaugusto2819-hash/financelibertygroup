@@ -39,6 +39,8 @@ const Index = () => {
   } = useFinance();
   const { data: libertyData, isLoading: libertyLoading } = useLibertyData(dateRange.from, dateRange.to);
   const { data: adsData, isLoading: adsLoading } = useAdsSpend(dateRange.from, dateRange.to);
+  const queryClient = useQueryClient();
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [editingCash, setEditingCash] = useState(false);
   const [cashInput, setCashInput] = useState("");
   const [editingSaqueBR, setEditingSaqueBR] = useState(false);
