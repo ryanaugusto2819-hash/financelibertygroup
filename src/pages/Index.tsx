@@ -47,6 +47,7 @@ const Index = () => {
   const [editingSaqueBR, setEditingSaqueBR] = useState(false);
   const [saqueBRInput, setSaqueBRInput] = useState("");
   const [editingSaqueUY, setEditingSaqueUY] = useState(false);
+  const [expandPayable, setExpandPayable] = useState(false);
   const [saqueUYInput, setSaqueUYInput] = useState("");
 
   // Select summary based on country filter
