@@ -4,6 +4,7 @@ import {
   expenseCategories, getTodayBR, PaymentSource
 } from "@/lib/finance-data";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchFinanceManualValues, saveFinanceManualValue, type FinanceManualValueKey } from "@/lib/finance-manual-values";
 
 export type CountryFilter = "todos" | "brasil" | "uruguay";
 
@@ -35,6 +36,24 @@ const FinanceContext = createContext<FinanceContextType | undefined>(undefined);
 
 const today = getTodayBR();
 
+function readStoredNumber(key: string): number | null {
+  if (typeof window === "undefined") return null;
+  const stored = localStorage.getItem(key);
+  if (stored === null || stored.trim() === "") return null;
+  const parsed = Number(stored);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function syncStoredNumber(key: string, value: number | null) {
+  if (typeof window === "undefined") return;
+  if (value === null) {
+    localStorage.removeItem(key);
+    return;
+  }
+
+  localStorage.setItem(key, String(value));
+}
+
 function rowToExpense(row: any): Expense {
   return {
     id: row.id,
@@ -55,22 +74,10 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   const [selectedDate, setSelectedDate] = useState(today);
   const [dateRange, setDateRange] = useState({ from: today, to: today });
   const [countryFilter, setCountryFilter] = useState<CountryFilter>("todos");
-  const [fbAdsPaid, setFbAdsPaid] = useState<number>(() => {
-    const stored = localStorage.getItem("fbAdsPaid");
-    return stored ? Number(stored) : 0;
-  });
-  const [manualCash, setManualCashState] = useState<number | null>(() => {
-    const stored = localStorage.getItem("manualCash");
-    return stored ? Number(stored) : null;
-  });
-  const [manualSaqueBR, setManualSaqueBRState] = useState<number | null>(() => {
-    const stored = localStorage.getItem("manualSaqueBR");
-    return stored ? Number(stored) : null;
-  });
-  const [manualSaqueUY, setManualSaqueUYState] = useState<number | null>(() => {
-    const stored = localStorage.getItem("manualSaqueUY");
-    return stored ? Number(stored) : null;
-  });
+  const [fbAdsPaid, setFbAdsPaidState] = useState<number>(() => readStoredNumber("fbAdsPaid") ?? 0);
+  const [manualCash, setManualCashState] = useState<number | null>(() => readStoredNumber("manualCash"));
+  const [manualSaqueBR, setManualSaqueBRState] = useState<number | null>(() => readStoredNumber("manualSaqueBR"));
+  const [manualSaqueUY, setManualSaqueUYState] = useState<number | null>(() => readStoredNumber("manualSaqueUY"));
 
   useEffect(() => {
     const loadExpenses = async () => {
@@ -85,20 +92,84 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     loadExpenses();
   }, []);
 
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadManualValues = async () => {
+      const localValues = {
+        manualCash: readStoredNumber("manualCash"),
+        manualSaqueBR: readStoredNumber("manualSaqueBR"),
+        manualSaqueUY: readStoredNumber("manualSaqueUY"),
+        fbAdsPaid: readStoredNumber("fbAdsPaid") ?? 0,
+      };
+
+      try {
+        const remoteValues = await fetchFinanceManualValues();
+        if (!isMounted) return;
+
+        const resolvedManualCash = remoteValues.manualCash ?? localValues.manualCash;
+        const resolvedManualSaqueBR = remoteValues.manualSaqueBR ?? localValues.manualSaqueBR;
+        const resolvedManualSaqueUY = remoteValues.manualSaqueUY ?? localValues.manualSaqueUY;
+        const resolvedFbAdsPaid = remoteValues.fbAdsPaid ?? localValues.fbAdsPaid;
+
+        setManualCashState(resolvedManualCash ?? null);
+        setManualSaqueBRState(resolvedManualSaqueBR ?? null);
+        setManualSaqueUYState(resolvedManualSaqueUY ?? null);
+        setFbAdsPaidState(resolvedFbAdsPaid ?? 0);
+
+        syncStoredNumber("manualCash", resolvedManualCash ?? null);
+        syncStoredNumber("manualSaqueBR", resolvedManualSaqueBR ?? null);
+        syncStoredNumber("manualSaqueUY", resolvedManualSaqueUY ?? null);
+        syncStoredNumber("fbAdsPaid", resolvedFbAdsPaid ?? 0);
+
+        const migrationTasks: Promise<unknown>[] = [];
+
+        if (remoteValues.manualCash === undefined && localValues.manualCash !== null) {
+          migrationTasks.push(saveFinanceManualValue("manualCash", localValues.manualCash));
+        }
+        if (remoteValues.manualSaqueBR === undefined && localValues.manualSaqueBR !== null) {
+          migrationTasks.push(saveFinanceManualValue("manualSaqueBR", localValues.manualSaqueBR));
+        }
+        if (remoteValues.manualSaqueUY === undefined && localValues.manualSaqueUY !== null) {
+          migrationTasks.push(saveFinanceManualValue("manualSaqueUY", localValues.manualSaqueUY));
+        }
+        if (remoteValues.fbAdsPaid === undefined && localValues.fbAdsPaid > 0) {
+          migrationTasks.push(saveFinanceManualValue("fbAdsPaid", localValues.fbAdsPaid));
+        }
+
+        if (migrationTasks.length > 0) {
+          await Promise.all(migrationTasks);
+        }
+      } catch (error) {
+        console.error("Erro ao carregar valores manuais", error);
+      }
+    };
+
+    loadManualValues();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const persistManualValue = useCallback((key: FinanceManualValueKey, value: number | null) => {
+    syncStoredNumber(key, value);
+    void saveFinanceManualValue(key, value).catch((error) => {
+      console.error(`Erro ao salvar ${key}`, error);
+    });
+  }, []);
+
   const setManualCash = (value: number | null) => {
     setManualCashState(value);
-    if (value !== null) localStorage.setItem("manualCash", String(value));
-    else localStorage.removeItem("manualCash");
+    persistManualValue("manualCash", value);
   };
   const setManualSaqueBR = (value: number | null) => {
     setManualSaqueBRState(value);
-    if (value !== null) localStorage.setItem("manualSaqueBR", String(value));
-    else localStorage.removeItem("manualSaqueBR");
+    persistManualValue("manualSaqueBR", value);
   };
   const setManualSaqueUY = (value: number | null) => {
     setManualSaqueUYState(value);
-    if (value !== null) localStorage.setItem("manualSaqueUY", String(value));
-    else localStorage.removeItem("manualSaqueUY");
+    persistManualValue("manualSaqueUY", value);
   };
 
   const expenses = useMemo(() => {
@@ -170,8 +241,8 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
 
   const registerFbAdsPayment = useCallback(async (amount: number, source: PaymentSource) => {
     const newPaid = fbAdsPaid + amount;
-    setFbAdsPaid(newPaid);
-    localStorage.setItem("fbAdsPaid", String(newPaid));
+    setFbAdsPaidState(newPaid);
+    persistManualValue("fbAdsPaid", newPaid);
     const expenseData = {
       date: today,
       description: `Pagamento Facebook ADS`,
@@ -196,7 +267,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       const id = `FBPAY${String(Date.now()).slice(-6)}`;
       setAllExpenses(prev => [{ ...expenseData, id }, ...prev]);
     }
-  }, [fbAdsPaid]);
+  }, [fbAdsPaid, persistManualValue]);
 
   return (
     <FinanceContext.Provider value={{
