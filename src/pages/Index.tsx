@@ -18,7 +18,7 @@ import {
 } from "recharts";
 import {
   DollarSign, Wallet, TrendingUp, ArrowUpRight, ArrowDownRight,
-  Landmark, Target, Pencil, Check, X, Banknote, Package, RefreshCw,
+  Landmark, Target, Pencil, Check, X, Banknote, Package, RefreshCw, ChevronDown,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useMemo, useState } from "react";
@@ -47,6 +47,7 @@ const Index = () => {
   const [editingSaqueBR, setEditingSaqueBR] = useState(false);
   const [saqueBRInput, setSaqueBRInput] = useState("");
   const [editingSaqueUY, setEditingSaqueUY] = useState(false);
+  const [expandPayable, setExpandPayable] = useState(false);
   const [saqueUYInput, setSaqueUYInput] = useState("");
 
   // Select summary based on country filter
@@ -106,8 +107,11 @@ const Index = () => {
   const totalRecebidoCartaoBoleto = (summary?.totalPagoCartao ?? 0) + (summary?.totalPagoBoleto ?? 0);
 
   const totalPayable = getTotalAccountsPayable();
-  const scheduledExpenses = periodExpenses.filter(e => e.status === "agendado").reduce((s, e) => s + e.amount, 0);
-  const totalPayableWithScheduled = totalPayable + scheduledExpenses;
+  const pendingExpensesList = useMemo(() => expenses.filter(e => e.status === "pendente"), [expenses]);
+  const scheduledExpensesList = useMemo(() => expenses.filter(e => e.status === "agendado"), [expenses]);
+  const totalPendingExpenses = pendingExpensesList.reduce((s, e) => s + e.amount, 0);
+  const scheduledExpenses = scheduledExpensesList.reduce((s, e) => s + e.amount, 0);
+  const totalPayableWithScheduled = totalPendingExpenses + scheduledExpenses;
   const currentCash = manualCash !== null ? manualCash : (periodIncome - periodOut);
 
   // Frete: Brasil uses API data, Uruguay uses fixed R$35 per unit
@@ -238,7 +242,53 @@ const Index = () => {
           </div>
         )}
 
-        <KPICard label="Total a Pagar + Agendadas" value={totalPayableWithScheduled} prefix="R$" icon={Landmark} index={1} variant="negative" />
+        {/* Total a Pagar + Agendadas — Expandable */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.12, duration: 0.4 }}
+          className="cfo-card p-5 group accent-red cursor-pointer"
+          onClick={() => setExpandPayable(prev => !prev)}
+        >
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Total a Pagar + Agendadas</p>
+            <div className="icon-box icon-box-red">
+              <Landmark size={18} />
+            </div>
+          </div>
+          <p className="text-2xl font-bold font-mono tracking-tight text-chart-negative">{formatCurrency(totalPayableWithScheduled)}</p>
+          <div className="flex items-center gap-1 mt-1.5">
+            <ChevronDown className={`w-3 h-3 text-muted-foreground transition-transform duration-200 ${expandPayable ? "rotate-180" : ""}`} />
+            <span className="text-[10px] text-muted-foreground">
+              {pendingExpensesList.length + scheduledExpensesList.length} itens · clique para detalhes
+            </span>
+          </div>
+          {expandPayable && (
+            <div className="mt-3 pt-3 border-t border-border/50 space-y-1.5 max-h-48 overflow-y-auto">
+              {pendingExpensesList.length > 0 && (
+                <p className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wider mb-1">Pendentes</p>
+              )}
+              {pendingExpensesList.map(e => (
+                <div key={e.id} className="flex justify-between items-center">
+                  <span className="text-[10px] text-foreground truncate max-w-[60%]">{e.description}</span>
+                  <span className="text-[10px] font-mono font-semibold text-chart-negative">{formatCurrency(e.amount)}</span>
+                </div>
+              ))}
+              {scheduledExpensesList.length > 0 && (
+                <p className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wider mb-1 mt-2">Agendadas</p>
+              )}
+              {scheduledExpensesList.map(e => (
+                <div key={e.id} className="flex justify-between items-center">
+                  <span className="text-[10px] text-foreground truncate max-w-[60%]">{e.description}</span>
+                  <span className="text-[10px] font-mono font-semibold text-chart-warning">{formatCurrency(e.amount)}</span>
+                </div>
+              ))}
+              {pendingExpensesList.length === 0 && scheduledExpensesList.length === 0 && (
+                <p className="text-[10px] text-muted-foreground italic">Nenhum débito pendente ou agendado.</p>
+              )}
+            </div>
+          )}
+        </motion.div>
         <KPICard label="Saldo (Caixa - Obrigações)" value={currentCash - totalPayableWithScheduled} prefix="R$" icon={Target} index={2} variant={(currentCash - totalPayableWithScheduled) >= 0 ? "positive" : "negative"} />
 
         {/* Saque - shows per country or combined */}
