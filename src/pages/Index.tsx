@@ -110,8 +110,8 @@ const Index = () => {
   const pendingExpensesList = useMemo(() => expenses.filter(e => e.status === "pendente"), [expenses]);
   const scheduledExpensesList = useMemo(() => expenses.filter(e => e.status === "agendado"), [expenses]);
   const totalPendingExpenses = pendingExpensesList.reduce((s, e) => s + e.amount, 0);
-  const scheduledExpenses = scheduledExpensesList.reduce((s, e) => s + e.amount, 0);
-  const totalPayableWithScheduled = totalPendingExpenses + scheduledExpenses;
+  const scheduledExpensesTotal = scheduledExpensesList.reduce((s, e) => s + e.amount, 0);
+  const totalPayableWithScheduled = totalPendingExpenses + scheduledExpensesTotal;
   const currentCash = manualCash !== null ? manualCash : (periodIncome - periodOut);
 
   // Frete: Brasil uses API data, Uruguay uses fixed R$35 per unit
