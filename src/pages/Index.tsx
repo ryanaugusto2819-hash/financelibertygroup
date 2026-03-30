@@ -12,7 +12,7 @@ import {
 import { useFinance } from "@/context/FinanceContext";
 import { useLibertyData } from "@/hooks/useLibertyData";
 import { useAdsSpend } from "@/hooks/useAdsSpend";
-import {
+import { useQueryClient } from "@tanstack/react-query";
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from "recharts";
 import {
