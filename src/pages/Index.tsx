@@ -293,31 +293,47 @@ const Index = () => {
 
         {/* Saque - shows per country or combined */}
         {countryFilter === "todos" ? (
-          <div className="glass-card p-4">
+          <div className="glass-card p-4 group">
             <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-2">Saque Disponível</p>
             <p className="text-xl font-bold font-mono text-foreground mb-2">{formatCurrency(saqueDisponivel)}</p>
             <div className="space-y-1 border-t border-border/50 pt-2">
               <div className="flex justify-between items-center">
                 <span className="text-[10px] text-muted-foreground">🇧🇷 Brasil</span>
-                <div className="flex items-center gap-1">
-                  <span className="text-xs font-mono font-semibold text-foreground">{formatCurrency(saqueDisponBR)}</span>
-                  {!editingSaqueBR && (
-                    <button onClick={handleStartEditSaqueBR} className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-muted">
+                {editingSaqueBR ? (
+                  <div className="flex items-center gap-1">
+                    <Input type="text" value={saqueBRInput} onChange={e => setSaqueBRInput(e.target.value)}
+                      onKeyDown={e => { if (e.key === "Enter") handleSaveSaqueBR(); if (e.key === "Escape") handleCancelEditSaqueBR(); }}
+                      className="h-6 w-24 text-xs font-mono" autoFocus />
+                    <button onClick={handleSaveSaqueBR} className="text-chart-positive hover:opacity-80"><Check className="h-3.5 w-3.5" /></button>
+                    <button onClick={handleCancelEditSaqueBR} className="text-destructive hover:opacity-80"><X className="h-3.5 w-3.5" /></button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs font-mono font-semibold text-foreground">{formatCurrency(saqueDisponBR)}</span>
+                    <button onClick={handleStartEditSaqueBR} className="p-0.5 rounded hover:bg-muted">
                       <Pencil className="h-2.5 w-2.5 text-muted-foreground" />
                     </button>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-[10px] text-muted-foreground">🇺🇾 Uruguay</span>
-                <div className="flex items-center gap-1">
-                  <span className="text-xs font-mono font-semibold text-foreground">{formatCurrency(saqueDisponUY)}</span>
-                  {!editingSaqueUY && (
-                    <button onClick={handleStartEditSaqueUY} className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-muted">
+                {editingSaqueUY ? (
+                  <div className="flex items-center gap-1">
+                    <Input type="text" value={saqueUYInput} onChange={e => setSaqueUYInput(e.target.value)}
+                      onKeyDown={e => { if (e.key === "Enter") handleSaveSaqueUY(); if (e.key === "Escape") handleCancelEditSaqueUY(); }}
+                      className="h-6 w-24 text-xs font-mono" autoFocus />
+                    <button onClick={handleSaveSaqueUY} className="text-chart-positive hover:opacity-80"><Check className="h-3.5 w-3.5" /></button>
+                    <button onClick={handleCancelEditSaqueUY} className="text-destructive hover:opacity-80"><X className="h-3.5 w-3.5" /></button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs font-mono font-semibold text-foreground">{formatCurrency(saqueDisponUY)}</span>
+                    <button onClick={handleStartEditSaqueUY} className="p-0.5 rounded hover:bg-muted">
                       <Pencil className="h-2.5 w-2.5 text-muted-foreground" />
                     </button>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
