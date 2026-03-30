@@ -81,7 +81,16 @@ serve(async (req) => {
       throw new Error(`Failed to fetch data: ${error.message}`);
     }
 
-    const allPedidos = (pedidos ?? []).map(p => {
+    // Deduplicate by nome (trimmed+lowercased) + data_entrada + valor
+    const seen = new Set<string>();
+    const dedupedPedidos = (pedidos ?? []).filter(p => {
+      const key = `${(p.nome || "").trim().toLowerCase()}|${p.data_entrada}|${p.valor}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+
+    const allPedidos = dedupedPedidos.map(p => {
       const pais = (p.pais || "").toLowerCase();
       const isUY = pais === "uy" || pais === "uruguay";
       if (isUY) {
