@@ -1,4 +1,5 @@
 import { DashboardLayout } from "@/components/DashboardLayout";
+import { motion } from "framer-motion";
 import { KPICard } from "@/components/KPICard";
 import { ScenarioCard } from "@/components/ScenarioCard";
 import { DateFilter } from "@/components/DateFilter";
