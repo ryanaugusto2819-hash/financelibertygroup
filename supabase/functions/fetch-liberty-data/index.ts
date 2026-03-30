@@ -55,8 +55,6 @@ serve(async (req) => {
   try {
     const libertyUrl = Deno.env.get("LIBERTY_SUPABASE_URL") || "https://gwvhvvmghkpgtiofnivo.supabase.co";
     const libertyKey = Deno.env.get("LIBERTY_SERVICE_ROLE_KEY") || Deno.env.get("LIBERTY_SUPABASE_ANON_KEY") || "";
-    console.log("Liberty URL:", libertyUrl);
-    console.log("Liberty key prefix:", libertyKey.substring(0, 20) + "...");
     const libertyClient = createClient(libertyUrl, libertyKey, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
@@ -84,8 +82,6 @@ serve(async (req) => {
       console.error("Error fetching pedidos:", JSON.stringify(error));
       throw new Error(`Failed to fetch data: ${error.message}`);
     }
-
-    console.log("Pedidos count:", (pedidos ?? []).length, "URL:", libertyUrl, "Key prefix:", libertyKey.substring(0, 30));
 
     // Deduplicate by telefone + data_entrada (same person, same day)
     const seen = new Set<string>();
