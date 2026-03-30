@@ -50,15 +50,23 @@ serve(async (req) => {
     const libertyKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd3dmh2dm1naGtwZ3Rpb2ZuaXZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzMDEyNTIsImV4cCI6MjA4Nzg3NzI1Mn0.mdyn-P2fWruiwjDKincla1PI3UVcMMnCGQPW5IAIb5g";
     const libertyClient = createClient(libertyUrl, libertyKey);
 
-    const { from, to } = await req.json().catch(() => ({}));
+    const body = await req.json().catch(() => ({}));
+    const { from, to } = body;
+
+    // Fetch date field parameter (default: data_entrada, can also use created_at)
+    const dateField = body.dateField || "data_entrada";
 
     let query = libertyClient
       .from("pedidos")
-      .select("*")
-      .order("data_entrada", { ascending: false });
+      .select("id, nome, produto, valor, quantidade, status_pagamento, data_entrada, data_pagamento, pais, vendedor, departamento, cidade, forma_pagamento, valor_frete")
+      .order("created_at", { ascending: false });
 
-    if (from) query = query.gte("data_entrada", from);
-    if (to) query = query.lte("data_entrada", to);
+    if (from) {
+      query = query.gte(dateField, dateField === "created_at" ? from + "T00:00:00" : from);
+    }
+    if (to) {
+      query = query.lte(dateField, dateField === "created_at" ? to + "T23:59:59" : to);
+    }
 
     const { data: pedidos, error } = await query.limit(2000);
 
