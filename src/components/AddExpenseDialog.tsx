@@ -63,21 +63,50 @@ export function AddExpenseDialog() {
       return;
     }
     const countryLabel = salaryForm.country === "brasil" ? "🇧🇷" : salaryForm.country === "uruguay" ? "🇺🇾" : "🇧🇷🇺🇾";
-    const desc = salaryForm.role
+    const baseName = salaryForm.role
       ? `Salário - ${salaryForm.employeeName} (${salaryForm.role}) ${countryLabel}`
       : `Salário - ${salaryForm.employeeName} ${countryLabel}`;
-    addExpense({
-      description: desc,
-      category: "Salários",
-      amount: parseFloat(salaryForm.amount),
-      date: salaryForm.date,
-      type: "fixa",
-      status: salaryForm.status,
-      country: salaryForm.country as any,
-    });
-    toast.success("Salário lançado com sucesso!");
+
+    if (salaryForm.frequency === "quinzenal") {
+      const halfAmount = parseFloat(salaryForm.amount) / 2;
+      const baseDate = new Date(salaryForm.date + "T12:00:00");
+      const secondDate = new Date(baseDate);
+      secondDate.setDate(secondDate.getDate() + 15);
+      const secondDateStr = secondDate.toISOString().split("T")[0];
+
+      addExpense({
+        description: `${baseName} (1ª quinzena)`,
+        category: "Salários",
+        amount: halfAmount,
+        date: salaryForm.date,
+        type: "fixa",
+        status: salaryForm.status,
+        country: salaryForm.country as any,
+      });
+      addExpense({
+        description: `${baseName} (2ª quinzena)`,
+        category: "Salários",
+        amount: halfAmount,
+        date: secondDateStr,
+        type: "fixa",
+        status: salaryForm.status,
+        country: salaryForm.country as any,
+      });
+      toast.success("Salário quinzenal lançado (2 parcelas)!");
+    } else {
+      addExpense({
+        description: baseName,
+        category: "Salários",
+        amount: parseFloat(salaryForm.amount),
+        date: salaryForm.date,
+        type: "fixa",
+        status: salaryForm.status,
+        country: salaryForm.country as any,
+      });
+      toast.success("Salário lançado com sucesso!");
+    }
     setOpen(false);
-    setSalaryForm({ employeeName: "", role: "", amount: "", date: new Date().toISOString().split("T")[0], status: "pendente", country: "ambos" });
+    setSalaryForm({ employeeName: "", role: "", amount: "", date: new Date().toISOString().split("T")[0], status: "pendente", country: "ambos", frequency: "mensal" });
   };
 
   return (
