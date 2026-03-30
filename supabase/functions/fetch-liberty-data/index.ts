@@ -52,13 +52,20 @@ serve(async (req) => {
 
     const { from, to } = await req.json().catch(() => ({}));
 
+    // Fetch date field parameter (default: data_entrada, can also use created_at)
+    const dateField = body.dateField || "data_entrada";
+
     let query = libertyClient
       .from("pedidos")
-      .select("*")
-      .order("data_entrada", { ascending: false });
+      .select("id, nome, produto, valor, quantidade, status_pagamento, data_entrada, data_pagamento, pais, vendedor, departamento, cidade, forma_pagamento, valor_frete")
+      .order("created_at", { ascending: false });
 
-    if (from) query = query.gte("data_entrada", from);
-    if (to) query = query.lte("data_entrada", to);
+    if (from) {
+      query = query.gte(dateField, dateField === "created_at" ? from + "T00:00:00" : from);
+    }
+    if (to) {
+      query = query.lte(dateField, dateField === "created_at" ? to + "T23:59:59" : to);
+    }
 
     const { data: pedidos, error } = await query.limit(2000);
 
