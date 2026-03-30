@@ -58,7 +58,7 @@ serve(async (req) => {
       .order("data_entrada", { ascending: false });
 
     if (from) query = query.gte("data_entrada", from);
-    if (to) query = query.lte("data_entrada", to);
+    if (to) query = query.lte("data_entrada", to + "T23:59:59");
 
     const { data: pedidos, error } = await query.limit(1000);
 
