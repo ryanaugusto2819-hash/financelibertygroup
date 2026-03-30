@@ -46,8 +46,8 @@ serve(async (req) => {
   }
 
   try {
-    const libertyUrl = "https://gwvhvvmghkpgtiofnivo.supabase.co";
-    const libertyKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd3dmh2dm1naGtwZ3Rpb2ZuaXZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzMDEyNTIsImV4cCI6MjA4Nzg3NzI1Mn0.mdyn-P2fWruiwjDKincla1PI3UVcMMnCGQPW5IAIb5g";
+    const libertyUrl = Deno.env.get("LIBERTY_SUPABASE_URL") || "https://gwvhvvmghkpgtiofnivo.supabase.co";
+    const libertyKey = Deno.env.get("LIBERTY_SUPABASE_ANON_KEY") || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd3dmh2dm1naGtwZ3Rpb2ZuaXZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzMDEyNTIsImV4cCI6MjA4Nzg3NzI1Mn0.mdyn-P2fWruiwjDKincla1PI3UVcMMnCGQPW5IAIb5g";
     const libertyClient = createClient(libertyUrl, libertyKey);
 
     const { from, to } = await req.json().catch(() => ({}));
