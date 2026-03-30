@@ -55,6 +55,8 @@ serve(async (req) => {
   try {
     const libertyUrl = Deno.env.get("LIBERTY_SUPABASE_URL") || "https://gwvhvvmghkpgtiofnivo.supabase.co";
     const libertyKey = Deno.env.get("LIBERTY_SERVICE_ROLE_KEY") || Deno.env.get("LIBERTY_SUPABASE_ANON_KEY") || "";
+    console.log("Liberty URL:", libertyUrl);
+    console.log("Liberty key prefix:", libertyKey.substring(0, 20) + "...");
     const libertyClient = createClient(libertyUrl, libertyKey, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
