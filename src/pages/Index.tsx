@@ -38,6 +38,7 @@ const Index = () => {
     manualSaqueUY, setManualSaqueUY,
   } = useFinance();
   const { data: libertyData, isLoading: libertyLoading } = useLibertyData(dateRange.from, dateRange.to);
+  const { data: libertyDataTotal } = useLibertyData();
   const { data: adsData, isLoading: adsLoading } = useAdsSpend(dateRange.from, dateRange.to);
   const queryClient = useQueryClient();
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -55,6 +56,14 @@ const Index = () => {
     if (countryFilter === "uruguay") return libertyData.summaryUruguay;
     return libertyData.summary;
   }, [libertyData, countryFilter]);
+
+  // Summary total (sem filtro de data) para Receita Total e Receita Recebida
+  const summaryTotal = useMemo(() => {
+    if (!libertyDataTotal) return undefined;
+    if (countryFilter === "brasil") return libertyDataTotal.summaryBrasil;
+    if (countryFilter === "uruguay") return libertyDataTotal.summaryUruguay;
+    return libertyDataTotal.summary;
+  }, [libertyDataTotal, countryFilter]);
 
   const pedidos = useMemo(() => {
     const all = libertyData?.pedidos ?? [];
@@ -305,10 +314,10 @@ const Index = () => {
         )}
       </div>
 
-      {/* Receita */}
+      {/* Receita — Período Total */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
-        <KPICard label="Receita Total (Faturamento)" value={summary?.totalValor ?? 0} prefix="R$" icon={DollarSign} index={0} />
-        <KPICard label="Receita Já Recebida" value={totalReceived} prefix="R$" icon={Wallet} index={1} variant="positive" />
+        <KPICard label="Receita Total — Período Total" value={summaryTotal?.totalValor ?? 0} prefix="R$" icon={DollarSign} index={0} />
+        <KPICard label="Receita Já Recebida — Período Total" value={summaryTotal?.totalPago ?? 0} prefix="R$" icon={Wallet} index={1} variant="positive" />
       </div>
 
       {/* Cenários de Pagamento */}
