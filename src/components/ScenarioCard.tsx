@@ -7,13 +7,15 @@ interface Props {
   totalExpenses: number;
   adsSpend?: number;
   shippingCost?: number;
+  shippingCount?: number;
   productCost?: number;
+  productCount?: number;
   dailySalaryCost?: number;
   index: number;
   highlight?: boolean;
 }
 
-export function ScenarioCard({ percentage, totalReceivable, totalExpenses, adsSpend = 0, shippingCost = 0, productCost = 0, dailySalaryCost = 0, index, highlight }: Props) {
+export function ScenarioCard({ percentage, totalReceivable, totalExpenses, adsSpend = 0, shippingCost = 0, shippingCount = 0, productCost = 0, productCount = 0, dailySalaryCost = 0, index, highlight }: Props) {
   const projected = totalReceivable * (percentage / 100);
   const adsWithTax = adsSpend * 1.12;
   const totalCosts = totalExpenses + adsWithTax + shippingCost + productCost + dailySalaryCost;
@@ -59,12 +61,12 @@ export function ScenarioCard({ percentage, totalReceivable, totalExpenses, adsSp
         )}
         {shippingCost > 0 && (
           <div className="flex justify-between items-center">
-            <span className="text-[10px] text-muted-foreground">Total Frete</span>
+            <span className="text-[10px] text-muted-foreground">Total Frete ({shippingCount}x)</span>
             <span className="text-xs font-bold font-mono text-chart-negative">{formatCurrency(shippingCost)}</span>
           </div>
         )}
         <div className="flex justify-between items-center">
-          <span className="text-[10px] text-muted-foreground">Custo Produtos</span>
+          <span className="text-[10px] text-muted-foreground">Custo Produtos ({productCount}x)</span>
           <span className="text-xs font-bold font-mono text-chart-negative">{formatCurrency(productCost)}</span>
         </div>
         {dailySalaryCost > 0 && (
