@@ -81,9 +81,11 @@ serve(async (req) => {
     const { data: pedidos, error } = await query.limit(2000);
 
     if (error) {
-      console.error("Error fetching pedidos:", error);
+      console.error("Error fetching pedidos:", JSON.stringify(error));
       throw new Error(`Failed to fetch data: ${error.message}`);
     }
+
+    console.log("Pedidos count:", (pedidos ?? []).length, "URL:", libertyUrl, "Key prefix:", libertyKey.substring(0, 30));
 
     // Deduplicate by telefone + data_entrada (same person, same day)
     const seen = new Set<string>();
