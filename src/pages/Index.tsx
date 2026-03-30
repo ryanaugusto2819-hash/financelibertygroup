@@ -57,6 +57,14 @@ const Index = () => {
     return libertyData.summary;
   }, [libertyData, countryFilter]);
 
+  // Summary total (sem filtro de data) para Receita Total e Receita Recebida
+  const summaryTotal = useMemo(() => {
+    if (!libertyDataTotal) return undefined;
+    if (countryFilter === "brasil") return libertyDataTotal.summaryBrasil;
+    if (countryFilter === "uruguay") return libertyDataTotal.summaryUruguay;
+    return libertyDataTotal.summary;
+  }, [libertyDataTotal, countryFilter]);
+
   const pedidos = useMemo(() => {
     const all = libertyData?.pedidos ?? [];
     if (countryFilter === "todos") return all;
