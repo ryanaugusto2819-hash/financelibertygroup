@@ -59,7 +59,12 @@ const Index = () => {
   const pedidos = useMemo(() => {
     const all = libertyData?.pedidos ?? [];
     if (countryFilter === "todos") return all;
-    return all.filter(p => (p.pais || "").toLowerCase() === countryFilter);
+    return all.filter(p => {
+      const pais = (p.pais || "").toLowerCase();
+      if (countryFilter === "brasil") return pais === "br" || pais === "brasil";
+      if (countryFilter === "uruguay") return pais === "uy" || pais === "uruguay";
+      return false;
+    });
   }, [libertyData, countryFilter]);
 
   // Ads data per country
