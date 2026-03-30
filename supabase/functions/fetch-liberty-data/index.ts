@@ -53,9 +53,13 @@ serve(async (req) => {
   }
 
   try {
-    const libertyUrl = "https://gwvhvvmghkpgtiofnivo.supabase.co";
-    const libertyKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd3dmh2dm1naGtwZ3Rpb2ZuaXZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzMDEyNTIsImV4cCI6MjA4Nzg3NzI1Mn0.mdyn-P2fWruiwjDKincla1PI3UVcMMnCGQPW5IAIb5g";
-    const libertyClient = createClient(libertyUrl, libertyKey);
+    const libertyUrl = Deno.env.get("LIBERTY_SUPABASE_URL") || "https://gwvhvvmghkpgtiofnivo.supabase.co";
+    const libertyKey = Deno.env.get("LIBERTY_SERVICE_ROLE_KEY") || Deno.env.get("LIBERTY_SUPABASE_ANON_KEY") || "";
+    console.log("Liberty URL:", libertyUrl);
+    console.log("Liberty key prefix:", libertyKey.substring(0, 20) + "...");
+    const libertyClient = createClient(libertyUrl, libertyKey, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
 
     const body = await req.json().catch(() => ({}));
     const { from, to } = body;
@@ -77,9 +81,11 @@ serve(async (req) => {
     const { data: pedidos, error } = await query.limit(2000);
 
     if (error) {
-      console.error("Error fetching pedidos:", error);
+      console.error("Error fetching pedidos:", JSON.stringify(error));
       throw new Error(`Failed to fetch data: ${error.message}`);
     }
+
+    console.log("Pedidos count:", (pedidos ?? []).length, "URL:", libertyUrl, "Key prefix:", libertyKey.substring(0, 30));
 
     // Deduplicate by telefone + data_entrada (same person, same day)
     const seen = new Set<string>();
