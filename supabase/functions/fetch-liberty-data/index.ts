@@ -53,8 +53,8 @@ serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const { from, to } = body;
 
-    // Always use created_at for date filtering (more reliable than data_entrada)
-    const dateField = "created_at";
+    // Use data_entrada for date filtering (matches Google Sheets input)
+    const dateField = "data_entrada";
 
     let query = libertyClient
       .from("pedidos")
@@ -62,10 +62,10 @@ serve(async (req) => {
       .order("created_at", { ascending: false });
 
     if (from) {
-      query = query.gte(dateField, from + "T00:00:00");
+      query = query.gte(dateField, from);
     }
     if (to) {
-      query = query.lte(dateField, to + "T23:59:59");
+      query = query.lte(dateField, to);
     }
 
     const { data: pedidos, error } = await query.limit(2000);
