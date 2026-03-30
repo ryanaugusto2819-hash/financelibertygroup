@@ -314,10 +314,10 @@ const Index = () => {
         )}
       </div>
 
-      {/* Receita */}
+      {/* Receita — Período Total */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
-        <KPICard label="Receita Total (Faturamento)" value={summary?.totalValor ?? 0} prefix="R$" icon={DollarSign} index={0} />
-        <KPICard label="Receita Já Recebida" value={totalReceived} prefix="R$" icon={Wallet} index={1} variant="positive" />
+        <KPICard label="Receita Total — Período Total" value={summaryTotal?.totalValor ?? 0} prefix="R$" icon={DollarSign} index={0} />
+        <KPICard label="Receita Já Recebida — Período Total" value={summaryTotal?.totalPago ?? 0} prefix="R$" icon={Wallet} index={1} variant="positive" />
       </div>
 
       {/* Cenários de Pagamento */}
