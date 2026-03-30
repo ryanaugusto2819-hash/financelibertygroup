@@ -251,9 +251,22 @@ export function AddExpenseDialog() {
                   </Select>
                 </div>
               </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label>Frequência</Label>
+                  <Select value={salaryForm.frequency} onValueChange={v => setSalaryForm(f => ({ ...f, frequency: v as any }))}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="mensal">Mensal</SelectItem>
+                      <SelectItem value="quinzenal">Quinzenal (15 em 15)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
               <p className="text-[10px] text-muted-foreground">
                 Salários são lançados como despesa <strong>fixa</strong> e divididos por 30 dias nas projeções.
-                Funcionários com "Ambos" aparecem nos dois filtros de país.
+                {salaryForm.frequency === "quinzenal" && " Quinzenal: lança 2 parcelas de metade do valor, com 15 dias de diferença."}
+                {" "}Funcionários com "Ambos" aparecem nos dois filtros de país.
               </p>
               <Button type="submit" className="w-full">Lançar Salário</Button>
             </form>
