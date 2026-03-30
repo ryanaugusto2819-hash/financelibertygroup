@@ -56,6 +56,42 @@ export type Database = {
         }
         Relationships: []
       }
+      revenues: {
+        Row: {
+          amount: number
+          client: string
+          country: string | null
+          created_at: string
+          date: string
+          description: string
+          id: string
+          payment_method: string | null
+          status: string
+        }
+        Insert: {
+          amount?: number
+          client: string
+          country?: string | null
+          created_at?: string
+          date: string
+          description: string
+          id?: string
+          payment_method?: string | null
+          status?: string
+        }
+        Update: {
+          amount?: number
+          client?: string
+          country?: string | null
+          created_at?: string
+          date?: string
+          description?: string
+          id?: string
+          payment_method?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
