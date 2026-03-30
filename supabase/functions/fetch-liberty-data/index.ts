@@ -64,7 +64,7 @@ serve(async (req) => {
 
     let query = libertyClient
       .from("pedidos")
-      .select("id, nome, produto, valor, quantidade, status_pagamento, data_entrada, data_pagamento, pais, vendedor, departamento, cidade, forma_pagamento, valor_frete")
+      .select("id, nome, produto, valor, quantidade, status_pagamento, data_entrada, data_pagamento, pais, vendedor, departamento, cidade, forma_pagamento, valor_frete, telefone")
       .order("created_at", { ascending: false });
 
     if (from) {
