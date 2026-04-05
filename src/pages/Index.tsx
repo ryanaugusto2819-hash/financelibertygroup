@@ -30,13 +30,26 @@ const PRODUCT_COST = { brasil: 13, uruguay: 5 };
 // Fixed shipping for Uruguay per unit
 const FRETE_FIXO_UY = 35;
 
-const Index = () => {
+interface IndexProps {
+  country?: "brasil" | "uruguay";
+}
+
+const Index = ({ country }: IndexProps = {}) => {
   const {
-    selectedDate, dateRange, expenses, countryFilter,
+    selectedDate, dateRange, expenses, countryFilter, setCountryFilter,
     manualCash, setManualCash,
     manualSaqueBR, setManualSaqueBR,
     manualSaqueUY, setManualSaqueUY,
   } = useFinance();
+
+  // Sync country prop to context filter
+  React.useEffect(() => {
+    if (country) {
+      setCountryFilter(country);
+    } else {
+      setCountryFilter("todos");
+    }
+  }, [country, setCountryFilter]);
   const { data: libertyData, isLoading: libertyLoading } = useLibertyData(dateRange.from, dateRange.to);
   const { data: libertyDataTotal } = useLibertyData();
   const { data: adsData, isLoading: adsLoading } = useAdsSpend(dateRange.from, dateRange.to);
