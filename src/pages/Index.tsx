@@ -21,7 +21,7 @@ import {
   Landmark, Target, Pencil, Check, X, Banknote, Package, RefreshCw, ChevronDown,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 
