@@ -105,7 +105,7 @@ const Expenses = ({ country }: ExpensesProps = {}) => {
   const faturaRestante = Math.max(0, adsSpendTotal - fbAdsPaid);
 
   return (
-    <DashboardLayout title="Custos & Despesas" subtitle="Controle detalhado de gastos">
+    <DashboardLayout title={country === "brasil" ? "🇧🇷 Despesas Brasil" : country === "uruguay" ? "🇺🇾 Despesas Uruguay" : "Custos & Despesas"} subtitle="Controle detalhado de gastos" hideCountryFilter={!!country}>
       <div className="flex items-center justify-between mb-6">
         <DateFilter />
         <div className="flex gap-2">

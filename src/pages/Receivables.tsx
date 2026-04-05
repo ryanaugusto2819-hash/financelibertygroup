@@ -109,7 +109,7 @@ const Receivables = ({ country }: ReceivablesProps = {}) => {
   ] : [];
 
   return (
-    <DashboardLayout title="Capital em Giro" subtitle="Receita real do LibertyPainel + Receitas Manuais">
+    <DashboardLayout title={country === "brasil" ? "🇧🇷 Receitas Brasil" : country === "uruguay" ? "🇺🇾 Receitas Uruguay" : "Capital em Giro"} subtitle="Receita real do LibertyPainel + Receitas Manuais" hideCountryFilter={!!country}>
       {/* KPIs */}
       {isLoading ? (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
