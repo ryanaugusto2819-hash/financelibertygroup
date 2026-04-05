@@ -7,6 +7,7 @@ interface Props {
   children: React.ReactNode;
   title: string;
   subtitle?: string;
+  hideCountryFilter?: boolean;
 }
 
 export function DashboardLayout({ children, title, subtitle }: Props) {
