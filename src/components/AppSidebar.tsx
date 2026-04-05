@@ -48,8 +48,8 @@ export function AppSidebar() {
           </div>
           {!collapsed && (
             <div>
-              <p className="text-sm font-bold text-foreground tracking-tight">FinanceOS</p>
-              <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Controle Financeiro</p>
+              <p className="text-sm font-bold text-foreground tracking-tight">LIBERTY</p>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Gestão Financeira</p>
             </div>
           )}
         </div>
