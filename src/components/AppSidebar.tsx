@@ -26,8 +26,10 @@ import {
 } from "@/components/ui/sidebar";
 
 const mainItems = [
-  { title: "Painel", url: "/", icon: LayoutDashboard },
-  { title: "Receitas", url: "/recebiveis", icon: DollarSign },
+  { title: "Visão Geral", url: "/", icon: LayoutDashboard },
+  { title: "🇧🇷 Brasil", url: "/brasil", icon: DollarSign },
+  { title: "🇺🇾 Uruguay", url: "/uruguay", icon: DollarSign },
+  { title: "Receitas", url: "/recebiveis", icon: Wallet },
   { title: "Despesas", url: "/despesas", icon: ArrowLeftRight },
   { title: "Projeções", url: "/projecoes", icon: TrendingUp },
 ];

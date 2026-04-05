@@ -7,9 +7,10 @@ interface Props {
   children: React.ReactNode;
   title: string;
   subtitle?: string;
+  hideCountryFilter?: boolean;
 }
 
-export function DashboardLayout({ children, title, subtitle }: Props) {
+export function DashboardLayout({ children, title, subtitle, hideCountryFilter }: Props) {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
@@ -24,7 +25,7 @@ export function DashboardLayout({ children, title, subtitle }: Props) {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <CountryFilter />
+              {!hideCountryFilter && <CountryFilter />}
               <button className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground">
                 <Search className="w-4 h-4" />
               </button>

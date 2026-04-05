@@ -21,7 +21,7 @@ import {
   Landmark, Target, Pencil, Check, X, Banknote, Package, RefreshCw, ChevronDown,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 
@@ -30,13 +30,26 @@ const PRODUCT_COST = { brasil: 13, uruguay: 5 };
 // Fixed shipping for Uruguay per unit
 const FRETE_FIXO_UY = 35;
 
-const Index = () => {
+interface IndexProps {
+  country?: "brasil" | "uruguay";
+}
+
+const Index = ({ country }: IndexProps = {}) => {
   const {
-    selectedDate, dateRange, expenses, countryFilter,
+    selectedDate, dateRange, expenses, countryFilter, setCountryFilter,
     manualCash, setManualCash,
     manualSaqueBR, setManualSaqueBR,
     manualSaqueUY, setManualSaqueUY,
   } = useFinance();
+
+  // Sync country prop to context filter
+  React.useEffect(() => {
+    if (country) {
+      setCountryFilter(country);
+    } else {
+      setCountryFilter("todos");
+    }
+  }, [country, setCountryFilter]);
   const { data: libertyData, isLoading: libertyLoading } = useLibertyData(dateRange.from, dateRange.to);
   const { data: libertyDataTotal } = useLibertyData();
   const { data: adsData, isLoading: adsLoading } = useAdsSpend(dateRange.from, dateRange.to);
@@ -196,7 +209,7 @@ const Index = () => {
   const adsSpendForScenario = currentAdsData?.totalSpend ?? 0;
 
   return (
-    <DashboardLayout title="Painel Financeiro" subtitle="Controle financeiro executivo">
+    <DashboardLayout title={country === "brasil" ? "🇧🇷 Brasil" : country === "uruguay" ? "🇺🇾 Uruguay" : "Painel Financeiro"} subtitle={country ? "Controle financeiro" : "Controle financeiro executivo"} hideCountryFilter={!!country}>
       <div className="flex items-center justify-between mb-6">
         <DateFilter />
         <div className="flex items-center gap-2">
