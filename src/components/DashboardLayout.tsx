@@ -10,7 +10,7 @@ interface Props {
   hideCountryFilter?: boolean;
 }
 
-export function DashboardLayout({ children, title, subtitle }: Props) {
+export function DashboardLayout({ children, title, subtitle, hideCountryFilter }: Props) {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
