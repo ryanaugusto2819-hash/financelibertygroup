@@ -6,9 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { FinanceProvider } from "@/context/FinanceContext";
 import Index from "./pages/Index";
 import Receivables from "./pages/Receivables";
-import DailyControl from "./pages/DailyControl";
 import Expenses from "./pages/Expenses";
-import AccountsPayable from "./pages/AccountsPayable";
 import Projections from "./pages/Projections";
 import NotFound from "./pages/NotFound";
 
@@ -26,7 +24,11 @@ const App = () => (
             <Route path="/brasil" element={<Index country="brasil" />} />
             <Route path="/uruguay" element={<Index country="uruguay" />} />
             <Route path="/recebiveis" element={<Receivables />} />
+            <Route path="/brasil/recebiveis" element={<Receivables country="brasil" />} />
+            <Route path="/uruguay/recebiveis" element={<Receivables country="uruguay" />} />
             <Route path="/despesas" element={<Expenses />} />
+            <Route path="/brasil/despesas" element={<Expenses country="brasil" />} />
+            <Route path="/uruguay/despesas" element={<Expenses country="uruguay" />} />
             <Route path="/projecoes" element={<Projections />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
