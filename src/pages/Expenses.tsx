@@ -31,8 +31,21 @@ const PAYMENT_SOURCE_LABELS: Record<string, string> = {
   nao_paga: "Não Paga",
 };
 
-const Expenses = () => {
-  const { expenses, selectedDate, dateRange, addAutoExpenses, registerFbAdsPayment, fbAdsAccumulated, fbAdsPaid, updateExpense, deleteExpense, countryFilter } = useFinance();
+interface ExpensesProps {
+  country?: "brasil" | "uruguay";
+}
+
+const Expenses = ({ country }: ExpensesProps = {}) => {
+  const { expenses, selectedDate, dateRange, addAutoExpenses, registerFbAdsPayment, fbAdsAccumulated, fbAdsPaid, updateExpense, deleteExpense, countryFilter, setCountryFilter } = useFinance();
+
+  // Sync country prop to context
+  React.useEffect(() => {
+    if (country) {
+      setCountryFilter(country);
+    } else {
+      setCountryFilter("todos");
+    }
+  }, [country, setCountryFilter]);
   const { data: libertyData } = useLibertyData(dateRange.from, dateRange.to);
   const { data: adsData } = useAdsSpend(dateRange.from, dateRange.to);
 
