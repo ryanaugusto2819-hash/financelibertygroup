@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { AddExpenseDialog } from "@/components/AddExpenseDialog";
 import { AIExpenseImportDialog } from "@/components/AIExpenseImportDialog";
