@@ -25,14 +25,19 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { useAuth } from "@/context/AuthContext";
 
 export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const location = useLocation();
+  const { countryAccess } = useAuth();
 
   const isBrasilActive = location.pathname.startsWith("/brasil");
   const isUruguayActive = location.pathname.startsWith("/uruguay");
+
+  const showBrasil  = countryAccess !== "uruguay";
+  const showGlobal  = !countryAccess;
 
   return (
     <Sidebar collapsible="icon">
@@ -53,17 +58,19 @@ export function AppSidebar() {
           <SidebarGroupLabel className="text-[10px] uppercase tracking-widest">Principal</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <NavLink to="/" end className="hover:bg-muted/50" activeClassName="bg-primary/10 text-primary font-medium">
-                    <LayoutDashboard className="mr-2 h-4 w-4" />
-                    {!collapsed && <span>Visão Geral</span>}
-                  </NavLink>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+              {showGlobal && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild>
+                    <NavLink to="/" end className="hover:bg-muted/50" activeClassName="bg-primary/10 text-primary font-medium">
+                      <LayoutDashboard className="mr-2 h-4 w-4" />
+                      {!collapsed && <span>Visão Geral</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
 
-              {/* Brasil */}
-              <Collapsible defaultOpen={isBrasilActive} className="group/collapsible">
+              {/* Brasil — oculto para usuários com acesso apenas Uruguay */}
+              {showBrasil && <Collapsible defaultOpen={isBrasilActive} className="group/collapsible">
                 <SidebarMenuItem>
                   <CollapsibleTrigger asChild>
                     <SidebarMenuButton className={`hover:bg-muted/50 ${isBrasilActive ? "bg-primary/10 text-primary font-medium" : ""}`}>
@@ -105,7 +112,7 @@ export function AppSidebar() {
                     </SidebarMenuSub>
                   </CollapsibleContent>
                 </SidebarMenuItem>
-              </Collapsible>
+              </Collapsible>}
 
               {/* Uruguay */}
               <Collapsible defaultOpen={isUruguayActive} className="group/collapsible">
@@ -152,31 +159,33 @@ export function AppSidebar() {
                 </SidebarMenuItem>
               </Collapsible>
 
-              {/* Global pages */}
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <NavLink to="/recebiveis" className="hover:bg-muted/50" activeClassName="bg-primary/10 text-primary font-medium">
-                    <Wallet className="mr-2 h-4 w-4" />
-                    {!collapsed && <span>Receitas (Todos)</span>}
-                  </NavLink>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <NavLink to="/despesas" className="hover:bg-muted/50" activeClassName="bg-primary/10 text-primary font-medium">
-                    <ArrowLeftRight className="mr-2 h-4 w-4" />
-                    {!collapsed && <span>Despesas (Todos)</span>}
-                  </NavLink>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <NavLink to="/projecoes" className="hover:bg-muted/50" activeClassName="bg-primary/10 text-primary font-medium">
-                    <TrendingUp className="mr-2 h-4 w-4" />
-                    {!collapsed && <span>Projeções</span>}
-                  </NavLink>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+              {/* Global pages — apenas para acesso total */}
+              {showGlobal && <>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild>
+                    <NavLink to="/recebiveis" className="hover:bg-muted/50" activeClassName="bg-primary/10 text-primary font-medium">
+                      <Wallet className="mr-2 h-4 w-4" />
+                      {!collapsed && <span>Receitas (Todos)</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild>
+                    <NavLink to="/despesas" className="hover:bg-muted/50" activeClassName="bg-primary/10 text-primary font-medium">
+                      <ArrowLeftRight className="mr-2 h-4 w-4" />
+                      {!collapsed && <span>Despesas (Todos)</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild>
+                    <NavLink to="/projecoes" className="hover:bg-muted/50" activeClassName="bg-primary/10 text-primary font-medium">
+                      <TrendingUp className="mr-2 h-4 w-4" />
+                      {!collapsed && <span>Projeções</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </>}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
