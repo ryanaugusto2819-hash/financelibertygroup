@@ -1,3 +1,4 @@
+import React from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { ScenarioCard } from "@/components/ScenarioCard";
 import { formatCurrency, formatDate, formatCompact, getTotalExpensesMonth } from "@/lib/finance-data";
