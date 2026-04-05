@@ -78,8 +78,24 @@ const Receivables = ({ country }: ReceivablesProps = {}) => {
     queryClient.invalidateQueries({ queryKey: ["revenues"] });
   };
 
-  const summary = data?.summary;
-  const pedidos = data?.pedidos ?? [];
+  // Select summary based on country
+  const summary = useMemo(() => {
+    if (!data) return undefined;
+    if (country === "brasil") return data.summaryBrasil;
+    if (country === "uruguay") return data.summaryUruguay;
+    return data.summary;
+  }, [data, country]);
+
+  const pedidos = useMemo(() => {
+    const all = data?.pedidos ?? [];
+    if (!country) return all;
+    return all.filter(p => {
+      const pais = (p.pais || "").toLowerCase();
+      if (country === "brasil") return pais === "br" || pais === "brasil";
+      if (country === "uruguay") return pais === "uy" || pais === "uruguay";
+      return false;
+    });
+  }, [data, country]);
 
   // Combine manual revenue totals with Liberty data
   const manualTotal = useMemo(() => manualRevenues.reduce((s, r) => s + Number(r.amount), 0), [manualRevenues]);
