@@ -22,7 +22,7 @@ export default function Login() {
     setLoading(false);
 
     if (error) {
-      setError("Email ou senha incorretos.");
+      setError(error.message || "Email ou senha incorretos.");
       return;
     }
 
