@@ -29,22 +29,39 @@ const statusBadgeVariant = (status: string) => {
   return "secondary" as const;
 };
 
-const Receivables = () => {
-  const { dateRange } = useFinance();
+interface ReceivablesProps {
+  country?: "brasil" | "uruguay";
+}
+
+const Receivables = ({ country }: ReceivablesProps = {}) => {
+  const { dateRange, setCountryFilter, countryFilter } = useFinance();
   const { data, isLoading, error } = useLibertyData(dateRange.from, dateRange.to);
   const totalExpenses = getTotalExpensesMonth();
   const queryClient = useQueryClient();
 
-  // Load manual revenues
+  // Sync country prop to context
+  React.useEffect(() => {
+    if (country) {
+      setCountryFilter(country);
+    } else {
+      setCountryFilter("todos");
+    }
+  }, [country, setCountryFilter]);
+
+  // Load manual revenues filtered by country
   const { data: manualRevenues = [] } = useQuery({
-    queryKey: ["revenues", dateRange.from, dateRange.to],
+    queryKey: ["revenues", dateRange.from, dateRange.to, country],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("revenues")
         .select("*")
         .gte("date", dateRange.from)
         .lte("date", dateRange.to)
         .order("created_at", { ascending: false });
+      if (country) {
+        query = query.eq("country", country);
+      }
+      const { data, error } = await query;
       if (error) throw error;
       return data ?? [];
     },
