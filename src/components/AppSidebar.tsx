@@ -1,14 +1,11 @@
 import {
   LayoutDashboard,
   ArrowLeftRight,
-  PieChart,
-  Target,
   TrendingUp,
   Settings,
   Wallet,
   DollarSign,
-  CalendarClock,
-  BarChart3,
+  ChevronDown,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -21,23 +18,21 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+  SidebarMenuSubButton,
   SidebarFooter,
   useSidebar,
 } from "@/components/ui/sidebar";
-
-const mainItems = [
-  { title: "Visão Geral", url: "/", icon: LayoutDashboard },
-  { title: "🇧🇷 Brasil", url: "/brasil", icon: DollarSign },
-  { title: "🇺🇾 Uruguay", url: "/uruguay", icon: DollarSign },
-  { title: "Receitas", url: "/recebiveis", icon: Wallet },
-  { title: "Despesas", url: "/despesas", icon: ArrowLeftRight },
-  { title: "Projeções", url: "/projecoes", icon: TrendingUp },
-];
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const location = useLocation();
+
+  const isBrasilActive = location.pathname.startsWith("/brasil");
+  const isUruguayActive = location.pathname.startsWith("/uruguay");
 
   return (
     <Sidebar collapsible="icon">
@@ -58,21 +53,130 @@ export function AppSidebar() {
           <SidebarGroupLabel className="text-[10px] uppercase tracking-widest">Principal</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {mainItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink
-                      to={item.url}
-                      end={item.url === "/"}
-                      className="hover:bg-muted/50"
-                      activeClassName="bg-primary/10 text-primary font-medium"
-                    >
-                      <item.icon className="mr-2 h-4 w-4" />
-                      {!collapsed && <span>{item.title}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <NavLink to="/" end className="hover:bg-muted/50" activeClassName="bg-primary/10 text-primary font-medium">
+                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                    {!collapsed && <span>Visão Geral</span>}
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+
+              {/* Brasil */}
+              <Collapsible defaultOpen={isBrasilActive} className="group/collapsible">
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton className={`hover:bg-muted/50 ${isBrasilActive ? "bg-primary/10 text-primary font-medium" : ""}`}>
+                      <DollarSign className="mr-2 h-4 w-4" />
+                      {!collapsed && (
+                        <>
+                          <span className="flex-1">🇧🇷 Brasil</span>
+                          <ChevronDown className="ml-auto h-3.5 w-3.5 transition-transform group-data-[state=open]/collapsible:rotate-180" />
+                        </>
+                      )}
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton asChild>
+                          <NavLink to="/brasil" end className="hover:bg-muted/50" activeClassName="bg-primary/10 text-primary font-medium">
+                            <LayoutDashboard className="mr-2 h-3.5 w-3.5" />
+                            Dashboard
+                          </NavLink>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton asChild>
+                          <NavLink to="/brasil/recebiveis" className="hover:bg-muted/50" activeClassName="bg-primary/10 text-primary font-medium">
+                            <Wallet className="mr-2 h-3.5 w-3.5" />
+                            Receitas
+                          </NavLink>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton asChild>
+                          <NavLink to="/brasil/despesas" className="hover:bg-muted/50" activeClassName="bg-primary/10 text-primary font-medium">
+                            <ArrowLeftRight className="mr-2 h-3.5 w-3.5" />
+                            Despesas
+                          </NavLink>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
                 </SidebarMenuItem>
-              ))}
+              </Collapsible>
+
+              {/* Uruguay */}
+              <Collapsible defaultOpen={isUruguayActive} className="group/collapsible">
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton className={`hover:bg-muted/50 ${isUruguayActive ? "bg-primary/10 text-primary font-medium" : ""}`}>
+                      <DollarSign className="mr-2 h-4 w-4" />
+                      {!collapsed && (
+                        <>
+                          <span className="flex-1">🇺🇾 Uruguay</span>
+                          <ChevronDown className="ml-auto h-3.5 w-3.5 transition-transform group-data-[state=open]/collapsible:rotate-180" />
+                        </>
+                      )}
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton asChild>
+                          <NavLink to="/uruguay" end className="hover:bg-muted/50" activeClassName="bg-primary/10 text-primary font-medium">
+                            <LayoutDashboard className="mr-2 h-3.5 w-3.5" />
+                            Dashboard
+                          </NavLink>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton asChild>
+                          <NavLink to="/uruguay/recebiveis" className="hover:bg-muted/50" activeClassName="bg-primary/10 text-primary font-medium">
+                            <Wallet className="mr-2 h-3.5 w-3.5" />
+                            Receitas
+                          </NavLink>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton asChild>
+                          <NavLink to="/uruguay/despesas" className="hover:bg-muted/50" activeClassName="bg-primary/10 text-primary font-medium">
+                            <ArrowLeftRight className="mr-2 h-3.5 w-3.5" />
+                            Despesas
+                          </NavLink>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              </Collapsible>
+
+              {/* Global pages */}
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <NavLink to="/recebiveis" className="hover:bg-muted/50" activeClassName="bg-primary/10 text-primary font-medium">
+                    <Wallet className="mr-2 h-4 w-4" />
+                    {!collapsed && <span>Receitas (Todos)</span>}
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <NavLink to="/despesas" className="hover:bg-muted/50" activeClassName="bg-primary/10 text-primary font-medium">
+                    <ArrowLeftRight className="mr-2 h-4 w-4" />
+                    {!collapsed && <span>Despesas (Todos)</span>}
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <NavLink to="/projecoes" className="hover:bg-muted/50" activeClassName="bg-primary/10 text-primary font-medium">
+                    <TrendingUp className="mr-2 h-4 w-4" />
+                    {!collapsed && <span>Projeções</span>}
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

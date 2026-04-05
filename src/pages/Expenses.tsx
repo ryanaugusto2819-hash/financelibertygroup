@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { AddExpenseDialog } from "@/components/AddExpenseDialog";
 import { AIExpenseImportDialog } from "@/components/AIExpenseImportDialog";
@@ -31,8 +31,21 @@ const PAYMENT_SOURCE_LABELS: Record<string, string> = {
   nao_paga: "Não Paga",
 };
 
-const Expenses = () => {
-  const { expenses, selectedDate, dateRange, addAutoExpenses, registerFbAdsPayment, fbAdsAccumulated, fbAdsPaid, updateExpense, deleteExpense, countryFilter } = useFinance();
+interface ExpensesProps {
+  country?: "brasil" | "uruguay";
+}
+
+const Expenses = ({ country }: ExpensesProps = {}) => {
+  const { expenses, selectedDate, dateRange, addAutoExpenses, registerFbAdsPayment, fbAdsAccumulated, fbAdsPaid, updateExpense, deleteExpense, countryFilter, setCountryFilter } = useFinance();
+
+  // Sync country prop to context
+  React.useEffect(() => {
+    if (country) {
+      setCountryFilter(country);
+    } else {
+      setCountryFilter("todos");
+    }
+  }, [country, setCountryFilter]);
   const { data: libertyData } = useLibertyData(dateRange.from, dateRange.to);
   const { data: adsData } = useAdsSpend(dateRange.from, dateRange.to);
 
@@ -92,7 +105,7 @@ const Expenses = () => {
   const faturaRestante = Math.max(0, adsSpendTotal - fbAdsPaid);
 
   return (
-    <DashboardLayout title="Custos & Despesas" subtitle="Controle detalhado de gastos">
+    <DashboardLayout title={country === "brasil" ? "🇧🇷 Despesas Brasil" : country === "uruguay" ? "🇺🇾 Despesas Uruguay" : "Custos & Despesas"} subtitle="Controle detalhado de gastos" hideCountryFilter={!!country}>
       <div className="flex items-center justify-between mb-6">
         <DateFilter />
         <div className="flex gap-2">

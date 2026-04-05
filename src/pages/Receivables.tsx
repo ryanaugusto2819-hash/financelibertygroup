@@ -1,3 +1,4 @@
+import React from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { ScenarioCard } from "@/components/ScenarioCard";
 import { formatCurrency, formatDate, formatCompact, getTotalExpensesMonth } from "@/lib/finance-data";
@@ -29,22 +30,39 @@ const statusBadgeVariant = (status: string) => {
   return "secondary" as const;
 };
 
-const Receivables = () => {
-  const { dateRange } = useFinance();
+interface ReceivablesProps {
+  country?: "brasil" | "uruguay";
+}
+
+const Receivables = ({ country }: ReceivablesProps = {}) => {
+  const { dateRange, setCountryFilter, countryFilter } = useFinance();
   const { data, isLoading, error } = useLibertyData(dateRange.from, dateRange.to);
   const totalExpenses = getTotalExpensesMonth();
   const queryClient = useQueryClient();
 
-  // Load manual revenues
+  // Sync country prop to context
+  React.useEffect(() => {
+    if (country) {
+      setCountryFilter(country);
+    } else {
+      setCountryFilter("todos");
+    }
+  }, [country, setCountryFilter]);
+
+  // Load manual revenues filtered by country
   const { data: manualRevenues = [] } = useQuery({
-    queryKey: ["revenues", dateRange.from, dateRange.to],
+    queryKey: ["revenues", dateRange.from, dateRange.to, country],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("revenues")
         .select("*")
         .gte("date", dateRange.from)
         .lte("date", dateRange.to)
         .order("created_at", { ascending: false });
+      if (country) {
+        query = query.eq("country", country);
+      }
+      const { data, error } = await query;
       if (error) throw error;
       return data ?? [];
     },
@@ -60,8 +78,24 @@ const Receivables = () => {
     queryClient.invalidateQueries({ queryKey: ["revenues"] });
   };
 
-  const summary = data?.summary;
-  const pedidos = data?.pedidos ?? [];
+  // Select summary based on country
+  const summary = useMemo(() => {
+    if (!data) return undefined;
+    if (country === "brasil") return data.summaryBrasil;
+    if (country === "uruguay") return data.summaryUruguay;
+    return data.summary;
+  }, [data, country]);
+
+  const pedidos = useMemo(() => {
+    const all = data?.pedidos ?? [];
+    if (!country) return all;
+    return all.filter(p => {
+      const pais = (p.pais || "").toLowerCase();
+      if (country === "brasil") return pais === "br" || pais === "brasil";
+      if (country === "uruguay") return pais === "uy" || pais === "uruguay";
+      return false;
+    });
+  }, [data, country]);
 
   // Combine manual revenue totals with Liberty data
   const manualTotal = useMemo(() => manualRevenues.reduce((s, r) => s + Number(r.amount), 0), [manualRevenues]);
@@ -75,7 +109,7 @@ const Receivables = () => {
   ] : [];
 
   return (
-    <DashboardLayout title="Capital em Giro" subtitle="Receita real do LibertyPainel + Receitas Manuais">
+    <DashboardLayout title={country === "brasil" ? "🇧🇷 Receitas Brasil" : country === "uruguay" ? "🇺🇾 Receitas Uruguay" : "Capital em Giro"} subtitle="Receita real do LibertyPainel + Receitas Manuais" hideCountryFilter={!!country}>
       {/* KPIs */}
       {isLoading ? (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
