@@ -209,7 +209,7 @@ const Index = ({ country }: IndexProps = {}) => {
   const adsSpendForScenario = currentAdsData?.totalSpend ?? 0;
 
   return (
-    <DashboardLayout title="Painel Financeiro" subtitle="Controle financeiro executivo">
+    <DashboardLayout title={country === "brasil" ? "🇧🇷 Brasil" : country === "uruguay" ? "🇺🇾 Uruguay" : "Painel Financeiro"} subtitle={country ? "Controle financeiro" : "Controle financeiro executivo"} hideCountryFilter={!!country}>
       <div className="flex items-center justify-between mb-6">
         <DateFilter />
         <div className="flex items-center gap-2">
