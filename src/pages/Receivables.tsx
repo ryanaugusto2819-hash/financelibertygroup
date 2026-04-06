@@ -45,6 +45,27 @@ const Receivables = ({ country }: ReceivablesProps = {}) => {
   const { data, isLoading, error } = useLibertyData(dateRange.from, dateRange.to);
   const totalExpenses = getTotalExpensesMonth();
   const queryClient = useQueryClient();
+  const [payDialog, setPayDialog] = useState<{ id: string; nome: string } | null>(null);
+  const [payMethod, setPayMethod] = useState("pix");
+  const [paying, setPaying] = useState(false);
+
+  const handleMarkAsPago = async () => {
+    if (!payDialog) return;
+    setPaying(true);
+    try {
+      const { data: result, error } = await supabase.functions.invoke("update-liberty-pedido", {
+        body: { pedidoId: payDialog.id, status_pagamento: "pago", forma_pagamento: payMethod },
+      });
+      if (error) throw error;
+      toast.success(`Pedido de ${payDialog.nome} marcado como pago!`);
+      queryClient.invalidateQueries({ queryKey: ["liberty-data"] });
+      setPayDialog(null);
+    } catch (err: any) {
+      toast.error("Erro ao atualizar: " + (err?.message || "erro desconhecido"));
+    } finally {
+      setPaying(false);
+    }
+  };
 
   // Sync country prop to context
   React.useEffect(() => {
