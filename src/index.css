@@ -349,11 +349,11 @@
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: hsl(271 76% 53% / 0.3);
+    background: hsl(160 84% 39% / 0.25);
     border-radius: 99px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: hsl(271 76% 53% / 0.5);
+    background: hsl(160 84% 39% / 0.45);
   }
 
   .glow-primary {
@@ -365,14 +365,14 @@
   @keyframes pulse-glow {
     0%,
     100% {
-      box-shadow: 0 0 15px -5px hsl(var(--primary) / 0.2);
+      box-shadow: 0 0 15px -5px hsl(var(--primary) / 0.15);
     }
     50% {
-      box-shadow: 0 0 25px -5px hsl(var(--primary) / 0.4);
+      box-shadow: 0 0 25px -5px hsl(var(--primary) / 0.3);
     }
   }
 }
-/* Aplica accent-purple em todos os cards do projeto */
+/* Aplica accent em todos os cards do projeto */
 [class*="rounded"][class*="border"][class*="bg-card"]::before,
 [class*="rounded-xl"][class*="border"]::before {
   content: "";
@@ -382,7 +382,7 @@
   right: 0;
   height: 3px;
   border-radius: inherit;
-  background: linear-gradient(90deg, #7c3aed, #a78bfa);
+  background: linear-gradient(90deg, #10b981, #34d399);
 }
 [class*="rounded-xl"][class*="border"] {
   position: relative;
