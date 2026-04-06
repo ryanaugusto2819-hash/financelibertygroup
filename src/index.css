@@ -135,17 +135,17 @@
   }
 
   .glass-card {
-    background: hsl(var(--card) / 0.9);
-    backdrop-filter: blur(8px);
-    border: 1px solid hsl(var(--border) / 0.7);
-    box-shadow: 0 1px 8px hsl(0 0% 0% / 0.04);
+    background: hsl(var(--card) / 0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid hsl(var(--border) / 0.6);
+    box-shadow: 0 2px 16px hsl(0 0% 0% / 0.3), inset 0 1px 0 hsl(0 0% 100% / 0.03);
   }
 
   .liberty-gradient {
-    background: linear-gradient(135deg, hsl(271 76% 53%) 0%, hsl(300 76% 55%) 100%);
+    background: linear-gradient(135deg, hsl(160 84% 39%) 0%, hsl(172 66% 50%) 100%);
   }
   .liberty-gradient-text {
-    background: linear-gradient(135deg, hsl(271 76% 65%) 0%, hsl(300 76% 65%) 100%);
+    background: linear-gradient(135deg, hsl(160 84% 50%) 0%, hsl(172 66% 60%) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -154,11 +154,13 @@
   .card-hover {
     transition:
       transform 0.15s ease,
-      box-shadow 0.15s ease;
+      box-shadow 0.15s ease,
+      border-color 0.15s ease;
   }
   .card-hover:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px hsl(271 76% 53% / 0.12);
+    box-shadow: 0 8px 32px hsl(160 84% 39% / 0.1);
+    border-color: hsl(var(--border) / 1);
   }
 
   .cfo-card {
