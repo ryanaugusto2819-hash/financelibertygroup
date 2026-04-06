@@ -164,19 +164,21 @@
   }
 
   .cfo-card {
-    background: white;
+    background: hsl(var(--card));
     border-radius: 16px;
-    border: 1px solid hsl(270 12% 88%);
-    box-shadow: var(--shadow-sm);
+    border: 1px solid hsl(var(--border));
+    box-shadow: 0 2px 12px hsl(0 0% 0% / 0.25), inset 0 1px 0 hsl(0 0% 100% / 0.03);
     transition:
       box-shadow 0.25s ease,
-      transform 0.25s ease;
+      transform 0.25s ease,
+      border-color 0.25s ease;
     position: relative;
     overflow: hidden;
   }
   .cfo-card:hover {
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 4px 24px hsl(0 0% 0% / 0.35), inset 0 1px 0 hsl(0 0% 100% / 0.05);
     transform: translateY(-1px);
+    border-color: hsl(var(--border) / 1.5);
   }
   .cfo-card::before {
     content: "";
@@ -188,25 +190,25 @@
     border-radius: 16px 16px 0 0;
   }
   .accent-purple::before {
-    background: linear-gradient(90deg, #7c3aed, #a78bfa);
+    background: linear-gradient(90deg, #10b981, #34d399);
   }
   .accent-green::before {
-    background: linear-gradient(90deg, #059669, #34d399);
+    background: linear-gradient(90deg, #10b981, #34d399);
   }
   .accent-emerald::before {
     background: linear-gradient(90deg, #10b981, #6ee7b7);
   }
   .accent-amber::before {
-    background: linear-gradient(90deg, #d97706, #fbbf24);
+    background: linear-gradient(90deg, #f59e0b, #fbbf24);
   }
   .accent-red::before {
-    background: linear-gradient(90deg, #dc2626, #f87171);
+    background: linear-gradient(90deg, #ef4444, #f87171);
   }
   .accent-blue::before {
-    background: linear-gradient(90deg, #2563eb, #60a5fa);
+    background: linear-gradient(90deg, #0ea5e9, #38bdf8);
   }
   .accent-slate::before {
-    background: linear-gradient(90deg, #334155, #94a3b8);
+    background: linear-gradient(90deg, #475569, #94a3b8);
   }
 
   .icon-box {
