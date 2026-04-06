@@ -53,40 +53,40 @@
   }
 
   .dark {
-    --background: 258 38% 5%;
-    --foreground: 270 18% 92%;
-    --card: 258 35% 8%;
-    --card-foreground: 270 18% 92%;
-    --popover: 258 35% 9%;
-    --popover-foreground: 270 18% 92%;
-    --primary: 271 76% 63%;
+    --background: 240 20% 4%;
+    --foreground: 220 20% 93%;
+    --card: 240 18% 7%;
+    --card-foreground: 220 20% 93%;
+    --popover: 240 18% 8%;
+    --popover-foreground: 220 20% 93%;
+    --primary: 160 84% 39%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 258 32% 13%;
-    --secondary-foreground: 270 18% 92%;
-    --muted: 258 32% 13%;
-    --muted-foreground: 270 12% 55%;
-    --accent: 258 32% 14%;
-    --accent-foreground: 270 18% 92%;
-    --destructive: 0 62% 42%;
+    --secondary: 240 14% 12%;
+    --secondary-foreground: 220 20% 93%;
+    --muted: 240 14% 11%;
+    --muted-foreground: 220 10% 50%;
+    --accent: 240 14% 13%;
+    --accent-foreground: 220 20% 93%;
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
-    --success: 142 71% 45%;
+    --success: 160 84% 39%;
     --success-foreground: 0 0% 100%;
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
-    --info: 271 76% 63%;
+    --info: 199 89% 48%;
     --info-foreground: 0 0% 100%;
-    --border: 258 32% 14%;
-    --input: 258 32% 14%;
-    --ring: 271 76% 63%;
-    --sidebar-background: 258 38% 5%;
-    --sidebar-foreground: 270 18% 88%;
-    --sidebar-primary: 271 76% 63%;
+    --border: 240 14% 14%;
+    --input: 240 14% 14%;
+    --ring: 160 84% 39%;
+    --sidebar-background: 240 20% 3.5%;
+    --sidebar-foreground: 220 15% 75%;
+    --sidebar-primary: 160 84% 39%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 258 32% 11%;
-    --sidebar-accent-foreground: 270 18% 88%;
-    --sidebar-border: 258 32% 11%;
-    --sidebar-ring: 271 76% 63%;
-    --sidebar-muted: 270 12% 42%;
+    --sidebar-accent: 240 16% 10%;
+    --sidebar-accent-foreground: 220 15% 80%;
+    --sidebar-border: 240 14% 12%;
+    --sidebar-ring: 160 84% 39%;
+    --sidebar-muted: 220 10% 42%;
   }
 }
 
