@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { ScenarioCard } from "@/components/ScenarioCard";
 import { formatCurrency, formatDate, formatCompact, getTotalExpensesMonth } from "@/lib/finance-data";
@@ -10,12 +10,18 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from "recharts";
 import { KPICard } from "@/components/KPICard";
-import { DollarSign, Wallet, Clock, XCircle, Trash2 } from "lucide-react";
+import { DollarSign, Wallet, Clock, XCircle, Trash2, CheckCircle, Loader2 } from "lucide-react";
 import { AddRevenueDialog } from "@/components/AddRevenueDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { useMemo } from "react";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
 
 const statusColor: Record<string, string> = {
   pago: "hsl(152, 60%, 48%)",
@@ -39,6 +45,27 @@ const Receivables = ({ country }: ReceivablesProps = {}) => {
   const { data, isLoading, error } = useLibertyData(dateRange.from, dateRange.to);
   const totalExpenses = getTotalExpensesMonth();
   const queryClient = useQueryClient();
+  const [payDialog, setPayDialog] = useState<{ id: string; nome: string } | null>(null);
+  const [payMethod, setPayMethod] = useState("pix");
+  const [paying, setPaying] = useState(false);
+
+  const handleMarkAsPago = async () => {
+    if (!payDialog) return;
+    setPaying(true);
+    try {
+      const { data: result, error } = await supabase.functions.invoke("update-liberty-pedido", {
+        body: { pedidoId: payDialog.id, status_pagamento: "pago", forma_pagamento: payMethod },
+      });
+      if (error) throw error;
+      toast.success(`Pedido de ${payDialog.nome} marcado como pago!`);
+      queryClient.invalidateQueries({ queryKey: ["liberty-data"] });
+      setPayDialog(null);
+    } catch (err: any) {
+      toast.error("Erro ao atualizar: " + (err?.message || "erro desconhecido"));
+    } finally {
+      setPaying(false);
+    }
+  };
 
   // Sync country prop to context
   React.useEffect(() => {
@@ -212,42 +239,86 @@ const Receivables = ({ country }: ReceivablesProps = {}) => {
               <table className="w-full text-xs">
                 <thead>
                   <tr className="border-b border-border text-muted-foreground">
-                    <th className="text-left pb-3 font-medium">Cliente</th>
-                    <th className="text-left pb-3 font-medium">Produto</th>
-                    <th className="text-left pb-3 font-medium">País</th>
-                    <th className="text-left pb-3 font-medium">Data</th>
-                    <th className="text-right pb-3 font-medium">Valor</th>
-                    <th className="text-center pb-3 font-medium">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {pedidos.map(p => (
-                    <tr key={p.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
-                      <td className="py-3 font-medium text-foreground">{p.nome}</td>
-                      <td className="py-3 text-muted-foreground">{p.produto}</td>
-                      <td className="py-3 text-muted-foreground">{p.pais === "brasil" ? "🇧🇷" : p.pais === "uruguay" ? "🇺🇾" : p.pais}</td>
-                      <td className="py-3 font-mono text-muted-foreground">{formatDate(p.data_entrada)}</td>
-                      <td className="py-3 text-right font-mono font-medium text-foreground">{formatCurrency(p.valor)}</td>
-                      <td className="py-3 text-center">
-                        <Badge variant={statusBadgeVariant(p.status_pagamento)} className="text-[10px]">
-                          {p.status_pagamento}
-                        </Badge>
-                      </td>
-                    </tr>
-                  ))}
-                  {pedidos.length === 0 && (
-                    <tr>
-                      <td colSpan={6} className="py-8 text-center text-muted-foreground italic">Nenhum pedido encontrado no período.</td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </>
-      )}
-    </DashboardLayout>
-  );
-};
+                     <th className="text-left pb-3 font-medium">Cliente</th>
+                     <th className="text-left pb-3 font-medium">Produto</th>
+                     <th className="text-left pb-3 font-medium">País</th>
+                     <th className="text-left pb-3 font-medium">Data</th>
+                     <th className="text-right pb-3 font-medium">Valor</th>
+                     <th className="text-center pb-3 font-medium">Status</th>
+                     <th className="text-center pb-3 font-medium">Ação</th>
+                   </tr>
+                 </thead>
+                 <tbody>
+                   {pedidos.map(p => (
+                     <tr key={p.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
+                       <td className="py-3 font-medium text-foreground">{p.nome}</td>
+                       <td className="py-3 text-muted-foreground">{p.produto}</td>
+                       <td className="py-3 text-muted-foreground">{p.pais === "brasil" ? "🇧🇷" : p.pais === "uruguay" ? "🇺🇾" : p.pais}</td>
+                       <td className="py-3 font-mono text-muted-foreground">{formatDate(p.data_entrada)}</td>
+                       <td className="py-3 text-right font-mono font-medium text-foreground">{formatCurrency(p.valor)}</td>
+                       <td className="py-3 text-center">
+                         <Badge variant={statusBadgeVariant(p.status_pagamento)} className="text-[10px]">
+                           {p.status_pagamento}
+                         </Badge>
+                       </td>
+                       <td className="py-3 text-center">
+                         {p.status_pagamento === "pendente" && (
+                           <button
+                             onClick={() => setPayDialog({ id: p.id, nome: p.nome })}
+                             className="text-emerald-400 hover:text-emerald-300 transition-colors p-1"
+                             title="Marcar como pago"
+                           >
+                             <CheckCircle className="h-4 w-4" />
+                           </button>
+                         )}
+                       </td>
+                     </tr>
+                   ))}
+                   {pedidos.length === 0 && (
+                     <tr>
+                       <td colSpan={7} className="py-8 text-center text-muted-foreground italic">Nenhum pedido encontrado no período.</td>
+                     </tr>
+                   )}
+                 </tbody>
+               </table>
+             </div>
+           </div>
 
-export default Receivables;
+           {/* Dialog marcar como pago */}
+           <Dialog open={!!payDialog} onOpenChange={(open) => !open && setPayDialog(null)}>
+             <DialogContent className="sm:max-w-md">
+               <DialogHeader>
+                 <DialogTitle>Marcar como Pago</DialogTitle>
+               </DialogHeader>
+               <p className="text-sm text-muted-foreground">
+                 Confirmar pagamento de <span className="font-semibold text-foreground">{payDialog?.nome}</span>?
+               </p>
+               <div className="space-y-2">
+                 <label className="text-xs font-medium text-muted-foreground">Forma de pagamento</label>
+                 <Select value={payMethod} onValueChange={setPayMethod}>
+                   <SelectTrigger>
+                     <SelectValue />
+                   </SelectTrigger>
+                   <SelectContent>
+                     <SelectItem value="pix">PIX</SelectItem>
+                     <SelectItem value="cartao">Cartão</SelectItem>
+                     <SelectItem value="boleto">Boleto</SelectItem>
+                   </SelectContent>
+                 </Select>
+               </div>
+               <DialogFooter>
+                 <Button variant="outline" onClick={() => setPayDialog(null)} disabled={paying}>Cancelar</Button>
+                 <Button onClick={handleMarkAsPago} disabled={paying}>
+                   {paying && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                   Confirmar Pagamento
+                 </Button>
+               </DialogFooter>
+             </DialogContent>
+           </Dialog>
+         </>
+       )}
+     </DashboardLayout>
+   );
+ };
+
+ export default Receivables;
