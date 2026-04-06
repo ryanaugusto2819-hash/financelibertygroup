@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { ScenarioCard } from "@/components/ScenarioCard";
 import { formatCurrency, formatDate, formatCompact, getTotalExpensesMonth } from "@/lib/finance-data";
@@ -10,12 +10,18 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from "recharts";
 import { KPICard } from "@/components/KPICard";
-import { DollarSign, Wallet, Clock, XCircle, Trash2 } from "lucide-react";
+import { DollarSign, Wallet, Clock, XCircle, Trash2, CheckCircle, Loader2 } from "lucide-react";
 import { AddRevenueDialog } from "@/components/AddRevenueDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { useMemo } from "react";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
 
 const statusColor: Record<string, string> = {
   pago: "hsl(152, 60%, 48%)",
