@@ -12,7 +12,7 @@ import {
 import { useFinance } from "@/context/FinanceContext";
 import { useLibertyData } from "@/hooks/useLibertyData";
 import { useAdsSpend } from "@/hooks/useAdsSpend";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from "recharts";
@@ -24,6 +24,7 @@ import { Badge } from "@/components/ui/badge";
 import React, { useMemo, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
+import { supabase } from "@/integrations/supabase/client";
 
 // Product cost per unit by country
 const PRODUCT_COST = { brasil: 13, uruguay: 5 };
@@ -98,6 +99,23 @@ const Index = ({ country }: IndexProps = {}) => {
     return adsData;
   }, [adsData, countryFilter]);
 
+  // Load manual revenues
+  const { data: manualRevenues = [] } = useQuery({
+    queryKey: ["revenues", countryFilter],
+    queryFn: async () => {
+      let query = supabase.from("revenues").select("*").order("created_at", { ascending: false });
+      if (countryFilter === "brasil") query = query.eq("country", "brasil");
+      else if (countryFilter === "uruguay") query = query.eq("country", "uruguay");
+      const { data, error } = await query;
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const manualRevTotal = useMemo(() => manualRevenues.reduce((s, r) => s + Number(r.amount), 0), [manualRevenues]);
+  const manualRevPago = useMemo(() => manualRevenues.filter(r => r.status === "pago").reduce((s, r) => s + Number(r.amount), 0), [manualRevenues]);
+  const manualRevPendente = useMemo(() => manualRevenues.filter(r => r.status === "pendente").reduce((s, r) => s + Number(r.amount), 0), [manualRevenues]);
+
   // Filter expenses by period
   const periodExpenses = useMemo(() =>
     expenses.filter(e => e.date >= dateRange.from && e.date <= dateRange.to),
@@ -114,8 +132,8 @@ const Index = ({ country }: IndexProps = {}) => {
   const periodGrossProfit = periodIncome - periodOut;
   const totalExpensesPeriod = periodExpenses.reduce((s, e) => s + e.amount, 0);
 
-  const totalReceivable = summary?.totalPendente ?? 0;
-  const totalReceived = summary?.totalPago ?? 0;
+  const totalReceivable = (summary?.totalPendente ?? 0) + manualRevPendente;
+  const totalReceived = (summary?.totalPago ?? 0) + manualRevPago;
   const totalRecebidoPix = summary?.totalPagoPix ?? 0;
   const totalRecebidoCartaoBoleto = (summary?.totalPagoCartao ?? 0) + (summary?.totalPagoBoleto ?? 0);
 
@@ -218,6 +236,7 @@ const Index = ({ country }: IndexProps = {}) => {
               setIsRefreshing(true);
               await queryClient.invalidateQueries({ queryKey: ["liberty-data"] });
               await queryClient.invalidateQueries({ queryKey: ["ads-spend"] });
+              await queryClient.invalidateQueries({ queryKey: ["revenues"] });
               setIsRefreshing(false);
             }}
             className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors text-xs font-medium"
@@ -395,9 +414,9 @@ const Index = ({ country }: IndexProps = {}) => {
 
       {/* Receita — Período */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
-        <KPICard label={`Total Recebido (${periodLabel})`} value={summary?.totalPago ?? 0} prefix="R$" icon={Wallet} index={0} variant="positive" />
-        <KPICard label="Receita Total — Período Total" value={summaryTotal?.totalValor ?? 0} prefix="R$" icon={DollarSign} index={1} />
-        <KPICard label="Receita Já Recebida — Período Total" value={summaryTotal?.totalPago ?? 0} prefix="R$" icon={Wallet} index={2} variant="positive" />
+        <KPICard label={`Total Recebido (${periodLabel})`} value={(summary?.totalPago ?? 0) + manualRevPago} prefix="R$" icon={Wallet} index={0} variant="positive" />
+        <KPICard label="Receita Total — Período Total" value={(summaryTotal?.totalValor ?? 0) + manualRevTotal} prefix="R$" icon={DollarSign} index={1} />
+        <KPICard label="Receita Já Recebida — Período Total" value={(summaryTotal?.totalPago ?? 0) + manualRevPago} prefix="R$" icon={Wallet} index={2} variant="positive" />
       </div>
 
       {/* Cenários de Pagamento */}
