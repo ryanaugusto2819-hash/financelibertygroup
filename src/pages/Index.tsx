@@ -12,7 +12,7 @@ import {
 import { useFinance } from "@/context/FinanceContext";
 import { useLibertyData } from "@/hooks/useLibertyData";
 import { useAdsSpend } from "@/hooks/useAdsSpend";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from "recharts";
@@ -24,6 +24,7 @@ import { Badge } from "@/components/ui/badge";
 import React, { useMemo, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
+import { supabase } from "@/integrations/supabase/client";
 
 // Product cost per unit by country
 const PRODUCT_COST = { brasil: 13, uruguay: 5 };
