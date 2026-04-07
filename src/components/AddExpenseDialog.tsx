@@ -35,13 +35,13 @@ export function AddExpenseDialog() {
     frequency: "mensal" as "mensal" | "quinzenal",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.description || !form.category || !form.amount) {
       toast.error("Preencha todos os campos obrigatórios");
       return;
     }
-    addExpense({
+    const result = await addExpense({
       description: form.description,
       category: form.category,
       amount: parseFloat(form.amount),
@@ -51,12 +51,18 @@ export function AddExpenseDialog() {
       paymentSource: form.paymentSource,
       country: form.country || undefined,
     });
+
+    if (!result.success) {
+      toast.error(result.error || "Erro ao salvar custo.");
+      return;
+    }
+
     toast.success("Custo lançado com sucesso!");
     setOpen(false);
     setForm({ description: "", category: "", amount: "", date: new Date().toISOString().split("T")[0], type: "variavel", status: "pendente", paymentSource: "nao_paga", country: "" });
   };
 
-  const handleSalarySubmit = (e: React.FormEvent) => {
+  const handleSalarySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!salaryForm.employeeName || !salaryForm.amount) {
       toast.error("Preencha nome e valor do salário");
@@ -74,7 +80,7 @@ export function AddExpenseDialog() {
       secondDate.setDate(secondDate.getDate() + 15);
       const secondDateStr = secondDate.toISOString().split("T")[0];
 
-      addExpense({
+      const firstResult = await addExpense({
         description: `${baseName} (1ª quinzena)`,
         category: "Salários",
         amount: halfAmount,
@@ -83,7 +89,13 @@ export function AddExpenseDialog() {
         status: salaryForm.status,
         country: salaryForm.country as any,
       });
-      addExpense({
+
+      if (!firstResult.success) {
+        toast.error(firstResult.error || "Erro ao lançar salário.");
+        return;
+      }
+
+      const secondResult = await addExpense({
         description: `${baseName} (2ª quinzena)`,
         category: "Salários",
         amount: halfAmount,
@@ -92,9 +104,15 @@ export function AddExpenseDialog() {
         status: salaryForm.status,
         country: salaryForm.country as any,
       });
+
+      if (!secondResult.success) {
+        toast.error(secondResult.error || "Erro ao lançar segunda parcela do salário.");
+        return;
+      }
+
       toast.success("Salário quinzenal lançado (2 parcelas)!");
     } else {
-      addExpense({
+      const result = await addExpense({
         description: baseName,
         category: "Salários",
         amount: parseFloat(salaryForm.amount),
@@ -103,6 +121,12 @@ export function AddExpenseDialog() {
         status: salaryForm.status,
         country: salaryForm.country as any,
       });
+
+      if (!result.success) {
+        toast.error(result.error || "Erro ao lançar salário.");
+        return;
+      }
+
       toast.success("Salário lançado com sucesso!");
     }
     setOpen(false);

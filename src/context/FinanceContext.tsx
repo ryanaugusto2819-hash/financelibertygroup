@@ -11,11 +11,11 @@ export type CountryFilter = "todos" | "brasil" | "uruguay";
 interface FinanceContextType {
   expenses: Expense[];
   allExpenses: Expense[];
-  addExpense: (expense: Omit<Expense, "id">) => void;
-  updateExpense: (id: string, data: Partial<Omit<Expense, "id">>) => void;
-  deleteExpense: (id: string) => void;
+  addExpense: (expense: Omit<Expense, "id">) => Promise<{ success: boolean; error?: string }>;
+  updateExpense: (id: string, data: Partial<Omit<Expense, "id">>) => Promise<{ success: boolean; error?: string }>;
+  deleteExpense: (id: string) => Promise<{ success: boolean; error?: string }>;
   addAutoExpenses: (autoExpenses: Omit<Expense, "id">[]) => void;
-  registerFbAdsPayment: (amount: number, source: PaymentSource) => void;
+  registerFbAdsPayment: (amount: number, source: PaymentSource) => Promise<{ success: boolean; error?: string }>;
   fbAdsAccumulated: number;
   fbAdsPaid: number;
   selectedDate: string;
@@ -197,14 +197,13 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
 
     if (!error && data) {
       setAllExpenses(prev => [rowToExpense(data), ...prev]);
-    } else {
-      const id = `DES${String(Date.now()).slice(-6)}`;
-      setAllExpenses(prev => [{ ...expense, id }, ...prev]);
+      return { success: true };
     }
+
+    return { success: false, error: error?.message ?? "Erro ao salvar despesa." };
   }, []);
 
   const updateExpense = useCallback(async (id: string, updates: Partial<Omit<Expense, "id">>) => {
-    setAllExpenses(prev => prev.map(e => e.id === id ? { ...e, ...updates } : e));
     const dbUpdates: any = {};
     if (updates.description !== undefined) dbUpdates.description = updates.description;
     if (updates.amount !== undefined) dbUpdates.amount = updates.amount;
@@ -214,13 +213,33 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     if (updates.date !== undefined) dbUpdates.date = updates.date;
     if (updates.country !== undefined) dbUpdates.country = updates.country;
     if (updates.paymentSource !== undefined) dbUpdates.payment_source = updates.paymentSource;
-    await supabase.from("expenses").update(dbUpdates).eq("id", id);
-  }, []);
+
+    const previous = allExpenses;
+    setAllExpenses(prev => prev.map(e => e.id === id ? { ...e, ...updates } : e));
+
+    const { error } = await supabase.from("expenses").update(dbUpdates).eq("id", id);
+
+    if (error) {
+      setAllExpenses(previous);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true };
+  }, [allExpenses]);
 
   const deleteExpense = useCallback(async (id: string) => {
+    const previous = allExpenses;
     setAllExpenses(prev => prev.filter(e => e.id !== id));
-    await supabase.from("expenses").delete().eq("id", id);
-  }, []);
+
+    const { error } = await supabase.from("expenses").delete().eq("id", id);
+
+    if (error) {
+      setAllExpenses(previous);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true };
+  }, [allExpenses]);
 
   const addAutoExpenses = useCallback((autoExpenses: Omit<Expense, "id">[]) => {
     setAllExpenses(prev => {
@@ -241,8 +260,6 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
 
   const registerFbAdsPayment = useCallback(async (amount: number, source: PaymentSource) => {
     const newPaid = fbAdsPaid + amount;
-    setFbAdsPaidState(newPaid);
-    persistManualValue("fbAdsPaid", newPaid);
     const expenseData = {
       date: today,
       description: `Pagamento Facebook ADS`,
@@ -261,12 +278,15 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       })
       .select()
       .single();
+
     if (!error && data) {
+      setFbAdsPaidState(newPaid);
+      persistManualValue("fbAdsPaid", newPaid);
       setAllExpenses(prev => [rowToExpense(data), ...prev]);
-    } else {
-      const id = `FBPAY${String(Date.now()).slice(-6)}`;
-      setAllExpenses(prev => [{ ...expenseData, id }, ...prev]);
+      return { success: true };
     }
+
+    return { success: false, error: error?.message ?? "Erro ao registrar pagamento do Facebook ADS." };
   }, [fbAdsPaid, persistManualValue]);
 
   return (
