@@ -251,7 +251,7 @@ const Index = ({ country }: IndexProps = {}) => {
 
       {/* Main KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-3 mb-6">
-        <KPICard label="Receita em Caixa + Saque" value={currentCash + saqueDisponivel} prefix="R$" icon={DollarSign} index={0} variant="positive" />
+        <KPICard label="Receita em Caixa + Saque" value={currentCash + saqueDisponivel + manualRevPago} prefix="R$" icon={DollarSign} index={0} variant="positive" />
         
         {/* Caixa */}
         {editingCash ? (
@@ -439,7 +439,7 @@ const Index = ({ country }: IndexProps = {}) => {
 
       {/* Period Summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
-        <KPICard label={`Entradas (${periodLabel})`} value={periodIncome + totalRecebidoCartaoBoleto} prefix="R$" icon={ArrowUpRight} index={0} variant="positive" />
+        <KPICard label={`Entradas (${periodLabel})`} value={periodIncome + totalRecebidoCartaoBoleto + manualRevPago} prefix="R$" icon={ArrowUpRight} index={0} variant="positive" />
         <KPICard label={`Saídas (${periodLabel})`} value={periodOut + totalFrete} prefix="R$" icon={ArrowDownRight} index={1} variant="negative" />
         <KPICard label={`Lucro Líquido (${isSingleDay ? "Dia" : "Período"})`} value={periodGrossProfit * 0.85} prefix="R$" icon={TrendingUp} index={2} variant={periodGrossProfit >= 0 ? "positive" : "negative"} />
       </div>
