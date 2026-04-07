@@ -384,7 +384,7 @@ function FbAdsPaymentDialog({ onPay, remaining }: { onPay: (amount: number, sour
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" variant="outline" className="gap-1.5" disabled={remaining <= 0}>
+        <Button size="sm" variant="outline" className="gap-1.5">
           <CreditCard className="w-3.5 h-3.5" /> Registrar Pagamento
         </Button>
       </DialogTrigger>
