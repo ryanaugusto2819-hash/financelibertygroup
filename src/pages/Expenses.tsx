@@ -15,6 +15,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
 import { CreditCard, Pencil, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import {
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend,
 } from "recharts";
@@ -220,7 +221,17 @@ const Expenses = ({ country }: ExpensesProps = {}) => {
                               </AlertDialogHeader>
                               <AlertDialogFooter>
                                 <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => deleteExpense(e.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                            <AlertDialogAction
+                              onClick={async () => {
+                                const result = await deleteExpense(e.id);
+                                if (!result.success) {
+                                  toast.error(result.error || "Erro ao remover despesa.");
+                                  return;
+                                }
+                                toast.success("Despesa removida.");
+                              }}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
                                   Remover
                                 </AlertDialogAction>
                               </AlertDialogFooter>
@@ -241,7 +252,7 @@ const Expenses = ({ country }: ExpensesProps = {}) => {
 };
 
 // Edit expense dialog
-function EditExpenseDialog({ expense, onSave }: { expense: Expense; onSave: (id: string, data: Partial<Omit<Expense, "id">>) => void }) {
+function EditExpenseDialog({ expense, onSave }: { expense: Expense; onSave: (id: string, data: Partial<Omit<Expense, "id">>) => Promise<{ success: boolean; error?: string }> }) {
   const [open, setOpen] = useState(false);
   const [description, setDescription] = useState(expense.description);
   const [amount, setAmount] = useState(String(expense.amount));
@@ -251,12 +262,19 @@ function EditExpenseDialog({ expense, onSave }: { expense: Expense; onSave: (id:
   const [date, setDate] = useState(expense.date);
   const [paymentSource, setPaymentSource] = useState<PaymentSource | "">(expense.paymentSource || "");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(expense.id, {
+    const result = await onSave(expense.id, {
       description, amount: parseFloat(amount), category, type, status, date,
       paymentSource: paymentSource || undefined,
     });
+
+    if (!result.success) {
+      toast.error(result.error || "Erro ao salvar alterações.");
+      return;
+    }
+
+    toast.success("Despesa atualizada.");
     setOpen(false);
   };
 
@@ -342,16 +360,23 @@ function EditExpenseDialog({ expense, onSave }: { expense: Expense; onSave: (id:
 }
 
 // FB Ads payment dialog
-function FbAdsPaymentDialog({ onPay, remaining }: { onPay: (amount: number, source: "caixa" | "saque" | "nao_paga") => void; remaining: number }) {
+function FbAdsPaymentDialog({ onPay, remaining }: { onPay: (amount: number, source: "caixa" | "saque" | "nao_paga") => Promise<{ success: boolean; error?: string }>; remaining: number }) {
   const [open, setOpen] = useState(false);
   const [amount, setAmount] = useState("");
   const [source, setSource] = useState<"caixa" | "saque">("caixa");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const val = parseFloat(amount);
     if (!val || val <= 0) return;
-    onPay(val, source);
+
+    const result = await onPay(val, source);
+    if (!result.success) {
+      toast.error(result.error || "Erro ao registrar pagamento.");
+      return;
+    }
+
+    toast.success("Pagamento registrado.");
     setOpen(false);
     setAmount("");
   };
