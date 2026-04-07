@@ -35,6 +35,9 @@ export function useAdsSpend(from?: string, to?: string) {
       return data as AdsSpendData;
     },
     enabled: !!from && !!to,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 0,
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+    refetchOnReconnect: true,
   });
 }
