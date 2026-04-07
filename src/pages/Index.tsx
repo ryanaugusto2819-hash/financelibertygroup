@@ -236,6 +236,7 @@ const Index = ({ country }: IndexProps = {}) => {
               setIsRefreshing(true);
               await queryClient.invalidateQueries({ queryKey: ["liberty-data"] });
               await queryClient.invalidateQueries({ queryKey: ["ads-spend"] });
+              await queryClient.invalidateQueries({ queryKey: ["revenues"] });
               setIsRefreshing(false);
             }}
             className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors text-xs font-medium"
