@@ -44,11 +44,27 @@ function aggregateMetrics(metrics: any[]) {
   };
 }
 
-// Detect country from campaign name (e.g. "BR - ..." or "UY - ...")
+function tokenizeCampaignName(name: string) {
+  return (name || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter(Boolean);
+}
+
+// Detect country from campaign tokens, including names like "(EMA-BR) ..."
 function getCampaignCountry(name: string): "brasil" | "uruguay" | "unknown" {
-  const n = (name || "").toLowerCase();
-  if (n.startsWith("(br") || n.startsWith("br ") || n.startsWith("br-") || n.startsWith("br_") || n.includes("brasil")) return "brasil";
-  if (n.startsWith("(uy") || n.startsWith("uy ") || n.startsWith("uy-") || n.startsWith("uy_") || n.includes("uruguay")) return "uruguay";
+  const tokens = tokenizeCampaignName(name);
+
+  if (tokens.includes("br") || tokens.includes("brasil") || tokens.includes("brazil")) {
+    return "brasil";
+  }
+
+  if (tokens.includes("uy") || tokens.includes("uruguay") || tokens.includes("uruguai")) {
+    return "uruguay";
+  }
+
   return "unknown";
 }
 
