@@ -87,15 +87,15 @@ export function AIExpenseImportDialog() {
     setExpenses((prev) => prev.map((e) => ({ ...e, selected: !allSelected })));
   };
 
-  const importSelected = () => {
+  const importSelected = async () => {
     const selected = expenses.filter((e) => e.selected);
     if (selected.length === 0) {
       toast.error("Selecione pelo menos uma despesa");
       return;
     }
 
-    selected.forEach((exp) => {
-      addExpense({
+    for (const exp of selected) {
+      const result = await addExpense({
         description: exp.description,
         category: exp.category,
         amount: exp.amount,
@@ -103,7 +103,12 @@ export function AIExpenseImportDialog() {
         type: exp.type,
         status: exp.status,
       });
-    });
+
+      if (!result.success) {
+        toast.error(result.error || "Erro ao importar despesas.");
+        return;
+      }
+    }
 
     toast.success(`${selected.length} despesa(s) importada(s) com sucesso!`);
     setOpen(false);
