@@ -132,8 +132,8 @@ const Index = ({ country }: IndexProps = {}) => {
   const periodGrossProfit = periodIncome - periodOut;
   const totalExpensesPeriod = periodExpenses.reduce((s, e) => s + e.amount, 0);
 
-  const totalReceivable = summary?.totalPendente ?? 0;
-  const totalReceived = summary?.totalPago ?? 0;
+  const totalReceivable = (summary?.totalPendente ?? 0) + manualRevPendente;
+  const totalReceived = (summary?.totalPago ?? 0) + manualRevPago;
   const totalRecebidoPix = summary?.totalPagoPix ?? 0;
   const totalRecebidoCartaoBoleto = (summary?.totalPagoCartao ?? 0) + (summary?.totalPagoBoleto ?? 0);
 
