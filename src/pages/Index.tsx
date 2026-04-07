@@ -99,6 +99,23 @@ const Index = ({ country }: IndexProps = {}) => {
     return adsData;
   }, [adsData, countryFilter]);
 
+  // Load manual revenues
+  const { data: manualRevenues = [] } = useQuery({
+    queryKey: ["revenues", countryFilter],
+    queryFn: async () => {
+      let query = supabase.from("revenues").select("*").order("created_at", { ascending: false });
+      if (countryFilter === "brasil") query = query.eq("country", "brasil");
+      else if (countryFilter === "uruguay") query = query.eq("country", "uruguay");
+      const { data, error } = await query;
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const manualRevTotal = useMemo(() => manualRevenues.reduce((s, r) => s + Number(r.amount), 0), [manualRevenues]);
+  const manualRevPago = useMemo(() => manualRevenues.filter(r => r.status === "pago").reduce((s, r) => s + Number(r.amount), 0), [manualRevenues]);
+  const manualRevPendente = useMemo(() => manualRevenues.filter(r => r.status === "pendente").reduce((s, r) => s + Number(r.amount), 0), [manualRevenues]);
+
   // Filter expenses by period
   const periodExpenses = useMemo(() =>
     expenses.filter(e => e.date >= dateRange.from && e.date <= dateRange.to),
