@@ -413,8 +413,7 @@ const Index = ({ country }: IndexProps = {}) => {
       </div>
 
       {/* Receita — Período */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
-        <KPICard label={`Total Recebido (${periodLabel})`} value={(summary?.totalPago ?? 0) + manualRevPago} prefix="R$" icon={Wallet} index={0} variant="positive" />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
         <KPICard label="Receita Total — Período Total" value={(summaryTotal?.totalValor ?? 0) + manualRevTotal} prefix="R$" icon={DollarSign} index={1} />
         <KPICard label="Receita Já Recebida — Período Total" value={(summaryTotal?.totalPago ?? 0) + manualRevPago} prefix="R$" icon={Wallet} index={2} variant="positive" />
       </div>
