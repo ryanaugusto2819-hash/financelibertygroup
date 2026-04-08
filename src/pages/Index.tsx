@@ -185,14 +185,39 @@ const Index = ({ country }: IndexProps = {}) => {
   const totalRecebidoCartaoBoleto = paymentsByPeriod.cartao + paymentsByPeriod.boleto;
   const totalReceived = totalRecebidoPix + totalRecebidoCartaoBoleto;
 
+  // Pagamentos por país (para auto-caixa e auto-saque)
+  const countryPayments = useMemo(() => {
+    const allPedidos = libertyDataTotal?.pedidos ?? [];
+    const toDateBR = (ts: string | null) => ts ? ts.substring(0, 10) : null;
+    let pixBR = 0, cartaoBolBR = 0, pixUY = 0, cartaoBolUY = 0;
+    for (const p of allPedidos) {
+      if (p.status_pagamento !== "pago") continue;
+      const d = toDateBR(p.data_pagamento);
+      if (!d || d < dateRange.from || d > dateRange.to) continue;
+      const pais = (p.pais || "").toLowerCase();
+      const forma = (p.forma_pagamento || "").toLowerCase();
+      const valor = p.valor || 0;
+      if (pais === "br" || pais === "brasil") {
+        if (forma === "pix") pixBR += valor;
+        else if (["cartao", "cartão", "boleto"].includes(forma)) cartaoBolBR += valor;
+      } else if (pais === "uy" || pais === "uruguay") {
+        if (forma === "pix") pixUY += valor;
+        else cartaoBolUY += valor;
+      }
+    }
+    return { pixBR, cartaoBolBR, pixUY, cartaoBolUY };
+  }, [libertyDataTotal, dateRange]);
+
   const totalPayable = getTotalAccountsPayable();
   const pendingExpensesList = useMemo(() => expenses.filter(e => e.status === "pendente"), [expenses]);
   const scheduledExpensesList = useMemo(() => expenses.filter(e => e.status === "agendado"), [expenses]);
   const totalPendingExpenses = pendingExpensesList.reduce((s, e) => s + e.amount, 0);
   const scheduledExpensesTotal = scheduledExpensesList.reduce((s, e) => s + e.amount, 0);
   const totalPayableWithScheduled = totalPendingExpenses + scheduledExpensesTotal;
-  const currentCashBR = manualCashBR ?? 0;
-  const currentCashUY = manualCashUY ?? 0;
+
+  // Caixa auto = PIX recebido no período por país
+  const currentCashBR = manualCashBR !== null ? manualCashBR : countryPayments.pixBR;
+  const currentCashUY = manualCashUY !== null ? manualCashUY : countryPayments.pixUY;
   const currentCash = countryFilter === "brasil" ? currentCashBR
     : countryFilter === "uruguay" ? currentCashUY
     : (manualCash !== null ? manualCash : currentCashBR + currentCashUY);
@@ -234,11 +259,11 @@ const Index = ({ country }: IndexProps = {}) => {
   const custoDiarias = (totalSalariosFixos / 30) * diasPeriodo;
 
   // Saque Brasil: (Cartão + Boleto) - 5% taxa - Frete
-  const saqueBRCalc = Math.max(0, (libertyData?.summaryBrasil?.totalPagoCartao ?? 0 + (libertyData?.summaryBrasil?.totalPagoBoleto ?? 0)) * 0.95 - totalFreteBR);
+  const saqueBRCalc = Math.max(0, countryPayments.cartaoBolBR * 0.95 - totalFreteBR);
   const saqueDisponBR = manualSaqueBR !== null ? manualSaqueBR : saqueBRCalc;
 
-  // Saque Uruguay: todo valor recebido vai para saque
-  const saqueUYCalc = libertyData?.summaryUruguay?.totalPago ?? 0;
+  // Saque Uruguay: cartão/boleto vai para saque
+  const saqueUYCalc = countryPayments.cartaoBolUY;
   const saqueDisponUY = manualSaqueUY !== null ? manualSaqueUY : saqueUYCalc;
 
   // Combined or filtered saque
@@ -685,7 +710,7 @@ const Index = ({ country }: IndexProps = {}) => {
             </div>
           </div>
           <p className="text-2xl font-bold font-mono tracking-tight text-chart-negative">
-            {formatCurrency(periodOut + totalFrete + manualExpensesPago)}
+            {formatCurrency(periodOut + totalFrete + manualExpensesPago + adsSpendForScenario)}
           </p>
           <div className="flex items-center gap-1 mt-1.5">
             <ChevronDown className={`w-3 h-3 text-muted-foreground transition-transform duration-200 ${expandSaidas ? "rotate-180" : ""}`} />
@@ -696,6 +721,12 @@ const Index = ({ country }: IndexProps = {}) => {
               {/* Breakdown geral */}
               <div className="space-y-1 mb-2">
                 <p className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wider">Resumo</p>
+                {adsSpendForScenario > 0 && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] text-foreground">Anúncios</span>
+                    <span className="text-[10px] font-mono font-semibold text-chart-negative">{formatCurrency(adsSpendForScenario)}</span>
+                  </div>
+                )}
                 {totalFrete > 0 && (
                   <div className="flex justify-between items-center">
                     <span className="text-[10px] text-foreground">Frete</span>
@@ -721,7 +752,7 @@ const Index = ({ country }: IndexProps = {}) => {
                   ))}
                 </>
               )}
-              {periodOut === 0 && totalFrete === 0 && manualExpensesPago === 0 && (
+              {periodOut === 0 && totalFrete === 0 && manualExpensesPago === 0 && adsSpendForScenario === 0 && (
                 <p className="text-[10px] text-muted-foreground italic">Nenhuma saída no período.</p>
               )}
             </div>
