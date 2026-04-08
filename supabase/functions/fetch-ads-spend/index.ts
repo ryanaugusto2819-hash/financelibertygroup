@@ -103,7 +103,15 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    const metrics = data.data || [];
+    const rawMetrics = data.data || [];
+
+    // Convert BM4/BM5 spend from USD to BRL (R$ 5.10)
+    const USD_TO_BRL = 5.10;
+    const metrics = rawMetrics.map((m: any) =>
+      m.bm_account === "bm4" || m.bm_account === "bm5"
+        ? { ...m, spend: (m.spend || 0) * USD_TO_BRL }
+        : m
+    );
 
     // Split by country based on campaign name
     const brasilMetrics = metrics.filter((m: any) => getCampaignCountry(m.campaign_name) === "brasil");
