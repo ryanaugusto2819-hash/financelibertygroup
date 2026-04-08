@@ -39,6 +39,8 @@ const Index = ({ country }: IndexProps = {}) => {
   const {
     selectedDate, dateRange, expenses, countryFilter, setCountryFilter,
     manualCash, setManualCash,
+    manualCashBR, setManualCashBR,
+    manualCashUY, setManualCashUY,
     manualSaqueBR, setManualSaqueBR,
     manualSaqueUY, setManualSaqueUY,
   } = useFinance();
