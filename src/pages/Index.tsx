@@ -215,13 +215,6 @@ const Index = ({ country }: IndexProps = {}) => {
   const scheduledExpensesTotal = scheduledExpensesList.reduce((s, e) => s + e.amount, 0);
   const totalPayableWithScheduled = totalPendingExpenses + scheduledExpensesTotal;
 
-  // Caixa = saldo base (manual) + PIX recebido no período
-  const currentCashBR = (manualCashBR ?? 0) + countryPayments.pixBR;
-  const currentCashUY = (manualCashUY ?? 0) + countryPayments.pixUY;
-  const currentCash = countryFilter === "brasil" ? currentCashBR
-    : countryFilter === "uruguay" ? currentCashUY
-    : currentCashBR + currentCashUY;
-
   // Frete: Brasil uses API data, Uruguay uses fixed R$35 per unit
   const totalFreteBR = libertyData?.summaryBrasil?.totalFrete ?? 0;
   const totalQuantidadeUY = libertyData?.summaryUruguay?.totalQuantidadePagos ?? 0;
@@ -267,6 +260,17 @@ const Index = ({ country }: IndexProps = {}) => {
   const saqueDisponivel = countryFilter === "brasil" ? saqueDisponBR
     : countryFilter === "uruguay" ? saqueDisponUY
     : saqueDisponBR + saqueDisponUY;
+
+  // Saídas por país e Caixa automático (PIX - Saídas)
+  const adsBR = adsData?.brasil?.totalSpend ?? 0;
+  const adsUY = adsData?.uruguay?.totalSpend ?? 0;
+  const totalSaidasBR = totalFreteBR + manualExpensesPago + adsBR;
+  const totalSaidasUY = totalFreteUY + adsUY;
+  const currentCashBR = (manualCashBR ?? 0) + countryPayments.pixBR - totalSaidasBR;
+  const currentCashUY = (manualCashUY ?? 0) + countryPayments.pixUY - totalSaidasUY;
+  const currentCash = countryFilter === "brasil" ? currentCashBR
+    : countryFilter === "uruguay" ? currentCashUY
+    : currentCashBR + currentCashUY;
 
   // Edit cash handlers (combined - "todos" view)
   const handleStartEditCash = () => { setCashInput(String(currentCash)); setEditingCash(true); };
@@ -343,7 +347,11 @@ const Index = ({ country }: IndexProps = {}) => {
 
       {/* Main KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-3 mb-6">
-        <KPICard label="Receita em Caixa + Saque" value={currentCash + saqueDisponivel + manualRevPago} prefix="R$" icon={DollarSign} index={0} variant="positive" />
+        <KPICard label="Receita em Caixa + Saque" value={currentCash + saqueDisponivel + manualRevPago} prefix="R$" icon={DollarSign} index={0} variant="positive">
+          <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">Caixa</span><span className="text-[10px] font-mono font-semibold text-chart-positive">{formatCurrency(currentCash)}</span></div>
+          <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">Saque Disponível</span><span className="text-[10px] font-mono font-semibold text-chart-positive">{formatCurrency(saqueDisponivel)}</span></div>
+          {manualRevPago > 0 && <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">Receitas Manuais</span><span className="text-[10px] font-mono font-semibold text-chart-positive">{formatCurrency(manualRevPago)}</span></div>}
+        </KPICard>
         
         {/* Caixa — per country or combined */}
         {countryFilter === "todos" ? (
@@ -418,7 +426,14 @@ const Index = ({ country }: IndexProps = {}) => {
             </div>
           ) : (
             <div className="relative group">
-              <KPICard label="Receita em Caixa 🇧🇷" value={currentCashBR} prefix="R$" icon={Wallet} index={0} variant="positive" />
+              <KPICard label="Receita em Caixa 🇧🇷" value={currentCashBR} prefix="R$" icon={Wallet} index={0} variant="positive">
+                {(manualCashBR ?? 0) !== 0 && <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">Saldo Base</span><span className="text-[10px] font-mono font-semibold text-chart-positive">{formatCurrency(manualCashBR ?? 0)}</span></div>}
+                <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">+ PIX</span><span className="text-[10px] font-mono font-semibold text-chart-positive">{formatCurrency(countryPayments.pixBR)}</span></div>
+                {totalSaidasBR > 0 && <div className="flex justify-between items-center"><span className="text-[10px] text-muted-foreground">- Saídas</span><span className="text-[10px] font-mono text-chart-negative">- {formatCurrency(totalSaidasBR)}</span></div>}
+                {adsBR > 0 && <div className="flex justify-between items-center pl-3"><span className="text-[10px] text-muted-foreground">Anúncios</span><span className="text-[10px] font-mono text-muted-foreground">- {formatCurrency(adsBR)}</span></div>}
+                {totalFreteBR > 0 && <div className="flex justify-between items-center pl-3"><span className="text-[10px] text-muted-foreground">Frete</span><span className="text-[10px] font-mono text-muted-foreground">- {formatCurrency(totalFreteBR)}</span></div>}
+                {manualExpensesPago > 0 && <div className="flex justify-between items-center pl-3"><span className="text-[10px] text-muted-foreground">Despesas</span><span className="text-[10px] font-mono text-muted-foreground">- {formatCurrency(manualExpensesPago)}</span></div>}
+              </KPICard>
               <button onClick={handleStartEditCashBR} className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-muted">
                 <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
               </button>
@@ -438,7 +453,13 @@ const Index = ({ country }: IndexProps = {}) => {
             </div>
           ) : (
             <div className="relative group">
-              <KPICard label="Receita em Caixa 🇺🇾" value={currentCashUY} prefix="R$" icon={Wallet} index={0} variant="positive" />
+              <KPICard label="Receita em Caixa 🇺🇾" value={currentCashUY} prefix="R$" icon={Wallet} index={0} variant="positive">
+                {(manualCashUY ?? 0) !== 0 && <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">Saldo Base</span><span className="text-[10px] font-mono font-semibold text-chart-positive">{formatCurrency(manualCashUY ?? 0)}</span></div>}
+                <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">+ PIX</span><span className="text-[10px] font-mono font-semibold text-chart-positive">{formatCurrency(countryPayments.pixUY)}</span></div>
+                {totalSaidasUY > 0 && <div className="flex justify-between items-center"><span className="text-[10px] text-muted-foreground">- Saídas</span><span className="text-[10px] font-mono text-chart-negative">- {formatCurrency(totalSaidasUY)}</span></div>}
+                {adsUY > 0 && <div className="flex justify-between items-center pl-3"><span className="text-[10px] text-muted-foreground">Anúncios</span><span className="text-[10px] font-mono text-muted-foreground">- {formatCurrency(adsUY)}</span></div>}
+                {totalFreteUY > 0 && <div className="flex justify-between items-center pl-3"><span className="text-[10px] text-muted-foreground">Frete</span><span className="text-[10px] font-mono text-muted-foreground">- {formatCurrency(totalFreteUY)}</span></div>}
+              </KPICard>
               <button onClick={handleStartEditCashUY} className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-muted">
                 <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
               </button>
@@ -555,7 +576,12 @@ const Index = ({ country }: IndexProps = {}) => {
             </div>
           ) : (
             <div className="relative group">
-              <KPICard label="Saque 🇧🇷 Brasil" value={saqueDisponBR} prefix="R$" icon={Banknote} index={3} variant="positive" />
+              <KPICard label="Saque 🇧🇷 Brasil" value={saqueDisponBR} prefix="R$" icon={Banknote} index={3} variant="positive">
+                <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">Cartão + Boleto</span><span className="text-[10px] font-mono font-semibold text-chart-positive">{formatCurrency(countryPayments.cartaoBolBR)}</span></div>
+                {(manualSaqueBR ?? 0) !== 0 && <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">Saldo Base</span><span className="text-[10px] font-mono font-semibold text-chart-positive">{formatCurrency(manualSaqueBR ?? 0)}</span></div>}
+                <div className="flex justify-between items-center"><span className="text-[10px] text-muted-foreground">- Taxa 5%</span><span className="text-[10px] font-mono text-muted-foreground">- {formatCurrency(countryPayments.cartaoBolBR * 0.05)}</span></div>
+                {totalFreteBR > 0 && <div className="flex justify-between items-center"><span className="text-[10px] text-muted-foreground">- Frete</span><span className="text-[10px] font-mono text-muted-foreground">- {formatCurrency(totalFreteBR)}</span></div>}
+              </KPICard>
               <button onClick={handleStartEditSaqueBR} className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-muted">
                 <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
               </button>
@@ -575,7 +601,10 @@ const Index = ({ country }: IndexProps = {}) => {
             </div>
           ) : (
             <div className="relative group">
-              <KPICard label="Saque 🇺🇾 Uruguay" value={saqueDisponUY} prefix="R$" icon={Banknote} index={3} variant="positive" />
+              <KPICard label="Saque 🇺🇾 Uruguay" value={saqueDisponUY} prefix="R$" icon={Banknote} index={3} variant="positive">
+                <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">Cartão + Boleto</span><span className="text-[10px] font-mono font-semibold text-chart-positive">{formatCurrency(countryPayments.cartaoBolUY)}</span></div>
+                {(manualSaqueUY ?? 0) !== 0 && <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">Saldo Base</span><span className="text-[10px] font-mono font-semibold text-chart-positive">{formatCurrency(manualSaqueUY ?? 0)}</span></div>}
+              </KPICard>
               <button onClick={handleStartEditSaqueUY} className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-muted">
                 <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
               </button>
@@ -586,9 +615,18 @@ const Index = ({ country }: IndexProps = {}) => {
 
       {/* Receita — Período */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
-        <KPICard label={`Total Recebido (${periodLabel})`} value={totalReceived} prefix="R$" icon={Wallet} index={0} variant="positive" />
-        <KPICard label="Receita Total — Período Total" value={(summaryTotal?.totalValor ?? 0) + manualRevTotal} prefix="R$" icon={DollarSign} index={1} />
-        <KPICard label="Receita Já Recebida — Período Total" value={(summaryTotal?.totalPago ?? 0) + manualRevPago} prefix="R$" icon={Wallet} index={2} variant="positive" />
+        <KPICard label={`Total Recebido (${periodLabel})`} value={totalReceived} prefix="R$" icon={Wallet} index={0} variant="positive">
+          <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">PIX</span><span className="text-[10px] font-mono font-semibold text-chart-positive">{formatCurrency(totalRecebidoPix)}</span></div>
+          <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">Cartão + Boleto</span><span className="text-[10px] font-mono font-semibold text-chart-positive">{formatCurrency(totalRecebidoCartaoBoleto)}</span></div>
+        </KPICard>
+        <KPICard label="Receita Total — Período Total" value={(summaryTotal?.totalValor ?? 0) + manualRevTotal} prefix="R$" icon={DollarSign} index={1}>
+          <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">Liberty Painel</span><span className="text-[10px] font-mono font-semibold">{formatCurrency(summaryTotal?.totalValor ?? 0)}</span></div>
+          {manualRevTotal > 0 && <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">Receitas Manuais</span><span className="text-[10px] font-mono font-semibold">{formatCurrency(manualRevTotal)}</span></div>}
+        </KPICard>
+        <KPICard label="Receita Já Recebida — Período Total" value={(summaryTotal?.totalPago ?? 0) + manualRevPago} prefix="R$" icon={Wallet} index={2} variant="positive">
+          <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">Liberty Painel</span><span className="text-[10px] font-mono font-semibold text-chart-positive">{formatCurrency(summaryTotal?.totalPago ?? 0)}</span></div>
+          {manualRevPago > 0 && <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">Receitas Manuais</span><span className="text-[10px] font-mono font-semibold text-chart-positive">{formatCurrency(manualRevPago)}</span></div>}
+        </KPICard>
       </div>
 
       {/* Cenários de Pagamento */}
@@ -756,7 +794,13 @@ const Index = ({ country }: IndexProps = {}) => {
           )}
         </motion.div>
 
-        <KPICard label={`Lucro Líquido (${isSingleDay ? "Dia" : "Período"})`} value={(totalReceived + manualRevPago) - (periodOut + totalFrete + manualExpensesPago + adsSpendForScenario)} prefix="R$" icon={TrendingUp} index={2} variant={(totalReceived + manualRevPago) >= (periodOut + totalFrete + manualExpensesPago + adsSpendForScenario) ? "positive" : "negative"} />
+        <KPICard label={`Lucro Líquido (${isSingleDay ? "Dia" : "Período"})`} value={(totalReceived + manualRevPago) - (periodOut + totalFrete + manualExpensesPago + adsSpendForScenario)} prefix="R$" icon={TrendingUp} index={2} variant={(totalReceived + manualRevPago) >= (periodOut + totalFrete + manualExpensesPago + adsSpendForScenario) ? "positive" : "negative"}>
+          <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">Entradas</span><span className="text-[10px] font-mono font-semibold text-chart-positive">{formatCurrency(totalReceived + manualRevPago)}</span></div>
+          <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">Saídas</span><span className="text-[10px] font-mono font-semibold text-chart-negative">- {formatCurrency(periodOut + totalFrete + manualExpensesPago + adsSpendForScenario)}</span></div>
+          {adsSpendForScenario > 0 && <div className="flex justify-between items-center pl-3"><span className="text-[10px] text-muted-foreground">Anúncios</span><span className="text-[10px] font-mono text-muted-foreground">- {formatCurrency(adsSpendForScenario)}</span></div>}
+          {totalFrete > 0 && <div className="flex justify-between items-center pl-3"><span className="text-[10px] text-muted-foreground">Frete</span><span className="text-[10px] font-mono text-muted-foreground">- {formatCurrency(totalFrete)}</span></div>}
+          {manualExpensesPago > 0 && <div className="flex justify-between items-center pl-3"><span className="text-[10px] text-muted-foreground">Despesas</span><span className="text-[10px] font-mono text-muted-foreground">- {formatCurrency(manualExpensesPago)}</span></div>}
+        </KPICard>
       </div>
 
       {/* Charts Row */}
