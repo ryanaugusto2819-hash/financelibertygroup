@@ -183,6 +183,14 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     setManualCashState(value);
     persistManualValue("manualCash", value);
   };
+  const setManualCashBR = (value: number | null) => {
+    setManualCashBRState(value);
+    persistManualValue("manualCashBR", value);
+  };
+  const setManualCashUY = (value: number | null) => {
+    setManualCashUYState(value);
+    persistManualValue("manualCashUY", value);
+  };
   const setManualSaqueBR = (value: number | null) => {
     setManualSaqueBRState(value);
     persistManualValue("manualSaqueBR", value);
