@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { TrendingUp, TrendingDown, ChevronDown, LucideIcon } from "lucide-react";
 import { formatCurrency } from "@/lib/finance-data";
@@ -12,7 +12,7 @@ interface KPICardProps {
   icon?: LucideIcon;
   index: number;
   variant?: "default" | "positive" | "negative" | "warning";
-  children?: React.ReactNode;
+  children?: ReactNode;
 }
 
 export function KPICard({
