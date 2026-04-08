@@ -605,7 +605,7 @@ const Index = ({ country }: IndexProps = {}) => {
             </div>
           </div>
           <p className="text-2xl font-bold font-mono tracking-tight text-chart-positive">
-            {formatCurrency(periodIncome + totalRecebidoCartaoBoleto + manualRevPago)}
+            {formatCurrency(totalReceived)}
           </p>
           <div className="flex items-center gap-1 mt-1.5">
             <ChevronDown className={`w-3 h-3 text-muted-foreground transition-transform duration-200 ${expandEntradas ? "rotate-180" : ""}`} />
