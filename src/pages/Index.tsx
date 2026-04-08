@@ -282,25 +282,105 @@ const Index = ({ country }: IndexProps = {}) => {
       <div className="grid grid-cols-1 md:grid-cols-5 gap-3 mb-6">
         <KPICard label="Receita em Caixa + Saque" value={currentCash + saqueDisponivel + manualRevPago} prefix="R$" icon={DollarSign} index={0} variant="positive" />
         
-        {/* Caixa */}
-        {editingCash ? (
-          <div className="glass-card p-4 flex flex-col gap-2">
-            <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Receita em Caixa</span>
-            <div className="flex items-center gap-2">
-              <Input type="text" value={cashInput} onChange={e => setCashInput(e.target.value)}
-                onKeyDown={e => { if (e.key === "Enter") handleSaveCash(); if (e.key === "Escape") handleCancelEditCash(); }}
-                className="h-8 text-sm font-mono" autoFocus placeholder="Ex: 150000" />
-              <button onClick={handleSaveCash} className="text-chart-positive hover:opacity-80"><Check className="h-4 w-4" /></button>
-              <button onClick={handleCancelEditCash} className="text-destructive hover:opacity-80"><X className="h-4 w-4" /></button>
+        {/* Caixa — per country or combined */}
+        {countryFilter === "todos" ? (
+          editingCash ? (
+            <div className="glass-card p-4 flex flex-col gap-2">
+              <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Receita em Caixa (Geral)</span>
+              <div className="flex items-center gap-2">
+                <Input type="text" value={cashInput} onChange={e => setCashInput(e.target.value)}
+                  onKeyDown={e => { if (e.key === "Enter") handleSaveCash(); if (e.key === "Escape") handleCancelEditCash(); }}
+                  className="h-8 text-sm font-mono" autoFocus placeholder="Ex: 150000" />
+                <button onClick={handleSaveCash} className="text-chart-positive hover:opacity-80"><Check className="h-4 w-4" /></button>
+                <button onClick={handleCancelEditCash} className="text-destructive hover:opacity-80"><X className="h-4 w-4" /></button>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="glass-card p-4 group relative">
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-2">Receita em Caixa</p>
+              <p className="text-xl font-bold font-mono text-foreground mb-2">{formatCurrency(currentCash)}</p>
+              <div className="space-y-1 border-t border-border/50 pt-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] text-muted-foreground">🇧🇷 Brasil</span>
+                  {editingCashBR ? (
+                    <div className="flex items-center gap-1">
+                      <Input type="text" value={cashBRInput} onChange={e => setCashBRInput(e.target.value)}
+                        onKeyDown={e => { if (e.key === "Enter") handleSaveCashBR(); if (e.key === "Escape") handleCancelEditCashBR(); }}
+                        className="h-6 w-24 text-xs font-mono" autoFocus />
+                      <button onClick={handleSaveCashBR} className="text-chart-positive hover:opacity-80"><Check className="h-3.5 w-3.5" /></button>
+                      <button onClick={handleCancelEditCashBR} className="text-destructive hover:opacity-80"><X className="h-3.5 w-3.5" /></button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1">
+                      <span className="text-xs font-mono font-semibold text-foreground">{formatCurrency(currentCashBR)}</span>
+                      <button onClick={handleStartEditCashBR} className="p-0.5 rounded hover:bg-muted">
+                        <Pencil className="h-2.5 w-2.5 text-muted-foreground" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] text-muted-foreground">🇺🇾 Uruguay</span>
+                  {editingCashUY ? (
+                    <div className="flex items-center gap-1">
+                      <Input type="text" value={cashUYInput} onChange={e => setCashUYInput(e.target.value)}
+                        onKeyDown={e => { if (e.key === "Enter") handleSaveCashUY(); if (e.key === "Escape") handleCancelEditCashUY(); }}
+                        className="h-6 w-24 text-xs font-mono" autoFocus />
+                      <button onClick={handleSaveCashUY} className="text-chart-positive hover:opacity-80"><Check className="h-3.5 w-3.5" /></button>
+                      <button onClick={handleCancelEditCashUY} className="text-destructive hover:opacity-80"><X className="h-3.5 w-3.5" /></button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1">
+                      <span className="text-xs font-mono font-semibold text-foreground">{formatCurrency(currentCashUY)}</span>
+                      <button onClick={handleStartEditCashUY} className="p-0.5 rounded hover:bg-muted">
+                        <Pencil className="h-2.5 w-2.5 text-muted-foreground" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )
+        ) : countryFilter === "brasil" ? (
+          editingCashBR ? (
+            <div className="glass-card p-4 flex flex-col gap-2">
+              <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Receita em Caixa 🇧🇷</span>
+              <div className="flex items-center gap-2">
+                <Input type="text" value={cashBRInput} onChange={e => setCashBRInput(e.target.value)}
+                  onKeyDown={e => { if (e.key === "Enter") handleSaveCashBR(); if (e.key === "Escape") handleCancelEditCashBR(); }}
+                  className="h-8 text-sm font-mono" autoFocus />
+                <button onClick={handleSaveCashBR} className="text-chart-positive hover:opacity-80"><Check className="h-4 w-4" /></button>
+                <button onClick={handleCancelEditCashBR} className="text-destructive hover:opacity-80"><X className="h-4 w-4" /></button>
+              </div>
+            </div>
+          ) : (
+            <div className="relative group">
+              <KPICard label="Receita em Caixa 🇧🇷" value={currentCashBR} prefix="R$" icon={Wallet} index={0} variant="positive" />
+              <button onClick={handleStartEditCashBR} className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-muted">
+                <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+              </button>
+            </div>
+          )
         ) : (
-          <div className="relative group">
-            <KPICard label="Receita em Caixa" value={currentCash} prefix="R$" icon={Wallet} index={0} variant="positive" />
-            <button onClick={handleStartEditCash} className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-muted" title="Editar valor manualmente">
-              <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
-            </button>
-          </div>
+          editingCashUY ? (
+            <div className="glass-card p-4 flex flex-col gap-2">
+              <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Receita em Caixa 🇺🇾</span>
+              <div className="flex items-center gap-2">
+                <Input type="text" value={cashUYInput} onChange={e => setCashUYInput(e.target.value)}
+                  onKeyDown={e => { if (e.key === "Enter") handleSaveCashUY(); if (e.key === "Escape") handleCancelEditCashUY(); }}
+                  className="h-8 text-sm font-mono" autoFocus />
+                <button onClick={handleSaveCashUY} className="text-chart-positive hover:opacity-80"><Check className="h-4 w-4" /></button>
+                <button onClick={handleCancelEditCashUY} className="text-destructive hover:opacity-80"><X className="h-4 w-4" /></button>
+              </div>
+            </div>
+          ) : (
+            <div className="relative group">
+              <KPICard label="Receita em Caixa 🇺🇾" value={currentCashUY} prefix="R$" icon={Wallet} index={0} variant="positive" />
+              <button onClick={handleStartEditCashUY} className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-muted">
+                <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+              </button>
+            </div>
+          )
         )}
 
         {/* Total a Pagar + Agendadas — Expandable */}
