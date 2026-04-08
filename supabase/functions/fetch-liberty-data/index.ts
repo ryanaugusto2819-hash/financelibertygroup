@@ -79,13 +79,15 @@ serve(async (req) => {
     if (to)   queryEntrada = queryEntrada.lte("data_entrada", to);
 
     // Query 2: pedidos PAGOS no período filtrados por data_pagamento (recebimento real)
+    // data_pagamento é TIMESTAMPTZ: usar fim do dia no fuso de Brasília (-03:00)
+    // para não cortar pagamentos feitos depois da meia-noite UTC no mesmo dia BR.
     let queryPagos = libertyClient
       .from("pedidos")
       .select(SELECT_FIELDS)
       .eq("status_pagamento", "pago");
 
-    if (from) queryPagos = queryPagos.gte("data_pagamento", from);
-    if (to)   queryPagos = queryPagos.lte("data_pagamento", to);
+    if (from) queryPagos = queryPagos.gte("data_pagamento", from + "T00:00:00-03:00");
+    if (to)   queryPagos = queryPagos.lte("data_pagamento", to   + "T23:59:59.999-03:00");
 
     const [{ data: pedidosEntrada, error }, { data: pedidosPagos, error: errorPagos }] =
       await Promise.all([queryEntrada.limit(2000), queryPagos.limit(2000)]);
