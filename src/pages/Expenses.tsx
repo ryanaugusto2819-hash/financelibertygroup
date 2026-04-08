@@ -273,7 +273,7 @@ function EditExpenseDialog({ expense, onSave }: { expense: Expense; onSave: (id:
     const result = await onSave(expense.id, {
       description, amount: parseFloat(amount), category, type, status, date,
       paymentSource: paymentSource || undefined,
-      country: country || undefined,
+      country: (country || undefined) as "brasil" | "uruguay" | undefined,
     });
 
     if (!result.success) {
