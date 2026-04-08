@@ -13,11 +13,16 @@ function convertUYUtoBRL(valor: number): number {
   return Math.round((valor / UYU_TO_BRL) * 100) / 100;
 }
 
-function buildSummary(pedidos: any[]) {
+// pagosNoPeriodo = pedidos pagos filtrados por data_pagamento (recebimento real)
+// pedidos = pedidos filtrados por data_entrada (entradas do período)
+function buildSummary(pedidos: any[], pagosNoPeriodo: any[]) {
   const total = pedidos.length;
   const totalValor = pedidos.reduce((s, p) => s + (p.valor || 0), 0);
-  const pagos = pedidos.filter(p => p.status_pagamento === "pago");
+
+  // totalPago usa data_pagamento para refletir o que foi RECEBIDO no período
+  const pagos = pagosNoPeriodo;
   const totalPago = pagos.reduce((s, p) => s + (p.valor || 0), 0);
+
   const pendentes = pedidos.filter(p => p.status_pagamento === "pendente");
   const totalPendente = pendentes.reduce((s, p) => s + (p.valor || 0), 0);
   const cancelados = pedidos.filter(p => p.status_pagamento === "cancelado" || p.status_pagamento === "reembolso");
@@ -42,8 +47,8 @@ function buildSummary(pedidos: any[]) {
     countPagosPix: pagosPix.length,
     countPagosCartao: pagosCartao.length,
     countPagosBoleto: pagosBoleto.length,
-    totalFrete: pedidos.reduce((s, p) => s + (p.valor_frete || 0), 0),
-    totalQuantidadePagos: pedidos.reduce((s, p) => s + (p.quantidade || 0), 0),
+    totalFrete: pagos.reduce((s, p) => s + (p.valor_frete || 0), 0),
+    totalQuantidadePagos: pagos.reduce((s, p) => s + (p.quantidade || 0), 0),
   };
 }
 
@@ -62,38 +67,54 @@ serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const { from, to } = body;
 
-    const dateField = "data_entrada";
+    const SELECT_FIELDS = "id, nome, produto, valor, quantidade, status_pagamento, data_entrada, data_pagamento, pais, vendedor, departamento, cidade, forma_pagamento, valor_frete, telefone";
 
-    let query = libertyClient
+    // Query 1: pedidos do período filtrados por data_entrada (entradas/pendentes/cancelados)
+    let queryEntrada = libertyClient
       .from("pedidos")
-      .select("id, nome, produto, valor, quantidade, status_pagamento, data_entrada, data_pagamento, pais, vendedor, departamento, cidade, forma_pagamento, valor_frete, telefone")
+      .select(SELECT_FIELDS)
       .order("created_at", { ascending: false });
 
-    if (from) {
-      query = query.gte(dateField, from);
-    }
-    if (to) {
-      query = query.lte(dateField, to);
-    }
+    if (from) queryEntrada = queryEntrada.gte("data_entrada", from);
+    if (to)   queryEntrada = queryEntrada.lte("data_entrada", to);
 
-    const { data: pedidos, error } = await query.limit(2000);
+    // Query 2: pedidos PAGOS no período filtrados por data_pagamento (recebimento real)
+    let queryPagos = libertyClient
+      .from("pedidos")
+      .select(SELECT_FIELDS)
+      .eq("status_pagamento", "pago");
+
+    if (from) queryPagos = queryPagos.gte("data_pagamento", from);
+    if (to)   queryPagos = queryPagos.lte("data_pagamento", to);
+
+    const [{ data: pedidosEntrada, error }, { data: pedidosPagos, error: errorPagos }] =
+      await Promise.all([queryEntrada.limit(2000), queryPagos.limit(2000)]);
 
     if (error) {
       console.error("Error fetching pedidos:", JSON.stringify(error));
       throw new Error(`Failed to fetch data: ${error.message}`);
     }
+    if (errorPagos) {
+      console.error("Error fetching pagos:", JSON.stringify(errorPagos));
+      throw new Error(`Failed to fetch pagos: ${errorPagos.message}`);
+    }
 
-    // Deduplicate by telefone + data_entrada (same person, same day)
-    const seen = new Set<string>();
-    const dedupedPedidos = (pedidos ?? []).filter(p => {
-      const tel = (p.telefone || "").trim();
-      const key = tel ? `${tel}|${p.data_entrada}` : `${(p.nome || "").trim().toLowerCase()}|${p.data_entrada}|${p.valor}`;
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    });
+    // Dedup helper: mesma pessoa no mesmo dia = mesmo pedido
+    function dedup(list: any[]): any[] {
+      const seen = new Set<string>();
+      return (list ?? []).filter(p => {
+        const tel = (p.telefone || "").trim();
+        const key = tel
+          ? `${tel}|${p.data_entrada}`
+          : `${(p.nome || "").trim().toLowerCase()}|${p.data_entrada}|${p.valor}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+    }
 
-    const allPedidos = dedupedPedidos.map(p => {
+    // Conversão UYU → BRL
+    function convertPedido(p: any) {
       const pais = (p.pais || "").toLowerCase();
       const isUY = pais === "uy" || pais === "uruguay";
       if (isUY) {
@@ -105,7 +126,10 @@ serve(async (req) => {
         };
       }
       return p;
-    });
+    }
+
+    const allPedidos = dedup(pedidosEntrada).map(convertPedido);
+    const allPagos   = dedup(pedidosPagos).map(convertPedido);
 
     const brasilPedidos = allPedidos.filter(p => {
       const pais = (p.pais || "").toLowerCase();
@@ -116,11 +140,20 @@ serve(async (req) => {
       return pais === "uy" || pais === "uruguay";
     });
 
+    const brasilPagos = allPagos.filter(p => {
+      const pais = (p.pais || "").toLowerCase();
+      return pais === "br" || pais === "brasil";
+    });
+    const uruguayPagos = allPagos.filter(p => {
+      const pais = (p.pais || "").toLowerCase();
+      return pais === "uy" || pais === "uruguay";
+    });
+
     return new Response(JSON.stringify({
       pedidos: allPedidos,
-      summary: buildSummary(allPedidos),
-      summaryBrasil: buildSummary(brasilPedidos),
-      summaryUruguay: buildSummary(uruguayPedidos),
+      summary:        buildSummary(allPedidos,      allPagos),
+      summaryBrasil:  buildSummary(brasilPedidos,   brasilPagos),
+      summaryUruguay: buildSummary(uruguayPedidos,  uruguayPagos),
       cotacaoUYU: UYU_TO_BRL,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
