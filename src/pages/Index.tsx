@@ -759,7 +759,7 @@ const Index = ({ country }: IndexProps = {}) => {
           )}
         </motion.div>
 
-        <KPICard label={`Lucro Líquido (${isSingleDay ? "Dia" : "Período"})`} value={periodGrossProfit * 0.85} prefix="R$" icon={TrendingUp} index={2} variant={periodGrossProfit >= 0 ? "positive" : "negative"} />
+        <KPICard label={`Lucro Líquido (${isSingleDay ? "Dia" : "Período"})`} value={(totalReceived + manualRevPago) - (periodOut + totalFrete + manualExpensesPago + adsSpendForScenario)} prefix="R$" icon={TrendingUp} index={2} variant={(totalReceived + manualRevPago) >= (periodOut + totalFrete + manualExpensesPago + adsSpendForScenario) ? "positive" : "negative"} />
       </div>
 
       {/* Charts Row */}
