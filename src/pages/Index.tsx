@@ -205,7 +205,7 @@ const Index = ({ country }: IndexProps = {}) => {
     : countryFilter === "uruguay" ? saqueDisponUY
     : saqueDisponBR + saqueDisponUY;
 
-  // Edit cash handlers
+  // Edit cash handlers (combined - "todos" view)
   const handleStartEditCash = () => { setCashInput(String(currentCash)); setEditingCash(true); };
   const handleSaveCash = () => {
     const val = parseFloat(cashInput.replace(/[^\d.,\-]/g, "").replace(",", "."));
@@ -213,6 +213,24 @@ const Index = ({ country }: IndexProps = {}) => {
     setEditingCash(false);
   };
   const handleCancelEditCash = () => setEditingCash(false);
+
+  // Edit cash BR handlers
+  const handleStartEditCashBR = () => { setCashBRInput(String(currentCashBR)); setEditingCashBR(true); };
+  const handleSaveCashBR = () => {
+    const val = parseFloat(cashBRInput.replace(/[^\d.,\-]/g, "").replace(",", "."));
+    if (!isNaN(val)) setManualCashBR(val);
+    setEditingCashBR(false);
+  };
+  const handleCancelEditCashBR = () => setEditingCashBR(false);
+
+  // Edit cash UY handlers
+  const handleStartEditCashUY = () => { setCashUYInput(String(currentCashUY)); setEditingCashUY(true); };
+  const handleSaveCashUY = () => {
+    const val = parseFloat(cashUYInput.replace(/[^\d.,\-]/g, "").replace(",", "."));
+    if (!isNaN(val)) setManualCashUY(val);
+    setEditingCashUY(false);
+  };
+  const handleCancelEditCashUY = () => setEditingCashUY(false);
 
   // Edit saque BR handlers
   const handleStartEditSaqueBR = () => { setSaqueBRInput(String(saqueDisponBR)); setEditingSaqueBR(true); };
