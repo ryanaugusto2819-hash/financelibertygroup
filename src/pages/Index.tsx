@@ -68,6 +68,8 @@ const Index = ({ country }: IndexProps = {}) => {
   const [saqueBRInput, setSaqueBRInput] = useState("");
   const [editingSaqueUY, setEditingSaqueUY] = useState(false);
   const [expandPayable, setExpandPayable] = useState(false);
+  const [expandEntradas, setExpandEntradas] = useState(false);
+  const [expandSaidas, setExpandSaidas] = useState(false);
   const [saqueUYInput, setSaqueUYInput] = useState("");
 
   // Select summary based on country filter
@@ -548,8 +550,145 @@ const Index = ({ country }: IndexProps = {}) => {
 
       {/* Period Summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
-        <KPICard label={`Entradas (${periodLabel})`} value={periodIncome + totalRecebidoCartaoBoleto + manualRevPago} prefix="R$" icon={ArrowUpRight} index={0} variant="positive" />
-        <KPICard label={`Saídas (${periodLabel})`} value={periodOut + totalFrete + manualExpensesPago} prefix="R$" icon={ArrowDownRight} index={1} variant="negative" />
+
+        {/* Entradas expandível */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.08, duration: 0.4 }}
+          className="cfo-card p-5 group accent-green cursor-pointer"
+          onClick={() => setExpandEntradas(prev => !prev)}
+        >
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Entradas ({periodLabel})</p>
+            <div className="icon-box icon-box-green">
+              <ArrowUpRight size={18} />
+            </div>
+          </div>
+          <p className="text-2xl font-bold font-mono tracking-tight text-chart-positive">
+            {formatCurrency(periodIncome + totalRecebidoCartaoBoleto + manualRevPago)}
+          </p>
+          <div className="flex items-center gap-1 mt-1.5">
+            <ChevronDown className={`w-3 h-3 text-muted-foreground transition-transform duration-200 ${expandEntradas ? "rotate-180" : ""}`} />
+            <span className="text-[10px] text-muted-foreground">clique para detalhes</span>
+          </div>
+          {expandEntradas && (
+            <div className="mt-3 pt-3 border-t border-border/50 space-y-1.5 max-h-64 overflow-y-auto" onClick={e => e.stopPropagation()}>
+              {/* Breakdown por forma de pagamento */}
+              <div className="space-y-1 mb-2">
+                <p className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wider">Formas de Recebimento</p>
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] text-foreground">PIX</span>
+                  <span className="text-[10px] font-mono font-semibold text-chart-positive">{formatCurrency(totalRecebidoPix)}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] text-foreground">Cartão + Boleto</span>
+                  <span className="text-[10px] font-mono font-semibold text-chart-positive">{formatCurrency(totalRecebidoCartaoBoleto)}</span>
+                </div>
+                {manualRevPago > 0 && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] text-foreground">Receitas Manuais</span>
+                    <span className="text-[10px] font-mono font-semibold text-chart-positive">{formatCurrency(manualRevPago)}</span>
+                  </div>
+                )}
+              </div>
+              {/* Pedidos pagos */}
+              {pedidos.filter(p => p.status_pagamento === "pago").length > 0 && (
+                <>
+                  <p className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wider mt-2">Pedidos Recebidos</p>
+                  {pedidos.filter(p => p.status_pagamento === "pago").slice(0, 20).map(p => (
+                    <div key={p.id} className="flex justify-between items-center gap-2">
+                      <span className="text-[10px] text-foreground truncate max-w-[55%]">{p.nome}</span>
+                      <div className="flex items-center gap-1">
+                        <span className="text-[9px] text-muted-foreground">{(p.forma_pagamento || "–").toUpperCase()}</span>
+                        <span className="text-[10px] font-mono font-semibold text-chart-positive">{formatCurrency(p.valor)}</span>
+                      </div>
+                    </div>
+                  ))}
+                  {pedidos.filter(p => p.status_pagamento === "pago").length > 20 && (
+                    <p className="text-[9px] text-muted-foreground italic text-center pt-1">
+                      + {pedidos.filter(p => p.status_pagamento === "pago").length - 20} pedidos
+                    </p>
+                  )}
+                </>
+              )}
+              {/* Receitas manuais pagas */}
+              {manualRevenues.filter(r => r.status === "pago").length > 0 && (
+                <>
+                  <p className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wider mt-2">Receitas Manuais</p>
+                  {manualRevenues.filter(r => r.status === "pago").map(r => (
+                    <div key={r.id} className="flex justify-between items-center">
+                      <span className="text-[10px] text-foreground truncate max-w-[60%]">{r.description}</span>
+                      <span className="text-[10px] font-mono font-semibold text-chart-positive">{formatCurrency(Number(r.amount))}</span>
+                    </div>
+                  ))}
+                </>
+              )}
+              {pedidos.filter(p => p.status_pagamento === "pago").length === 0 && manualRevPago === 0 && (
+                <p className="text-[10px] text-muted-foreground italic">Nenhuma entrada no período.</p>
+              )}
+            </div>
+          )}
+        </motion.div>
+
+        {/* Saídas expandível */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.12, duration: 0.4 }}
+          className="cfo-card p-5 group accent-red cursor-pointer"
+          onClick={() => setExpandSaidas(prev => !prev)}
+        >
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Saídas ({periodLabel})</p>
+            <div className="icon-box icon-box-red">
+              <ArrowDownRight size={18} />
+            </div>
+          </div>
+          <p className="text-2xl font-bold font-mono tracking-tight text-chart-negative">
+            {formatCurrency(periodOut + totalFrete + manualExpensesPago)}
+          </p>
+          <div className="flex items-center gap-1 mt-1.5">
+            <ChevronDown className={`w-3 h-3 text-muted-foreground transition-transform duration-200 ${expandSaidas ? "rotate-180" : ""}`} />
+            <span className="text-[10px] text-muted-foreground">clique para detalhes</span>
+          </div>
+          {expandSaidas && (
+            <div className="mt-3 pt-3 border-t border-border/50 space-y-1.5 max-h-64 overflow-y-auto" onClick={e => e.stopPropagation()}>
+              {/* Breakdown geral */}
+              <div className="space-y-1 mb-2">
+                <p className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wider">Resumo</p>
+                {totalFrete > 0 && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] text-foreground">Frete</span>
+                    <span className="text-[10px] font-mono font-semibold text-chart-negative">{formatCurrency(totalFrete)}</span>
+                  </div>
+                )}
+                {manualExpensesPago > 0 && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] text-foreground">Despesas Pagas</span>
+                    <span className="text-[10px] font-mono font-semibold text-chart-negative">{formatCurrency(manualExpensesPago)}</span>
+                  </div>
+                )}
+              </div>
+              {/* Lista de despesas pagas */}
+              {periodExpenses.filter(e => e.status === "pago" && !e.isAutoGenerated).length > 0 && (
+                <>
+                  <p className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wider mt-2">Despesas Pagas</p>
+                  {periodExpenses.filter(e => e.status === "pago" && !e.isAutoGenerated).map(e => (
+                    <div key={e.id} className="flex justify-between items-center gap-2">
+                      <span className="text-[10px] text-foreground truncate max-w-[60%]">{e.description}</span>
+                      <span className="text-[10px] font-mono font-semibold text-chart-negative">{formatCurrency(e.amount)}</span>
+                    </div>
+                  ))}
+                </>
+              )}
+              {periodOut === 0 && totalFrete === 0 && manualExpensesPago === 0 && (
+                <p className="text-[10px] text-muted-foreground italic">Nenhuma saída no período.</p>
+              )}
+            </div>
+          )}
+        </motion.div>
+
         <KPICard label={`Lucro Líquido (${isSingleDay ? "Dia" : "Período"})`} value={periodGrossProfit * 0.85} prefix="R$" icon={TrendingUp} index={2} variant={periodGrossProfit >= 0 ? "positive" : "negative"} />
       </div>
 
