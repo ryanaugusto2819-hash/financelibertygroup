@@ -116,16 +116,22 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
         if (!isMounted) return;
 
         const resolvedManualCash = remoteValues.manualCash ?? localValues.manualCash;
+        const resolvedManualCashBR = remoteValues.manualCashBR ?? localValues.manualCashBR;
+        const resolvedManualCashUY = remoteValues.manualCashUY ?? localValues.manualCashUY;
         const resolvedManualSaqueBR = remoteValues.manualSaqueBR ?? localValues.manualSaqueBR;
         const resolvedManualSaqueUY = remoteValues.manualSaqueUY ?? localValues.manualSaqueUY;
         const resolvedFbAdsPaid = remoteValues.fbAdsPaid ?? localValues.fbAdsPaid;
 
         setManualCashState(resolvedManualCash ?? null);
+        setManualCashBRState(resolvedManualCashBR ?? null);
+        setManualCashUYState(resolvedManualCashUY ?? null);
         setManualSaqueBRState(resolvedManualSaqueBR ?? null);
         setManualSaqueUYState(resolvedManualSaqueUY ?? null);
         setFbAdsPaidState(resolvedFbAdsPaid ?? 0);
 
         syncStoredNumber("manualCash", resolvedManualCash ?? null);
+        syncStoredNumber("manualCashBR", resolvedManualCashBR ?? null);
+        syncStoredNumber("manualCashUY", resolvedManualCashUY ?? null);
         syncStoredNumber("manualSaqueBR", resolvedManualSaqueBR ?? null);
         syncStoredNumber("manualSaqueUY", resolvedManualSaqueUY ?? null);
         syncStoredNumber("fbAdsPaid", resolvedFbAdsPaid ?? 0);
