@@ -324,6 +324,8 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       selectedDate, setSelectedDate, dateRange, setDateRange,
       countryFilter, setCountryFilter,
       manualCash, setManualCash,
+      manualCashBR, setManualCashBR,
+      manualCashUY, setManualCashUY,
       manualSaqueBR, setManualSaqueBR,
       manualSaqueUY, setManualSaqueUY,
     }}>
