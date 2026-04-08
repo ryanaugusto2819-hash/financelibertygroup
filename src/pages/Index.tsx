@@ -70,6 +70,7 @@ const Index = ({ country }: IndexProps = {}) => {
   const [expandPayable, setExpandPayable] = useState(false);
   const [expandEntradas, setExpandEntradas] = useState(false);
   const [expandSaidas, setExpandSaidas] = useState(false);
+  const [expandCaixa, setExpandCaixa] = useState(false);
   const [saqueUYInput, setSaqueUYInput] = useState("");
 
   // Select summary based on country filter
@@ -367,10 +368,14 @@ const Index = ({ country }: IndexProps = {}) => {
               </div>
             </div>
           ) : (
-            <div className="glass-card p-4 group relative">
+            <div className="glass-card p-4 group relative cursor-pointer" onClick={() => setExpandCaixa(p => !p)}>
               <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-2">Receita em Caixa</p>
-              <p className="text-xl font-bold font-mono text-foreground mb-2">{formatCurrency(currentCash)}</p>
-              <div className="space-y-1 border-t border-border/50 pt-2">
+              <p className="text-xl font-bold font-mono text-foreground mb-1">{formatCurrency(currentCash)}</p>
+              <div className="flex items-center gap-1 mb-2">
+                <ChevronDown className={`w-3 h-3 text-muted-foreground transition-transform duration-200 ${expandCaixa ? "rotate-180" : ""}`} />
+                <span className="text-[10px] text-muted-foreground">clique para detalhes</span>
+              </div>
+              <div className="space-y-1 border-t border-border/50 pt-2" onClick={e => e.stopPropagation()}>
                 <div className="flex justify-between items-center">
                   <span className="text-[10px] text-muted-foreground">🇧🇷 Brasil</span>
                   {editingCashBR ? (
@@ -410,6 +415,31 @@ const Index = ({ country }: IndexProps = {}) => {
                   )}
                 </div>
               </div>
+              {expandCaixa && (
+                <div className="mt-3 pt-3 border-t border-border/50 space-y-1.5 max-h-64 overflow-y-auto" onClick={e => e.stopPropagation()}>
+                  <p className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wider">🤖 Automático</p>
+                  <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">🇧🇷 PIX recebido</span><span className="text-[10px] font-mono font-semibold text-chart-positive">+ {formatCurrency(countryPayments.pixBR)}</span></div>
+                  <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">🇺🇾 PIX recebido</span><span className="text-[10px] font-mono font-semibold text-chart-positive">+ {formatCurrency(countryPayments.pixUY)}</span></div>
+                  {adsBR > 0 && <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">🇧🇷 Anúncios debitados</span><span className="text-[10px] font-mono font-semibold text-chart-negative">- {formatCurrency(adsBR)}</span></div>}
+                  {adsUY > 0 && <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">🇺🇾 Anúncios debitados</span><span className="text-[10px] font-mono font-semibold text-chart-negative">- {formatCurrency(adsUY)}</span></div>}
+                  {totalFreteBR > 0 && <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">🇧🇷 Frete debitado</span><span className="text-[10px] font-mono font-semibold text-chart-negative">- {formatCurrency(totalFreteBR)}</span></div>}
+                  {totalFreteUY > 0 && <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">🇺🇾 Frete debitado</span><span className="text-[10px] font-mono font-semibold text-chart-negative">- {formatCurrency(totalFreteUY)}</span></div>}
+                  {((manualCashBR ?? 0) !== 0 || (manualCashUY ?? 0) !== 0 || manualExpensesPago > 0) && (
+                    <>
+                      <p className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wider mt-1">✍️ Manual</p>
+                      {(manualCashBR ?? 0) !== 0 && <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">🇧🇷 Saldo base definido</span><span className="text-[10px] font-mono font-semibold text-chart-positive">{formatCurrency(manualCashBR ?? 0)}</span></div>}
+                      {(manualCashUY ?? 0) !== 0 && <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">🇺🇾 Saldo base definido</span><span className="text-[10px] font-mono font-semibold text-chart-positive">{formatCurrency(manualCashUY ?? 0)}</span></div>}
+                      {manualExpensesPago > 0 && <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">Despesas pagas</span><span className="text-[10px] font-mono font-semibold text-chart-negative">- {formatCurrency(manualExpensesPago)}</span></div>}
+                      {periodExpenses.filter(e => e.status === "pago" && !e.isAutoGenerated).map(e => (
+                        <div key={e.id} className="flex justify-between items-center pl-3">
+                          <span className="text-[10px] text-muted-foreground truncate max-w-[60%]">{e.description}</span>
+                          <span className="text-[10px] font-mono text-muted-foreground">- {formatCurrency(e.amount)}</span>
+                        </div>
+                      ))}
+                    </>
+                  )}
+                </div>
+              )}
             </div>
           )
         ) : countryFilter === "brasil" ? (
@@ -427,12 +457,23 @@ const Index = ({ country }: IndexProps = {}) => {
           ) : (
             <div className="relative group">
               <KPICard label="Receita em Caixa 🇧🇷" value={currentCashBR} prefix="R$" icon={Wallet} index={0} variant="positive">
-                {(manualCashBR ?? 0) !== 0 && <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">Saldo Base</span><span className="text-[10px] font-mono font-semibold text-chart-positive">{formatCurrency(manualCashBR ?? 0)}</span></div>}
-                <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">+ PIX</span><span className="text-[10px] font-mono font-semibold text-chart-positive">{formatCurrency(countryPayments.pixBR)}</span></div>
-                {totalSaidasBR > 0 && <div className="flex justify-between items-center"><span className="text-[10px] text-muted-foreground">- Saídas</span><span className="text-[10px] font-mono text-chart-negative">- {formatCurrency(totalSaidasBR)}</span></div>}
-                {adsBR > 0 && <div className="flex justify-between items-center pl-3"><span className="text-[10px] text-muted-foreground">Anúncios</span><span className="text-[10px] font-mono text-muted-foreground">- {formatCurrency(adsBR)}</span></div>}
-                {totalFreteBR > 0 && <div className="flex justify-between items-center pl-3"><span className="text-[10px] text-muted-foreground">Frete</span><span className="text-[10px] font-mono text-muted-foreground">- {formatCurrency(totalFreteBR)}</span></div>}
-                {manualExpensesPago > 0 && <div className="flex justify-between items-center pl-3"><span className="text-[10px] text-muted-foreground">Despesas</span><span className="text-[10px] font-mono text-muted-foreground">- {formatCurrency(manualExpensesPago)}</span></div>}
+                <p className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wider">🤖 Automático</p>
+                <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">PIX recebido</span><span className="text-[10px] font-mono font-semibold text-chart-positive">+ {formatCurrency(countryPayments.pixBR)}</span></div>
+                {adsBR > 0 && <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">Anúncios debitados</span><span className="text-[10px] font-mono font-semibold text-chart-negative">- {formatCurrency(adsBR)}</span></div>}
+                {totalFreteBR > 0 && <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">Frete debitado</span><span className="text-[10px] font-mono font-semibold text-chart-negative">- {formatCurrency(totalFreteBR)}</span></div>}
+                {((manualCashBR ?? 0) !== 0 || manualExpensesPago > 0) && (
+                  <>
+                    <p className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wider mt-1">✍️ Manual</p>
+                    {(manualCashBR ?? 0) !== 0 && <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">Saldo base definido</span><span className="text-[10px] font-mono font-semibold text-chart-positive">{formatCurrency(manualCashBR ?? 0)}</span></div>}
+                    {manualExpensesPago > 0 && <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">Despesas pagas</span><span className="text-[10px] font-mono font-semibold text-chart-negative">- {formatCurrency(manualExpensesPago)}</span></div>}
+                    {periodExpenses.filter(e => e.status === "pago" && !e.isAutoGenerated).map(e => (
+                      <div key={e.id} className="flex justify-between items-center pl-3">
+                        <span className="text-[10px] text-muted-foreground truncate max-w-[60%]">{e.description}</span>
+                        <span className="text-[10px] font-mono text-muted-foreground">- {formatCurrency(e.amount)}</span>
+                      </div>
+                    ))}
+                  </>
+                )}
               </KPICard>
               <button onClick={handleStartEditCashBR} className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-muted">
                 <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
@@ -454,11 +495,16 @@ const Index = ({ country }: IndexProps = {}) => {
           ) : (
             <div className="relative group">
               <KPICard label="Receita em Caixa 🇺🇾" value={currentCashUY} prefix="R$" icon={Wallet} index={0} variant="positive">
-                {(manualCashUY ?? 0) !== 0 && <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">Saldo Base</span><span className="text-[10px] font-mono font-semibold text-chart-positive">{formatCurrency(manualCashUY ?? 0)}</span></div>}
-                <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">+ PIX</span><span className="text-[10px] font-mono font-semibold text-chart-positive">{formatCurrency(countryPayments.pixUY)}</span></div>
-                {totalSaidasUY > 0 && <div className="flex justify-between items-center"><span className="text-[10px] text-muted-foreground">- Saídas</span><span className="text-[10px] font-mono text-chart-negative">- {formatCurrency(totalSaidasUY)}</span></div>}
-                {adsUY > 0 && <div className="flex justify-between items-center pl-3"><span className="text-[10px] text-muted-foreground">Anúncios</span><span className="text-[10px] font-mono text-muted-foreground">- {formatCurrency(adsUY)}</span></div>}
-                {totalFreteUY > 0 && <div className="flex justify-between items-center pl-3"><span className="text-[10px] text-muted-foreground">Frete</span><span className="text-[10px] font-mono text-muted-foreground">- {formatCurrency(totalFreteUY)}</span></div>}
+                <p className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wider">🤖 Automático</p>
+                <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">PIX recebido</span><span className="text-[10px] font-mono font-semibold text-chart-positive">+ {formatCurrency(countryPayments.pixUY)}</span></div>
+                {adsUY > 0 && <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">Anúncios debitados</span><span className="text-[10px] font-mono font-semibold text-chart-negative">- {formatCurrency(adsUY)}</span></div>}
+                {totalFreteUY > 0 && <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">Frete debitado</span><span className="text-[10px] font-mono font-semibold text-chart-negative">- {formatCurrency(totalFreteUY)}</span></div>}
+                {((manualCashUY ?? 0) !== 0) && (
+                  <>
+                    <p className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wider mt-1">✍️ Manual</p>
+                    <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">Saldo base definido</span><span className="text-[10px] font-mono font-semibold text-chart-positive">{formatCurrency(manualCashUY ?? 0)}</span></div>
+                  </>
+                )}
               </KPICard>
               <button onClick={handleStartEditCashUY} className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-muted">
                 <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
