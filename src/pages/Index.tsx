@@ -60,6 +60,10 @@ const Index = ({ country }: IndexProps = {}) => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [editingCash, setEditingCash] = useState(false);
   const [cashInput, setCashInput] = useState("");
+  const [editingCashBR, setEditingCashBR] = useState(false);
+  const [cashBRInput, setCashBRInput] = useState("");
+  const [editingCashUY, setEditingCashUY] = useState(false);
+  const [cashUYInput, setCashUYInput] = useState("");
   const [editingSaqueBR, setEditingSaqueBR] = useState(false);
   const [saqueBRInput, setSaqueBRInput] = useState("");
   const [editingSaqueUY, setEditingSaqueUY] = useState(false);
