@@ -266,12 +266,14 @@ function EditExpenseDialog({ expense, onSave }: { expense: Expense; onSave: (id:
   const [status, setStatus] = useState(expense.status);
   const [date, setDate] = useState(expense.date);
   const [paymentSource, setPaymentSource] = useState<PaymentSource | "">(expense.paymentSource || "");
+  const [country, setCountry] = useState(expense.country || "");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const result = await onSave(expense.id, {
       description, amount: parseFloat(amount), category, type, status, date,
       paymentSource: paymentSource || undefined,
+      country: country || undefined,
     });
 
     if (!result.success) {
