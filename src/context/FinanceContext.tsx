@@ -102,6 +102,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   }, [session]);
 
   useEffect(() => {
+    if (!session) return;
     let isMounted = true;
 
     const loadManualValues = async () => {
@@ -173,7 +174,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [session]);
 
   const persistManualValue = useCallback((key: FinanceManualValueKey, value: number | null) => {
     syncStoredNumber(key, value);
