@@ -147,6 +147,12 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
         if (remoteValues.manualSaqueUY === undefined && localValues.manualSaqueUY !== null) {
           migrationTasks.push(saveFinanceManualValue("manualSaqueUY", localValues.manualSaqueUY));
         }
+        if (remoteValues.manualCashBR === undefined && localValues.manualCashBR !== null) {
+          migrationTasks.push(saveFinanceManualValue("manualCashBR", localValues.manualCashBR));
+        }
+        if (remoteValues.manualCashUY === undefined && localValues.manualCashUY !== null) {
+          migrationTasks.push(saveFinanceManualValue("manualCashUY", localValues.manualCashUY));
+        }
         if (remoteValues.fbAdsPaid === undefined && localValues.fbAdsPaid > 0) {
           migrationTasks.push(saveFinanceManualValue("fbAdsPaid", localValues.fbAdsPaid));
         }
