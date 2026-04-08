@@ -152,14 +152,12 @@ const Index = ({ country }: IndexProps = {}) => {
   const paymentsByPeriod = useMemo(() => {
     const allPedidos = libertyDataTotal?.pedidos ?? [];
 
+    // data_pagamento é salvo no libertypos como toLocaleDateString("sv-SE", { timeZone: "America/Sao_Paulo" })
+    // ex: "2026-04-07" → armazenado como "2026-04-07T00:00:00+00:00" no TIMESTAMPTZ.
+    // Converter para fuso BR daria "2026-04-06" (errado). Basta extrair os 10 primeiros chars.
     const toDateBR = (ts: string | null): string | null => {
       if (!ts) return null;
-      try {
-        return new Intl.DateTimeFormat("en-CA", {
-          timeZone: "America/Sao_Paulo",
-          year: "numeric", month: "2-digit", day: "2-digit",
-        }).format(new Date(ts));
-      } catch { return null; }
+      return ts.substring(0, 10);
     };
 
     const paid = allPedidos.filter(p => {
