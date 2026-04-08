@@ -172,13 +172,6 @@ const Index = ({ country }: IndexProps = {}) => {
       return true;
     });
 
-    // DEBUG — remover após diagnóstico
-    console.log("[paymentsByPeriod] total pedidos:", allPedidos.length);
-    console.log("[paymentsByPeriod] dateRange:", dateRange);
-    console.log("[paymentsByPeriod] pagos encontrados:", paid.length);
-    const sample = allPedidos.filter(p => p.status_pagamento === "pago").slice(0, 5);
-    console.log("[paymentsByPeriod] amostra pagos (status=pago):", sample.map(p => ({ nome: p.nome, data_pagamento: p.data_pagamento, valor: p.valor })));
-
     const total   = paid.reduce((s, p) => s + (p.valor || 0), 0);
     const pix     = paid.filter(p => (p.forma_pagamento || "").toLowerCase() === "pix").reduce((s, p) => s + (p.valor || 0), 0);
     const cartao  = paid.filter(p => ["cartao", "cartão"].includes((p.forma_pagamento || "").toLowerCase())).reduce((s, p) => s + (p.valor || 0), 0);
@@ -188,9 +181,9 @@ const Index = ({ country }: IndexProps = {}) => {
   }, [libertyDataTotal, dateRange, countryFilter]);
 
   const totalReceivable = (summary?.totalPendente ?? 0) + manualRevPendente;
-  const totalReceived = paymentsByPeriod.total + manualRevPago;
   const totalRecebidoPix = paymentsByPeriod.pix;
   const totalRecebidoCartaoBoleto = paymentsByPeriod.cartao + paymentsByPeriod.boleto;
+  const totalReceived = totalRecebidoPix + totalRecebidoCartaoBoleto + manualRevPago;
 
   const totalPayable = getTotalAccountsPayable();
   const pendingExpensesList = useMemo(() => expenses.filter(e => e.status === "pendente"), [expenses]);
