@@ -266,12 +266,14 @@ function EditExpenseDialog({ expense, onSave }: { expense: Expense; onSave: (id:
   const [status, setStatus] = useState(expense.status);
   const [date, setDate] = useState(expense.date);
   const [paymentSource, setPaymentSource] = useState<PaymentSource | "">(expense.paymentSource || "");
+  const [country, setCountry] = useState(expense.country || "");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const result = await onSave(expense.id, {
       description, amount: parseFloat(amount), category, type, status, date,
       paymentSource: paymentSource || undefined,
+      country: (country || undefined) as "brasil" | "uruguay" | undefined,
     });
 
     if (!result.success) {
@@ -333,7 +335,7 @@ function EditExpenseDialog({ expense, onSave }: { expense: Expense; onSave: (id:
               </Select>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             <div className="space-y-1.5">
               <Label>Status</Label>
               <Select value={status} onValueChange={v => setStatus(v as any)}>
@@ -347,12 +349,24 @@ function EditExpenseDialog({ expense, onSave }: { expense: Expense; onSave: (id:
             </div>
             <div className="space-y-1.5">
               <Label>Fonte Pagamento</Label>
-              <Select value={paymentSource} onValueChange={v => setPaymentSource(v as any)}>
+              <Select value={paymentSource || "none"} onValueChange={v => setPaymentSource(v === "none" ? "" : v as any)}>
                 <SelectTrigger><SelectValue placeholder="Nenhuma" /></SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="none">Nenhuma</SelectItem>
                   <SelectItem value="caixa">Caixa</SelectItem>
                   <SelectItem value="saque">Saque</SelectItem>
                   <SelectItem value="nao_paga">Não Paga</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label>País</Label>
+              <Select value={country || "none"} onValueChange={v => setCountry(v === "none" ? "" : v)}>
+                <SelectTrigger><SelectValue placeholder="Todos" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Todos</SelectItem>
+                  <SelectItem value="brasil">🇧🇷 Brasil</SelectItem>
+                  <SelectItem value="uruguay">🇺🇾 Uruguay</SelectItem>
                 </SelectContent>
               </Select>
             </div>
