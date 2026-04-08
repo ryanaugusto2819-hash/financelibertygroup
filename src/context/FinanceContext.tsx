@@ -5,6 +5,7 @@ import {
 } from "@/lib/finance-data";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchFinanceManualValues, saveFinanceManualValue, type FinanceManualValueKey } from "@/lib/finance-manual-values";
+import { useAuth } from "@/context/AuthContext";
 
 export type CountryFilter = "todos" | "brasil" | "uruguay";
 
@@ -74,6 +75,7 @@ function rowToExpense(row: any): Expense {
 }
 
 export function FinanceProvider({ children }: { children: ReactNode }) {
+  const { session } = useAuth();
   const [allExpenses, setAllExpenses] = useState<Expense[]>(initialExpenses);
   const [selectedDate, setSelectedDate] = useState(today);
   const [dateRange, setDateRange] = useState({ from: today, to: today });
@@ -86,6 +88,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   const [manualSaqueUY, setManualSaqueUYState] = useState<number | null>(() => readStoredNumber("manualSaqueUY"));
 
   useEffect(() => {
+    if (!session) return;
     const loadExpenses = async () => {
       const { data, error } = await supabase
         .from("expenses")
@@ -96,9 +99,10 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       }
     };
     loadExpenses();
-  }, []);
+  }, [session]);
 
   useEffect(() => {
+    if (!session) return;
     let isMounted = true;
 
     const loadManualValues = async () => {
@@ -170,7 +174,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [session]);
 
   const persistManualValue = useCallback((key: FinanceManualValueKey, value: number | null) => {
     syncStoredNumber(key, value);
