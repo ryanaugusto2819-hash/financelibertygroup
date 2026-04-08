@@ -150,7 +150,11 @@ const Index = ({ country }: IndexProps = {}) => {
   const totalPendingExpenses = pendingExpensesList.reduce((s, e) => s + e.amount, 0);
   const scheduledExpensesTotal = scheduledExpensesList.reduce((s, e) => s + e.amount, 0);
   const totalPayableWithScheduled = totalPendingExpenses + scheduledExpensesTotal;
-  const currentCash = manualCash !== null ? manualCash : (periodIncome - periodOut);
+  const currentCashBR = manualCashBR ?? 0;
+  const currentCashUY = manualCashUY ?? 0;
+  const currentCash = countryFilter === "brasil" ? currentCashBR
+    : countryFilter === "uruguay" ? currentCashUY
+    : (manualCash !== null ? manualCash : currentCashBR + currentCashUY);
 
   // Frete: Brasil uses API data, Uruguay uses fixed R$35 per unit
   const totalFreteBR = libertyData?.summaryBrasil?.totalFrete ?? 0;
