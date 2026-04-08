@@ -26,6 +26,10 @@ interface FinanceContextType {
   setCountryFilter: (country: CountryFilter) => void;
   manualCash: number | null;
   setManualCash: (value: number | null) => void;
+  manualCashBR: number | null;
+  setManualCashBR: (value: number | null) => void;
+  manualCashUY: number | null;
+  setManualCashUY: (value: number | null) => void;
   manualSaqueBR: number | null;
   setManualSaqueBR: (value: number | null) => void;
   manualSaqueUY: number | null;
@@ -76,6 +80,8 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   const [countryFilter, setCountryFilter] = useState<CountryFilter>("todos");
   const [fbAdsPaid, setFbAdsPaidState] = useState<number>(() => readStoredNumber("fbAdsPaid") ?? 0);
   const [manualCash, setManualCashState] = useState<number | null>(() => readStoredNumber("manualCash"));
+  const [manualCashBR, setManualCashBRState] = useState<number | null>(() => readStoredNumber("manualCashBR"));
+  const [manualCashUY, setManualCashUYState] = useState<number | null>(() => readStoredNumber("manualCashUY"));
   const [manualSaqueBR, setManualSaqueBRState] = useState<number | null>(() => readStoredNumber("manualSaqueBR"));
   const [manualSaqueUY, setManualSaqueUYState] = useState<number | null>(() => readStoredNumber("manualSaqueUY"));
 
@@ -98,6 +104,8 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     const loadManualValues = async () => {
       const localValues = {
         manualCash: readStoredNumber("manualCash"),
+        manualCashBR: readStoredNumber("manualCashBR"),
+        manualCashUY: readStoredNumber("manualCashUY"),
         manualSaqueBR: readStoredNumber("manualSaqueBR"),
         manualSaqueUY: readStoredNumber("manualSaqueUY"),
         fbAdsPaid: readStoredNumber("fbAdsPaid") ?? 0,
@@ -108,16 +116,22 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
         if (!isMounted) return;
 
         const resolvedManualCash = remoteValues.manualCash ?? localValues.manualCash;
+        const resolvedManualCashBR = remoteValues.manualCashBR ?? localValues.manualCashBR;
+        const resolvedManualCashUY = remoteValues.manualCashUY ?? localValues.manualCashUY;
         const resolvedManualSaqueBR = remoteValues.manualSaqueBR ?? localValues.manualSaqueBR;
         const resolvedManualSaqueUY = remoteValues.manualSaqueUY ?? localValues.manualSaqueUY;
         const resolvedFbAdsPaid = remoteValues.fbAdsPaid ?? localValues.fbAdsPaid;
 
         setManualCashState(resolvedManualCash ?? null);
+        setManualCashBRState(resolvedManualCashBR ?? null);
+        setManualCashUYState(resolvedManualCashUY ?? null);
         setManualSaqueBRState(resolvedManualSaqueBR ?? null);
         setManualSaqueUYState(resolvedManualSaqueUY ?? null);
         setFbAdsPaidState(resolvedFbAdsPaid ?? 0);
 
         syncStoredNumber("manualCash", resolvedManualCash ?? null);
+        syncStoredNumber("manualCashBR", resolvedManualCashBR ?? null);
+        syncStoredNumber("manualCashUY", resolvedManualCashUY ?? null);
         syncStoredNumber("manualSaqueBR", resolvedManualSaqueBR ?? null);
         syncStoredNumber("manualSaqueUY", resolvedManualSaqueUY ?? null);
         syncStoredNumber("fbAdsPaid", resolvedFbAdsPaid ?? 0);
@@ -132,6 +146,12 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
         }
         if (remoteValues.manualSaqueUY === undefined && localValues.manualSaqueUY !== null) {
           migrationTasks.push(saveFinanceManualValue("manualSaqueUY", localValues.manualSaqueUY));
+        }
+        if (remoteValues.manualCashBR === undefined && localValues.manualCashBR !== null) {
+          migrationTasks.push(saveFinanceManualValue("manualCashBR", localValues.manualCashBR));
+        }
+        if (remoteValues.manualCashUY === undefined && localValues.manualCashUY !== null) {
+          migrationTasks.push(saveFinanceManualValue("manualCashUY", localValues.manualCashUY));
         }
         if (remoteValues.fbAdsPaid === undefined && localValues.fbAdsPaid > 0) {
           migrationTasks.push(saveFinanceManualValue("fbAdsPaid", localValues.fbAdsPaid));
@@ -162,6 +182,14 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   const setManualCash = (value: number | null) => {
     setManualCashState(value);
     persistManualValue("manualCash", value);
+  };
+  const setManualCashBR = (value: number | null) => {
+    setManualCashBRState(value);
+    persistManualValue("manualCashBR", value);
+  };
+  const setManualCashUY = (value: number | null) => {
+    setManualCashUYState(value);
+    persistManualValue("manualCashUY", value);
   };
   const setManualSaqueBR = (value: number | null) => {
     setManualSaqueBRState(value);
@@ -296,6 +324,8 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       selectedDate, setSelectedDate, dateRange, setDateRange,
       countryFilter, setCountryFilter,
       manualCash, setManualCash,
+      manualCashBR, setManualCashBR,
+      manualCashUY, setManualCashUY,
       manualSaqueBR, setManualSaqueBR,
       manualSaqueUY, setManualSaqueUY,
     }}>
