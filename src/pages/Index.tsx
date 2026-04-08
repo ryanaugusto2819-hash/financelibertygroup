@@ -215,12 +215,12 @@ const Index = ({ country }: IndexProps = {}) => {
   const scheduledExpensesTotal = scheduledExpensesList.reduce((s, e) => s + e.amount, 0);
   const totalPayableWithScheduled = totalPendingExpenses + scheduledExpensesTotal;
 
-  // Caixa auto = PIX recebido no período por país
-  const currentCashBR = manualCashBR !== null ? manualCashBR : countryPayments.pixBR;
-  const currentCashUY = manualCashUY !== null ? manualCashUY : countryPayments.pixUY;
+  // Caixa = saldo base (manual) + PIX recebido no período
+  const currentCashBR = (manualCashBR ?? 0) + countryPayments.pixBR;
+  const currentCashUY = (manualCashUY ?? 0) + countryPayments.pixUY;
   const currentCash = countryFilter === "brasil" ? currentCashBR
     : countryFilter === "uruguay" ? currentCashUY
-    : (manualCash !== null ? manualCash : currentCashBR + currentCashUY);
+    : currentCashBR + currentCashUY;
 
   // Frete: Brasil uses API data, Uruguay uses fixed R$35 per unit
   const totalFreteBR = libertyData?.summaryBrasil?.totalFrete ?? 0;
@@ -259,12 +259,9 @@ const Index = ({ country }: IndexProps = {}) => {
   const custoDiarias = (totalSalariosFixos / 30) * diasPeriodo;
 
   // Saque Brasil: (Cartão + Boleto) - 5% taxa - Frete
-  const saqueBRCalc = Math.max(0, countryPayments.cartaoBolBR * 0.95 - totalFreteBR);
-  const saqueDisponBR = manualSaqueBR !== null ? manualSaqueBR : saqueBRCalc;
-
-  // Saque Uruguay: cartão/boleto vai para saque
-  const saqueUYCalc = countryPayments.cartaoBolUY;
-  const saqueDisponUY = manualSaqueUY !== null ? manualSaqueUY : saqueUYCalc;
+  // Saque = saldo base (manual) + Cartão/Boleto do período
+  const saqueDisponBR = Math.max(0, (manualSaqueBR ?? 0) + countryPayments.cartaoBolBR * 0.95 - totalFreteBR);
+  const saqueDisponUY = (manualSaqueUY ?? 0) + countryPayments.cartaoBolUY;
 
   // Combined or filtered saque
   const saqueDisponivel = countryFilter === "brasil" ? saqueDisponBR
