@@ -26,6 +26,10 @@ interface FinanceContextType {
   setCountryFilter: (country: CountryFilter) => void;
   manualCash: number | null;
   setManualCash: (value: number | null) => void;
+  manualCashBR: number | null;
+  setManualCashBR: (value: number | null) => void;
+  manualCashUY: number | null;
+  setManualCashUY: (value: number | null) => void;
   manualSaqueBR: number | null;
   setManualSaqueBR: (value: number | null) => void;
   manualSaqueUY: number | null;
