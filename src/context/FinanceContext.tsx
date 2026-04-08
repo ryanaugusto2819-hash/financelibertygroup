@@ -5,6 +5,7 @@ import {
 } from "@/lib/finance-data";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchFinanceManualValues, saveFinanceManualValue, type FinanceManualValueKey } from "@/lib/finance-manual-values";
+import { useAuth } from "@/context/AuthContext";
 
 export type CountryFilter = "todos" | "brasil" | "uruguay";
 
