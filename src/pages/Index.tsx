@@ -107,11 +107,16 @@ const Index = ({ country }: IndexProps = {}) => {
     return adsData;
   }, [adsData, countryFilter]);
 
-  // Load manual revenues
+  // Load manual revenues filtered by date range
   const { data: manualRevenues = [] } = useQuery({
-    queryKey: ["revenues", countryFilter],
+    queryKey: ["revenues", dateRange.from, dateRange.to, countryFilter],
     queryFn: async () => {
-      let query = supabase.from("revenues").select("*").order("created_at", { ascending: false });
+      let query = supabase
+        .from("revenues")
+        .select("*")
+        .gte("date", dateRange.from)
+        .lte("date", dateRange.to)
+        .order("created_at", { ascending: false });
       if (countryFilter === "brasil") query = query.eq("country", "brasil");
       else if (countryFilter === "uruguay") query = query.eq("country", "uruguay");
       const { data, error } = await query;
