@@ -104,6 +104,8 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     const loadManualValues = async () => {
       const localValues = {
         manualCash: readStoredNumber("manualCash"),
+        manualCashBR: readStoredNumber("manualCashBR"),
+        manualCashUY: readStoredNumber("manualCashUY"),
         manualSaqueBR: readStoredNumber("manualSaqueBR"),
         manualSaqueUY: readStoredNumber("manualSaqueUY"),
         fbAdsPaid: readStoredNumber("fbAdsPaid") ?? 0,
