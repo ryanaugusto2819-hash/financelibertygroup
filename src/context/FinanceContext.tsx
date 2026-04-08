@@ -80,6 +80,8 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   const [countryFilter, setCountryFilter] = useState<CountryFilter>("todos");
   const [fbAdsPaid, setFbAdsPaidState] = useState<number>(() => readStoredNumber("fbAdsPaid") ?? 0);
   const [manualCash, setManualCashState] = useState<number | null>(() => readStoredNumber("manualCash"));
+  const [manualCashBR, setManualCashBRState] = useState<number | null>(() => readStoredNumber("manualCashBR"));
+  const [manualCashUY, setManualCashUYState] = useState<number | null>(() => readStoredNumber("manualCashUY"));
   const [manualSaqueBR, setManualSaqueBRState] = useState<number | null>(() => readStoredNumber("manualSaqueBR"));
   const [manualSaqueUY, setManualSaqueUYState] = useState<number | null>(() => readStoredNumber("manualSaqueUY"));
 
