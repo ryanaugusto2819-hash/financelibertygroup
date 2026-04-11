@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import Receivables from "./pages/Receivables";
 import Expenses from "./pages/Expenses";
 import Projections from "./pages/Projections";
+import WhatsAppAI from "./pages/WhatsAppAI";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 
@@ -41,6 +42,8 @@ const App = () => (
               <Route path="/uruguay/despesas" element={<ProtectedRoute country="uruguay"><Expenses country="uruguay" /></ProtectedRoute>} />
 
               <Route path="/projecoes" element={<ProtectedRoute><Projections /></ProtectedRoute>} />
+
+              <Route path="/whatsapp-ai" element={<ProtectedRoute><WhatsAppAI /></ProtectedRoute>} />
 
               <Route path="*" element={<NotFound />} />
             </Routes>
