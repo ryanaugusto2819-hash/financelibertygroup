@@ -264,7 +264,7 @@ Se não houver oportunidade clara ou dados suficientes, retorne should_suggest: 
   } catch (error) {
     console.error("Campaign monitor error:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: (error as Error).message }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

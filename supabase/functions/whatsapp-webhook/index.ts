@@ -87,7 +87,7 @@ serve(async (req) => {
 
 // ── Handle reply to an optimization suggestion ─────────────────
 async function handleSuggestionReply(
-  supabase: ReturnType<typeof createClient>,
+  supabase: any,
   messageText: string,
   messageId: string,
   suggestion: Record<string, unknown>
@@ -187,7 +187,7 @@ Palavras de rejeição: não, nao, cancela, para, negativo, recuso, deixa, melho
 
 // ── Handle general commands (no pending suggestion) ────────────
 async function handleGeneralCommand(
-  supabase: ReturnType<typeof createClient>,
+  supabase: any,
   message: string,
   _phone: string
 ): Promise<string> {
