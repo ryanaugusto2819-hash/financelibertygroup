@@ -4,6 +4,7 @@ import { KPICard } from "@/components/KPICard";
 import { ScenarioCard } from "@/components/ScenarioCard";
 import { DateFilter } from "@/components/DateFilter";
 import { AddExpenseDialog } from "@/components/AddExpenseDialog";
+import { AddRevenueDialog } from "@/components/AddRevenueDialog";
 import { ExpensePieChart } from "@/components/ExpensePieChart";
 import {
   formatCurrency, formatCompact, formatDate,
@@ -696,13 +697,12 @@ const Index = ({ country }: IndexProps = {}) => {
       {/* Period Summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
 
-        {/* Entradas expandível */}
+        {/* Entradas — apenas receitas manuais pagas */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.08, duration: 0.4 }}
-          className="cfo-card p-5 group accent-green cursor-pointer"
-          onClick={() => setExpandEntradas(prev => !prev)}
+          className="cfo-card p-5 group accent-green"
         >
           <div className="flex items-center justify-between mb-3">
             <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Entradas ({periodLabel})</p>
@@ -710,79 +710,34 @@ const Index = ({ country }: IndexProps = {}) => {
               <ArrowUpRight size={18} />
             </div>
           </div>
-          <p className="text-2xl font-bold font-mono tracking-tight text-chart-positive">
-            {formatCurrency(totalReceived + manualRevPago)}
+          <p className="text-2xl font-bold font-mono tracking-tight text-chart-positive mb-3">
+            {formatCurrency(manualRevPago)}
           </p>
-          <div className="flex items-center gap-1 mt-1.5">
-            <ChevronDown className={`w-3 h-3 text-muted-foreground transition-transform duration-200 ${expandEntradas ? "rotate-180" : ""}`} />
-            <span className="text-[10px] text-muted-foreground">clique para detalhes</span>
-          </div>
-          {expandEntradas && (
-            <div className="mt-3 pt-3 border-t border-border/50 space-y-1.5 max-h-64 overflow-y-auto" onClick={e => e.stopPropagation()}>
-              {/* Breakdown por forma de pagamento */}
-              <div className="space-y-1 mb-2">
-                <p className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wider">Formas de Recebimento</p>
-                <div className="flex justify-between items-center">
-                  <span className="text-[10px] text-foreground">PIX</span>
-                  <span className="text-[10px] font-mono font-semibold text-chart-positive">{formatCurrency(totalRecebidoPix)}</span>
+          <div className="border-t border-border/50 pt-3 space-y-1.5 max-h-48 overflow-y-auto">
+            {manualRevenues.filter(r => r.status === "pago").map(r => (
+              <div key={r.id} className="flex justify-between items-center gap-2">
+                <div>
+                  <span className="text-[10px] text-foreground truncate max-w-[60%] block">{r.client}</span>
+                  {r.description && <span className="text-[9px] text-muted-foreground">{r.description}</span>}
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-[10px] text-foreground">Cartão + Boleto</span>
-                  <span className="text-[10px] font-mono font-semibold text-chart-positive">{formatCurrency(totalRecebidoCartaoBoleto)}</span>
-                </div>
-                {manualRevPago > 0 && (
-                  <div className="flex justify-between items-center">
-                    <span className="text-[10px] text-foreground">Receitas Manuais</span>
-                    <span className="text-[10px] font-mono font-semibold text-chart-positive">{formatCurrency(manualRevPago)}</span>
-                  </div>
-                )}
+                <span className="text-[10px] font-mono font-semibold text-chart-positive shrink-0">{formatCurrency(Number(r.amount))}</span>
               </div>
-              {/* Pedidos pagos */}
-              {pedidos.filter(p => p.status_pagamento === "pago").length > 0 && (
-                <>
-                  <p className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wider mt-2">Pedidos Recebidos</p>
-                  {pedidos.filter(p => p.status_pagamento === "pago").slice(0, 20).map(p => (
-                    <div key={p.id} className="flex justify-between items-center gap-2">
-                      <span className="text-[10px] text-foreground truncate max-w-[55%]">{p.nome}</span>
-                      <div className="flex items-center gap-1">
-                        <span className="text-[9px] text-muted-foreground">{(p.forma_pagamento || "–").toUpperCase()}</span>
-                        <span className="text-[10px] font-mono font-semibold text-chart-positive">{formatCurrency(p.valor)}</span>
-                      </div>
-                    </div>
-                  ))}
-                  {pedidos.filter(p => p.status_pagamento === "pago").length > 20 && (
-                    <p className="text-[9px] text-muted-foreground italic text-center pt-1">
-                      + {pedidos.filter(p => p.status_pagamento === "pago").length - 20} pedidos
-                    </p>
-                  )}
-                </>
-              )}
-              {/* Receitas manuais pagas */}
-              {manualRevenues.filter(r => r.status === "pago").length > 0 && (
-                <>
-                  <p className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wider mt-2">Receitas Manuais</p>
-                  {manualRevenues.filter(r => r.status === "pago").map(r => (
-                    <div key={r.id} className="flex justify-between items-center">
-                      <span className="text-[10px] text-foreground truncate max-w-[60%]">{r.description}</span>
-                      <span className="text-[10px] font-mono font-semibold text-chart-positive">{formatCurrency(Number(r.amount))}</span>
-                    </div>
-                  ))}
-                </>
-              )}
-              {pedidos.filter(p => p.status_pagamento === "pago").length === 0 && manualRevPago === 0 && (
-                <p className="text-[10px] text-muted-foreground italic">Nenhuma entrada no período.</p>
-              )}
-            </div>
-          )}
+            ))}
+            {manualRevPago === 0 && (
+              <p className="text-[10px] text-muted-foreground italic">Nenhuma entrada no período.</p>
+            )}
+          </div>
+          <div className="mt-3 pt-2 border-t border-border/50" onClick={e => e.stopPropagation()}>
+            <AddRevenueDialog onAdded={() => queryClient.invalidateQueries({ queryKey: ["revenues"] })} />
+          </div>
         </motion.div>
 
-        {/* Saídas expandível */}
+        {/* Saídas — apenas despesas manuais pagas */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.12, duration: 0.4 }}
-          className="cfo-card p-5 group accent-red cursor-pointer"
-          onClick={() => setExpandSaidas(prev => !prev)}
+          className="cfo-card p-5 group accent-red"
         >
           <div className="flex items-center justify-between mb-3">
             <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Saídas ({periodLabel})</p>
@@ -790,52 +745,31 @@ const Index = ({ country }: IndexProps = {}) => {
               <ArrowDownRight size={18} />
             </div>
           </div>
-          <p className="text-2xl font-bold font-mono tracking-tight text-chart-negative">
-            {formatCurrency(periodOut + totalFrete + manualExpensesPago + adsSpendForScenario)}
+          <p className="text-2xl font-bold font-mono tracking-tight text-chart-negative mb-3">
+            {formatCurrency(manualExpensesPago)}
           </p>
-          <div className="flex items-center gap-1 mt-1.5">
-            <ChevronDown className={`w-3 h-3 text-muted-foreground transition-transform duration-200 ${expandSaidas ? "rotate-180" : ""}`} />
-            <span className="text-[10px] text-muted-foreground">clique para detalhes</span>
+          <div className="border-t border-border/50 pt-3 space-y-1.5 max-h-48 overflow-y-auto">
+            {periodExpenses.filter(e => e.status === "pago").map(e => (
+              <div key={e.id} className="flex justify-between items-center gap-2">
+                <div>
+                  <span className="text-[10px] text-foreground truncate max-w-[60%] block">{e.description}</span>
+                  <span className="text-[9px] text-muted-foreground">{e.category}</span>
+                </div>
+                <span className="text-[10px] font-mono font-semibold text-chart-negative shrink-0">{formatCurrency(e.amount)}</span>
+              </div>
+            ))}
+            {manualExpensesPago === 0 && (
+              <p className="text-[10px] text-muted-foreground italic">Nenhuma saída no período.</p>
+            )}
           </div>
-          {expandSaidas && (
-            <div className="mt-3 pt-3 border-t border-border/50 space-y-1.5 max-h-64 overflow-y-auto" onClick={e => e.stopPropagation()}>
-              {/* Lista de despesas pagas */}
-              {(periodExpenses.filter(e => e.status === "pago" && !e.isAutoGenerated).length > 0 || totalFrete > 0 || adsSpendForScenario > 0) && (
-                <>
-                  <p className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wider mt-2">Despesas do Período</p>
-                  {adsSpendForScenario > 0 && (
-                    <div className="flex justify-between items-center gap-2">
-                      <span className="text-[10px] text-foreground truncate max-w-[60%]">📣 Anúncios</span>
-                      <span className="text-[10px] font-mono font-semibold text-chart-negative">{formatCurrency(adsSpendForScenario)}</span>
-                    </div>
-                  )}
-                  {totalFrete > 0 && (
-                    <div className="flex justify-between items-center gap-2">
-                      <span className="text-[10px] text-foreground truncate max-w-[60%]">🚚 Frete ({totalQuantidadePagos} pedidos)</span>
-                      <span className="text-[10px] font-mono font-semibold text-chart-negative">{formatCurrency(totalFrete)}</span>
-                    </div>
-                  )}
-                  {periodExpenses.filter(e => e.status === "pago" && !e.isAutoGenerated).map(e => (
-                    <div key={e.id} className="flex justify-between items-center gap-2">
-                      <span className="text-[10px] text-foreground truncate max-w-[60%]">{e.description}</span>
-                      <span className="text-[10px] font-mono font-semibold text-chart-negative">{formatCurrency(e.amount)}</span>
-                    </div>
-                  ))}
-                </>
-              )}
-              {periodOut === 0 && totalFrete === 0 && manualExpensesPago === 0 && adsSpendForScenario === 0 && (
-                <p className="text-[10px] text-muted-foreground italic">Nenhuma saída no período.</p>
-              )}
-            </div>
-          )}
+          <div className="mt-3 pt-2 border-t border-border/50" onClick={e => e.stopPropagation()}>
+            <AddExpenseDialog />
+          </div>
         </motion.div>
 
-        <KPICard label={`Lucro Líquido (${isSingleDay ? "Dia" : "Período"})`} value={(totalReceived + manualRevPago) - (periodOut + totalFrete + manualExpensesPago + adsSpendForScenario)} prefix="R$" icon={TrendingUp} index={2} variant={(totalReceived + manualRevPago) >= (periodOut + totalFrete + manualExpensesPago + adsSpendForScenario) ? "positive" : "negative"}>
-          <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">Entradas</span><span className="text-[10px] font-mono font-semibold text-chart-positive">{formatCurrency(totalReceived + manualRevPago)}</span></div>
-          <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">Saídas</span><span className="text-[10px] font-mono font-semibold text-chart-negative">- {formatCurrency(periodOut + totalFrete + manualExpensesPago + adsSpendForScenario)}</span></div>
-          {adsSpendForScenario > 0 && <div className="flex justify-between items-center pl-3"><span className="text-[10px] text-muted-foreground">Anúncios</span><span className="text-[10px] font-mono text-muted-foreground">- {formatCurrency(adsSpendForScenario)}</span></div>}
-          {totalFrete > 0 && <div className="flex justify-between items-center pl-3"><span className="text-[10px] text-muted-foreground">Frete</span><span className="text-[10px] font-mono text-muted-foreground">- {formatCurrency(totalFrete)}</span></div>}
-          {manualExpensesPago > 0 && <div className="flex justify-between items-center pl-3"><span className="text-[10px] text-muted-foreground">Despesas</span><span className="text-[10px] font-mono text-muted-foreground">- {formatCurrency(manualExpensesPago)}</span></div>}
+        <KPICard label={`Lucro Líquido (${isSingleDay ? "Dia" : "Período"})`} value={manualRevPago - manualExpensesPago} prefix="R$" icon={TrendingUp} index={2} variant={manualRevPago >= manualExpensesPago ? "positive" : "negative"}>
+          <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">Entradas</span><span className="text-[10px] font-mono font-semibold text-chart-positive">{formatCurrency(manualRevPago)}</span></div>
+          <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">Saídas</span><span className="text-[10px] font-mono font-semibold text-chart-negative">- {formatCurrency(manualExpensesPago)}</span></div>
         </KPICard>
       </div>
 
