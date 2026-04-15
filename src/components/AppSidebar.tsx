@@ -6,7 +6,6 @@ import {
   Wallet,
   DollarSign,
   ChevronDown,
-  Bot,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -188,15 +187,6 @@ export function AppSidebar() {
                 </SidebarMenuItem>
               </>}
 
-              {/* WhatsApp AI — visível para todos */}
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <NavLink to="/whatsapp-ai" className="hover:bg-muted/50" activeClassName="bg-green-500/10 text-green-600 font-medium">
-                    <Bot className="mr-2 h-4 w-4" />
-                    {!collapsed && <span>Liberty AI</span>}
-                  </NavLink>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
