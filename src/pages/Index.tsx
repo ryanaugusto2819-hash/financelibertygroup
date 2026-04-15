@@ -181,7 +181,7 @@ const Index = ({ country }: IndexProps = {}) => {
     return { total, pix, cartao, boleto, count: paid.length };
   }, [libertyDataTotal, dateRange, countryFilter]);
 
-  const totalReceivable = (summaryTotal?.totalPendente ?? 0) + manualRevPendente;
+  const totalReceivable = (summary?.totalPendente ?? 0) + manualRevPendente;
   const totalRecebidoPix = paymentsByPeriod.pix;
   const totalRecebidoCartaoBoleto = paymentsByPeriod.cartao + paymentsByPeriod.boleto;
   const totalReceived = totalRecebidoPix + totalRecebidoCartaoBoleto;
