@@ -542,7 +542,7 @@ function TreinamentoTab() {
             <Brain className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
             <div className="text-sm text-blue-700 dark:text-blue-300 space-y-1">
               <p className="font-medium">Como treinar a IA</p>
-              <p className="text-xs">• <b>Regra:</b> "Se ROAS > 3x por 2 dias, aumentar orçamento em 25%"</p>
+              <p className="text-xs">• <b>Regra:</b> "Se ROAS {'>'} 3x por 2 dias, aumentar orçamento em 25%"</p>
               <p className="text-xs">• <b>Contexto:</b> "Nossa margem líquida é 40%, então CPA máximo aceitável é R$ 60"</p>
               <p className="text-xs">• <b>Exemplo:</b> Mensagem de WhatsApp que a IA deve usar como referência</p>
               <p className="text-xs">• <b>Persona:</b> Como a IA deve se comportar e se comunicar</p>
