@@ -1,17 +1,79 @@
+import { useMemo } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
-
 import { DateFilter } from "@/components/DateFilter";
 import { useFinance } from "@/context/FinanceContext";
-import { dailyEntries, formatCurrency, formatCompact, formatDate } from "@/lib/finance-data";
+import { formatCurrency, formatCompact, formatDate, getTodayBR, getNowBR } from "@/lib/finance-data";
 import { KPICard } from "@/components/KPICard";
 import { ArrowUpRight, ArrowDownRight, TrendingUp } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine,
 } from "recharts";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+
+function getLast12Days(): string[] {
+  const days: string[] = [];
+  const now = getNowBR();
+  for (let i = 11; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(d.getDate() - i);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    days.push(`${y}-${m}-${day}`);
+  }
+  return days;
+}
 
 const DailyControl = () => {
   const { selectedDate, setSelectedDate } = useFinance();
-  const todayData = dailyEntries.find(d => d.date === selectedDate);
+
+  const last12Days = useMemo(() => getLast12Days(), []);
+  const fromDate = last12Days[0];
+  const toDate = last12Days[last12Days.length - 1];
+
+  // Busca despesas pagas nos últimos 12 dias
+  const { data: paidExpenses = [] } = useQuery({
+    queryKey: ["daily-control-expenses", fromDate, toDate],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("expenses")
+        .select("date, amount, status")
+        .gte("date", fromDate)
+        .lte("date", toDate)
+        .eq("status", "pago");
+      return data ?? [];
+    },
+  });
+
+  // Busca receitas pagas nos últimos 12 dias
+  const { data: paidRevenues = [] } = useQuery({
+    queryKey: ["daily-control-revenues", fromDate, toDate],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("revenues")
+        .select("date, amount, status")
+        .gte("date", fromDate)
+        .lte("date", toDate)
+        .eq("status", "pago");
+      return data ?? [];
+    },
+  });
+
+  // Monta os dados diários agrupados por data
+  const dailyData = useMemo(() => {
+    return last12Days.map(date => {
+      const totalOut = paidExpenses
+        .filter(e => e.date === date)
+        .reduce((s, e) => s + Number(e.amount), 0);
+      const totalIn = paidRevenues
+        .filter(r => r.date === date)
+        .reduce((s, r) => s + Number(r.amount), 0);
+      return { date, totalIn, totalOut, grossProfit: totalIn - totalOut };
+    });
+  }, [last12Days, paidExpenses, paidRevenues]);
+
+  const todayData = dailyData.find(d => d.date === selectedDate);
 
   return (
     <DashboardLayout title="Controle Diário" subtitle="Movimentação financeira dia a dia">
@@ -19,7 +81,7 @@ const DailyControl = () => {
         <DateFilter />
       </div>
 
-      {/* Day KPIs */}
+      {/* KPIs do dia */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
         <KPICard label={`Entradas — ${formatDate(selectedDate)}`} value={todayData?.totalIn || 0} prefix="R$" icon={ArrowUpRight} index={0} variant="positive" />
         <KPICard label={`Saídas — ${formatDate(selectedDate)}`} value={todayData?.totalOut || 0} prefix="R$" icon={ArrowDownRight} index={1} variant="negative" />
@@ -27,12 +89,12 @@ const DailyControl = () => {
           variant={(todayData?.grossProfit || 0) >= 0 ? "positive" : "negative"} />
       </div>
 
-      {/* Chart */}
+      {/* Gráfico */}
       <div className="glass-card p-6 mb-6">
         <h3 className="text-sm font-semibold text-foreground mb-1">Fluxo Diário — Últimos 12 dias</h3>
-        <p className="text-xs text-muted-foreground mb-4">Lucro bruto diário</p>
+        <p className="text-xs text-muted-foreground mb-4">Lucro bruto diário (receitas pagas − despesas pagas)</p>
         <ResponsiveContainer width="100%" height={280}>
-          <BarChart data={[...dailyEntries].reverse()}>
+          <BarChart data={[...dailyData].reverse()}>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(222, 15%, 18%)" />
             <XAxis dataKey="date" tick={{ fontSize: 10, fill: "hsl(215, 15%, 55%)" }} axisLine={false} tickLine={false}
               tickFormatter={(v) => new Date(v + "T12:00:00").toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })} />
@@ -47,7 +109,7 @@ const DailyControl = () => {
         </ResponsiveContainer>
       </div>
 
-      {/* Daily Table */}
+      {/* Tabela diária */}
       <div className="glass-card p-6">
         <h3 className="text-sm font-semibold text-foreground mb-4">Histórico Diário</h3>
         <div className="overflow-x-auto">
@@ -62,7 +124,7 @@ const DailyControl = () => {
               </tr>
             </thead>
             <tbody>
-              {dailyEntries.map(d => {
+              {dailyData.map(d => {
                 const margin = d.totalIn > 0 ? ((d.grossProfit / d.totalIn) * 100).toFixed(1) : "0.0";
                 return (
                   <tr key={d.date} className={`border-b border-border/50 hover:bg-muted/30 transition-colors ${d.date === selectedDate ? "bg-primary/5" : ""}`}>
