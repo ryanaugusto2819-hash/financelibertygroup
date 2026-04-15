@@ -283,7 +283,7 @@ const Index = ({ country }: IndexProps = {}) => {
   const handleCancelEditCash = () => setEditingCash(false);
 
   // Edit cash BR handlers
-  const handleStartEditCashBR = () => { setCashBRInput(String(currentCashBR)); setEditingCashBR(true); };
+  const handleStartEditCashBR = () => { setCashBRInput(String(manualCashBR ?? 0)); setEditingCashBR(true); };
   const handleSaveCashBR = () => {
     const val = parseFloat(cashBRInput.replace(/[^\d.,\-]/g, "").replace(",", "."));
     if (!isNaN(val)) setManualCashBR(val);
@@ -292,7 +292,7 @@ const Index = ({ country }: IndexProps = {}) => {
   const handleCancelEditCashBR = () => setEditingCashBR(false);
 
   // Edit cash UY handlers
-  const handleStartEditCashUY = () => { setCashUYInput(String(currentCashUY)); setEditingCashUY(true); };
+  const handleStartEditCashUY = () => { setCashUYInput(String(manualCashUY ?? 0)); setEditingCashUY(true); };
   const handleSaveCashUY = () => {
     const val = parseFloat(cashUYInput.replace(/[^\d.,\-]/g, "").replace(",", "."));
     if (!isNaN(val)) setManualCashUY(val);
@@ -301,7 +301,7 @@ const Index = ({ country }: IndexProps = {}) => {
   const handleCancelEditCashUY = () => setEditingCashUY(false);
 
   // Edit saque BR handlers
-  const handleStartEditSaqueBR = () => { setSaqueBRInput(String(saqueDisponBR)); setEditingSaqueBR(true); };
+  const handleStartEditSaqueBR = () => { setSaqueBRInput(String(manualSaqueBR ?? 0)); setEditingSaqueBR(true); };
   const handleSaveSaqueBR = () => {
     const val = parseFloat(saqueBRInput.replace(/[^\d.,\-]/g, "").replace(",", "."));
     if (!isNaN(val)) setManualSaqueBR(val);
@@ -310,7 +310,7 @@ const Index = ({ country }: IndexProps = {}) => {
   const handleCancelEditSaqueBR = () => setEditingSaqueBR(false);
 
   // Edit saque UY handlers
-  const handleStartEditSaqueUY = () => { setSaqueUYInput(String(saqueDisponUY)); setEditingSaqueUY(true); };
+  const handleStartEditSaqueUY = () => { setSaqueUYInput(String(manualSaqueUY ?? 0)); setEditingSaqueUY(true); };
   const handleSaveSaqueUY = () => {
     const val = parseFloat(saqueUYInput.replace(/[^\d.,\-]/g, "").replace(",", "."));
     if (!isNaN(val)) setManualSaqueUY(val);
