@@ -90,6 +90,8 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   const [manualCashUY, setManualCashUYState] = useState<number | null>(() => readStoredNumber("manualCashUY"));
   const [manualSaqueBR, setManualSaqueBRState] = useState<number | null>(() => readStoredNumber("manualSaqueBR"));
   const [manualSaqueUY, setManualSaqueUYState] = useState<number | null>(() => readStoredNumber("manualSaqueUY"));
+  const [manualAdsBR, setManualAdsBRState] = useState<number | null>(() => readStoredNumber("manualAdsBR"));
+  const [manualAdsUY, setManualAdsUYState] = useState<number | null>(() => readStoredNumber("manualAdsUY"));
 
   useEffect(() => {
     if (!session) return;
