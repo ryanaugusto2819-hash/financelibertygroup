@@ -132,6 +132,8 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
         const resolvedManualCashUY = remoteValues.manualCashUY ?? localValues.manualCashUY;
         const resolvedManualSaqueBR = remoteValues.manualSaqueBR ?? localValues.manualSaqueBR;
         const resolvedManualSaqueUY = remoteValues.manualSaqueUY ?? localValues.manualSaqueUY;
+        const resolvedManualAdsBR = remoteValues.manualAdsBR ?? localValues.manualAdsBR;
+        const resolvedManualAdsUY = remoteValues.manualAdsUY ?? localValues.manualAdsUY;
         const resolvedFbAdsPaid = remoteValues.fbAdsPaid ?? localValues.fbAdsPaid;
 
         setManualCashState(resolvedManualCash ?? null);
@@ -139,6 +141,8 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
         setManualCashUYState(resolvedManualCashUY ?? null);
         setManualSaqueBRState(resolvedManualSaqueBR ?? null);
         setManualSaqueUYState(resolvedManualSaqueUY ?? null);
+        setManualAdsBRState(resolvedManualAdsBR ?? null);
+        setManualAdsUYState(resolvedManualAdsUY ?? null);
         setFbAdsPaidState(resolvedFbAdsPaid ?? 0);
 
         syncStoredNumber("manualCash", resolvedManualCash ?? null);
@@ -146,6 +150,8 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
         syncStoredNumber("manualCashUY", resolvedManualCashUY ?? null);
         syncStoredNumber("manualSaqueBR", resolvedManualSaqueBR ?? null);
         syncStoredNumber("manualSaqueUY", resolvedManualSaqueUY ?? null);
+        syncStoredNumber("manualAdsBR", resolvedManualAdsBR ?? null);
+        syncStoredNumber("manualAdsUY", resolvedManualAdsUY ?? null);
         syncStoredNumber("fbAdsPaid", resolvedFbAdsPaid ?? 0);
 
         const migrationTasks: Promise<unknown>[] = [];
