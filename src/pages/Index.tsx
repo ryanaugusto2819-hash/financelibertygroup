@@ -44,6 +44,8 @@ const Index = ({ country }: IndexProps = {}) => {
     manualCashUY, setManualCashUY,
     manualSaqueBR, setManualSaqueBR,
     manualSaqueUY, setManualSaqueUY,
+    manualAdsBR, setManualAdsBR,
+    manualAdsUY, setManualAdsUY,
   } = useFinance();
 
   // Sync country prop to context filter
