@@ -35,6 +35,10 @@ interface FinanceContextType {
   setManualSaqueBR: (value: number | null) => void;
   manualSaqueUY: number | null;
   setManualSaqueUY: (value: number | null) => void;
+  manualAdsBR: number | null;
+  setManualAdsBR: (value: number | null) => void;
+  manualAdsUY: number | null;
+  setManualAdsUY: (value: number | null) => void;
 }
 
 const FinanceContext = createContext<FinanceContextType | undefined>(undefined);
