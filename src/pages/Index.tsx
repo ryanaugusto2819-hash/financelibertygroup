@@ -631,14 +631,42 @@ const Index = ({ country }: IndexProps = {}) => {
 
       {/* Cenários de Pagamento */}
       <div className="mb-6">
-        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-          Projeção de Receita — Cenários de Pagamento
-          {countryFilter !== "todos" && (
-            <span className="ml-2 text-primary">
-              {countryFilter === "brasil" ? "🇧🇷 Brasil" : "🇺🇾 Uruguay"}
-            </span>
-          )}
-        </h3>
+        <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+          <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            Projeção de Receita — Cenários de Pagamento
+            {countryFilter !== "todos" && (
+              <span className="ml-2 text-primary">
+                {countryFilter === "brasil" ? "🇧🇷 Brasil" : "🇺🇾 Uruguay"}
+              </span>
+            )}
+          </h3>
+          <div className="flex items-center gap-3 flex-wrap">
+            {(countryFilter === "todos" || countryFilter === "brasil") && (
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">🇧🇷 Ads BR</span>
+                <Input
+                  type="number"
+                  value={manualAdsBR ?? ""}
+                  onChange={(e) => setManualAdsBR(e.target.value === "" ? null : Number(e.target.value))}
+                  placeholder="0"
+                  className="h-7 w-24 text-xs font-mono"
+                />
+              </div>
+            )}
+            {(countryFilter === "todos" || countryFilter === "uruguay") && (
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">🇺🇾 Ads UY</span>
+                <Input
+                  type="number"
+                  value={manualAdsUY ?? ""}
+                  onChange={(e) => setManualAdsUY(e.target.value === "" ? null : Number(e.target.value))}
+                  placeholder="0"
+                  className="h-7 w-24 text-xs font-mono"
+                />
+              </div>
+            )}
+          </div>
+        </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <ScenarioCard percentage={100} totalReceivable={totalReceivable} totalExpenses={totalExpensesPeriod} adsSpend={adsSpendForScenario} shippingCost={totalFrete} shippingCount={totalQuantidadePagos} productCost={custoProdutos} productCount={totalQuantidadePagos} dailySalaryCost={custoDiarias} index={0} />
           <ScenarioCard percentage={70} totalReceivable={totalReceivable} totalExpenses={totalExpensesPeriod} adsSpend={adsSpendForScenario} shippingCost={totalFrete} shippingCount={totalQuantidadePagos} productCost={custoProdutos} productCount={totalQuantidadePagos} dailySalaryCost={custoDiarias} index={1} highlight />
