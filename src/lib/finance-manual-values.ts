@@ -1,6 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 
-export type FinanceManualValueKey = "manualCash" | "manualCashBR" | "manualCashUY" | "manualSaqueBR" | "manualSaqueUY" | "fbAdsPaid";
+export type FinanceManualValueKey = "manualCash" | "manualCashBR" | "manualCashUY" | "manualSaqueBR" | "manualSaqueUY" | "fbAdsPaid" | "manualAdsBR" | "manualAdsUY";
 
 type ManualValuesMap = Partial<Record<FinanceManualValueKey, number | null>>;
 
