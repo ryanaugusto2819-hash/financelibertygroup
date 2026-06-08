@@ -118,6 +118,8 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
         manualCashUY: readStoredNumber("manualCashUY"),
         manualSaqueBR: readStoredNumber("manualSaqueBR"),
         manualSaqueUY: readStoredNumber("manualSaqueUY"),
+        manualAdsBR: readStoredNumber("manualAdsBR"),
+        manualAdsUY: readStoredNumber("manualAdsUY"),
         fbAdsPaid: readStoredNumber("fbAdsPaid") ?? 0,
       };
 
