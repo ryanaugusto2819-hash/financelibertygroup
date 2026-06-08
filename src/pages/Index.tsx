@@ -12,7 +12,7 @@ import {
 } from "@/lib/finance-data";
 import { useFinance } from "@/context/FinanceContext";
 import { useLibertyData } from "@/hooks/useLibertyData";
-import { useAdsSpend } from "@/hooks/useAdsSpend";
+
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
@@ -44,6 +44,8 @@ const Index = ({ country }: IndexProps = {}) => {
     manualCashUY, setManualCashUY,
     manualSaqueBR, setManualSaqueBR,
     manualSaqueUY, setManualSaqueUY,
+    manualAdsBR, setManualAdsBR,
+    manualAdsUY, setManualAdsUY,
   } = useFinance();
 
   // Sync country prop to context filter
@@ -56,7 +58,7 @@ const Index = ({ country }: IndexProps = {}) => {
   }, [country, setCountryFilter]);
   const { data: libertyData, isLoading: libertyLoading } = useLibertyData(dateRange.from, dateRange.to);
   const { data: libertyDataTotal } = useLibertyData();
-  const { data: adsData, isLoading: adsLoading } = useAdsSpend(dateRange.from, dateRange.to);
+  
   const queryClient = useQueryClient();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [editingCash, setEditingCash] = useState(false);
@@ -101,13 +103,12 @@ const Index = ({ country }: IndexProps = {}) => {
     });
   }, [libertyData, countryFilter]);
 
-  // Ads data per country
-  const currentAdsData = useMemo(() => {
-    if (!adsData) return undefined;
-    if (countryFilter === "brasil") return adsData.brasil;
-    if (countryFilter === "uruguay") return adsData.uruguay;
-    return adsData;
-  }, [adsData, countryFilter]);
+  // Ads manual values per country
+  const adsBRManual = manualAdsBR ?? 0;
+  const adsUYManual = manualAdsUY ?? 0;
+  const currentAdsSpend = countryFilter === "brasil" ? adsBRManual
+    : countryFilter === "uruguay" ? adsUYManual
+    : adsBRManual + adsUYManual;
 
   // Load manual revenues filtered by date range
   const { data: manualRevenues = [] } = useQuery({
@@ -264,8 +265,8 @@ const Index = ({ country }: IndexProps = {}) => {
     : saqueDisponBR + saqueDisponUY;
 
   // Saídas por país e Caixa automático (PIX - Saídas)
-  const adsBR = adsData?.brasil?.totalSpend ?? 0;
-  const adsUY = adsData?.uruguay?.totalSpend ?? 0;
+  const adsBR = adsBRManual;
+  const adsUY = adsUYManual;
   const currentCashBR = manualCashBR ?? 0;
   const currentCashUY = manualCashUY ?? 0;
   const currentCash = countryFilter === "brasil" ? currentCashBR
@@ -320,7 +321,7 @@ const Index = ({ country }: IndexProps = {}) => {
   const isSingleDay = dateRange.from === dateRange.to;
   const periodLabel = isSingleDay ? formatDate(dateRange.from) : `${formatDate(dateRange.from)} — ${formatDate(dateRange.to)}`;
 
-  const adsSpendForScenario = currentAdsData?.totalSpend ?? 0;
+  const adsSpendForScenario = currentAdsSpend;
 
   return (
     <DashboardLayout title={country === "brasil" ? "🇧🇷 Brasil" : country === "uruguay" ? "🇺🇾 Uruguay" : "Painel Financeiro"} subtitle={country ? "Controle financeiro" : "Controle financeiro executivo"} hideCountryFilter={!!country}>
@@ -630,14 +631,42 @@ const Index = ({ country }: IndexProps = {}) => {
 
       {/* Cenários de Pagamento */}
       <div className="mb-6">
-        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-          Projeção de Receita — Cenários de Pagamento
-          {countryFilter !== "todos" && (
-            <span className="ml-2 text-primary">
-              {countryFilter === "brasil" ? "🇧🇷 Brasil" : "🇺🇾 Uruguay"}
-            </span>
-          )}
-        </h3>
+        <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+          <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            Projeção de Receita — Cenários de Pagamento
+            {countryFilter !== "todos" && (
+              <span className="ml-2 text-primary">
+                {countryFilter === "brasil" ? "🇧🇷 Brasil" : "🇺🇾 Uruguay"}
+              </span>
+            )}
+          </h3>
+          <div className="flex items-center gap-3 flex-wrap">
+            {(countryFilter === "todos" || countryFilter === "brasil") && (
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">🇧🇷 Ads BR</span>
+                <Input
+                  type="number"
+                  value={manualAdsBR ?? ""}
+                  onChange={(e) => setManualAdsBR(e.target.value === "" ? null : Number(e.target.value))}
+                  placeholder="0"
+                  className="h-7 w-24 text-xs font-mono"
+                />
+              </div>
+            )}
+            {(countryFilter === "todos" || countryFilter === "uruguay") && (
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">🇺🇾 Ads UY</span>
+                <Input
+                  type="number"
+                  value={manualAdsUY ?? ""}
+                  onChange={(e) => setManualAdsUY(e.target.value === "" ? null : Number(e.target.value))}
+                  placeholder="0"
+                  className="h-7 w-24 text-xs font-mono"
+                />
+              </div>
+            )}
+          </div>
+        </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <ScenarioCard percentage={100} totalReceivable={totalReceivable} totalExpenses={totalExpensesPeriod} adsSpend={adsSpendForScenario} shippingCost={totalFrete} shippingCount={totalQuantidadePagos} productCost={custoProdutos} productCount={totalQuantidadePagos} dailySalaryCost={custoDiarias} index={0} />
           <ScenarioCard percentage={70} totalReceivable={totalReceivable} totalExpenses={totalExpensesPeriod} adsSpend={adsSpendForScenario} shippingCost={totalFrete} shippingCount={totalQuantidadePagos} productCost={custoProdutos} productCount={totalQuantidadePagos} dailySalaryCost={custoDiarias} index={1} highlight />

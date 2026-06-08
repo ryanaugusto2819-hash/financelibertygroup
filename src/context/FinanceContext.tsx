@@ -35,6 +35,10 @@ interface FinanceContextType {
   setManualSaqueBR: (value: number | null) => void;
   manualSaqueUY: number | null;
   setManualSaqueUY: (value: number | null) => void;
+  manualAdsBR: number | null;
+  setManualAdsBR: (value: number | null) => void;
+  manualAdsUY: number | null;
+  setManualAdsUY: (value: number | null) => void;
 }
 
 const FinanceContext = createContext<FinanceContextType | undefined>(undefined);
@@ -86,6 +90,8 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   const [manualCashUY, setManualCashUYState] = useState<number | null>(() => readStoredNumber("manualCashUY"));
   const [manualSaqueBR, setManualSaqueBRState] = useState<number | null>(() => readStoredNumber("manualSaqueBR"));
   const [manualSaqueUY, setManualSaqueUYState] = useState<number | null>(() => readStoredNumber("manualSaqueUY"));
+  const [manualAdsBR, setManualAdsBRState] = useState<number | null>(() => readStoredNumber("manualAdsBR"));
+  const [manualAdsUY, setManualAdsUYState] = useState<number | null>(() => readStoredNumber("manualAdsUY"));
 
   useEffect(() => {
     if (!session) return;
@@ -112,6 +118,8 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
         manualCashUY: readStoredNumber("manualCashUY"),
         manualSaqueBR: readStoredNumber("manualSaqueBR"),
         manualSaqueUY: readStoredNumber("manualSaqueUY"),
+        manualAdsBR: readStoredNumber("manualAdsBR"),
+        manualAdsUY: readStoredNumber("manualAdsUY"),
         fbAdsPaid: readStoredNumber("fbAdsPaid") ?? 0,
       };
 
@@ -124,6 +132,8 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
         const resolvedManualCashUY = remoteValues.manualCashUY ?? localValues.manualCashUY;
         const resolvedManualSaqueBR = remoteValues.manualSaqueBR ?? localValues.manualSaqueBR;
         const resolvedManualSaqueUY = remoteValues.manualSaqueUY ?? localValues.manualSaqueUY;
+        const resolvedManualAdsBR = remoteValues.manualAdsBR ?? localValues.manualAdsBR;
+        const resolvedManualAdsUY = remoteValues.manualAdsUY ?? localValues.manualAdsUY;
         const resolvedFbAdsPaid = remoteValues.fbAdsPaid ?? localValues.fbAdsPaid;
 
         setManualCashState(resolvedManualCash ?? null);
@@ -131,6 +141,8 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
         setManualCashUYState(resolvedManualCashUY ?? null);
         setManualSaqueBRState(resolvedManualSaqueBR ?? null);
         setManualSaqueUYState(resolvedManualSaqueUY ?? null);
+        setManualAdsBRState(resolvedManualAdsBR ?? null);
+        setManualAdsUYState(resolvedManualAdsUY ?? null);
         setFbAdsPaidState(resolvedFbAdsPaid ?? 0);
 
         syncStoredNumber("manualCash", resolvedManualCash ?? null);
@@ -138,6 +150,8 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
         syncStoredNumber("manualCashUY", resolvedManualCashUY ?? null);
         syncStoredNumber("manualSaqueBR", resolvedManualSaqueBR ?? null);
         syncStoredNumber("manualSaqueUY", resolvedManualSaqueUY ?? null);
+        syncStoredNumber("manualAdsBR", resolvedManualAdsBR ?? null);
+        syncStoredNumber("manualAdsUY", resolvedManualAdsUY ?? null);
         syncStoredNumber("fbAdsPaid", resolvedFbAdsPaid ?? 0);
 
         const migrationTasks: Promise<unknown>[] = [];
@@ -202,6 +216,14 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   const setManualSaqueUY = (value: number | null) => {
     setManualSaqueUYState(value);
     persistManualValue("manualSaqueUY", value);
+  };
+  const setManualAdsBR = (value: number | null) => {
+    setManualAdsBRState(value);
+    persistManualValue("manualAdsBR", value);
+  };
+  const setManualAdsUY = (value: number | null) => {
+    setManualAdsUYState(value);
+    persistManualValue("manualAdsUY", value);
   };
 
   const expenses = useMemo(() => {
@@ -332,6 +354,8 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       manualCashUY, setManualCashUY,
       manualSaqueBR, setManualSaqueBR,
       manualSaqueUY, setManualSaqueUY,
+      manualAdsBR, setManualAdsBR,
+      manualAdsUY, setManualAdsUY,
     }}>
       {children}
     </FinanceContext.Provider>
