@@ -265,8 +265,8 @@ const Index = ({ country }: IndexProps = {}) => {
     : saqueDisponBR + saqueDisponUY;
 
   // Saídas por país e Caixa automático (PIX - Saídas)
-  const adsBR = adsData?.brasil?.totalSpend ?? 0;
-  const adsUY = adsData?.uruguay?.totalSpend ?? 0;
+  const adsBR = adsBRManual;
+  const adsUY = adsUYManual;
   const currentCashBR = manualCashBR ?? 0;
   const currentCashUY = manualCashUY ?? 0;
   const currentCash = countryFilter === "brasil" ? currentCashBR
