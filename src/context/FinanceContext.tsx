@@ -354,6 +354,8 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       manualCashUY, setManualCashUY,
       manualSaqueBR, setManualSaqueBR,
       manualSaqueUY, setManualSaqueUY,
+      manualAdsBR, setManualAdsBR,
+      manualAdsUY, setManualAdsUY,
     }}>
       {children}
     </FinanceContext.Provider>
