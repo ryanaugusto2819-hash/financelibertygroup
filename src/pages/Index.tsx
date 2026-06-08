@@ -321,7 +321,7 @@ const Index = ({ country }: IndexProps = {}) => {
   const isSingleDay = dateRange.from === dateRange.to;
   const periodLabel = isSingleDay ? formatDate(dateRange.from) : `${formatDate(dateRange.from)} — ${formatDate(dateRange.to)}`;
 
-  const adsSpendForScenario = currentAdsData?.totalSpend ?? 0;
+  const adsSpendForScenario = currentAdsSpend;
 
   return (
     <DashboardLayout title={country === "brasil" ? "🇧🇷 Brasil" : country === "uruguay" ? "🇺🇾 Uruguay" : "Painel Financeiro"} subtitle={country ? "Controle financeiro" : "Controle financeiro executivo"} hideCountryFilter={!!country}>
