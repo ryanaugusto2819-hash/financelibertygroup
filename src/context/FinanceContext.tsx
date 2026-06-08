@@ -217,6 +217,14 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     setManualSaqueUYState(value);
     persistManualValue("manualSaqueUY", value);
   };
+  const setManualAdsBR = (value: number | null) => {
+    setManualAdsBRState(value);
+    persistManualValue("manualAdsBR", value);
+  };
+  const setManualAdsUY = (value: number | null) => {
+    setManualAdsUYState(value);
+    persistManualValue("manualAdsUY", value);
+  };
 
   const expenses = useMemo(() => {
     if (countryFilter === "todos") return allExpenses;
