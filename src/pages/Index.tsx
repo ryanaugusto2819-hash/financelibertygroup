@@ -103,13 +103,12 @@ const Index = ({ country }: IndexProps = {}) => {
     });
   }, [libertyData, countryFilter]);
 
-  // Ads data per country
-  const currentAdsData = useMemo(() => {
-    if (!adsData) return undefined;
-    if (countryFilter === "brasil") return adsData.brasil;
-    if (countryFilter === "uruguay") return adsData.uruguay;
-    return adsData;
-  }, [adsData, countryFilter]);
+  // Ads manual values per country
+  const adsBRManual = manualAdsBR ?? 0;
+  const adsUYManual = manualAdsUY ?? 0;
+  const currentAdsSpend = countryFilter === "brasil" ? adsBRManual
+    : countryFilter === "uruguay" ? adsUYManual
+    : adsBRManual + adsUYManual;
 
   // Load manual revenues filtered by date range
   const { data: manualRevenues = [] } = useQuery({
