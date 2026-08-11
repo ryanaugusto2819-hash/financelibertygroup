@@ -42,6 +42,7 @@ interface LibertyResponse {
   summaryBrasil: LibertySummary;
   summaryUruguay: LibertySummary;
   summaryParaguay: LibertySummary;
+  summaryCaixaRel: LibertySummary;
 }
 
 export function useLibertyData(from?: string, to?: string) {

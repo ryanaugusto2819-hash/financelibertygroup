@@ -7,6 +7,7 @@ const options: { key: CountryFilterType; label: string; flag?: string }[] = [
   { key: "brasil", label: "Brasil", flag: "🇧🇷" },
   { key: "uruguay", label: "Uruguay", flag: "🇺🇾" },
   { key: "paraguay", label: "Paraguay", flag: "🇵🇾" },
+  { key: "caixarel", label: "CAIXA REL", flag: "🏦" },
 ];
 
 export function CountryFilter() {

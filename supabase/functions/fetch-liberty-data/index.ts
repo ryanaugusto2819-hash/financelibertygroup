@@ -160,12 +160,22 @@ serve(async (req) => {
       return pais === "py" || pais === "paraguay" || pais === "paraguai";
     });
 
+    const caixaRelPedidos = allPedidos.filter(p => {
+      const pais = (p.pais || "").toLowerCase();
+      return pais === "caixarel" || pais === "caixa rel" || pais === "rel";
+    });
+    const caixaRelPagos = allPagos.filter(p => {
+      const pais = (p.pais || "").toLowerCase();
+      return pais === "caixarel" || pais === "caixa rel" || pais === "rel";
+    });
+
     return new Response(JSON.stringify({
       pedidos: allPedidos,
       summary:        buildSummary(allPedidos,      allPagos),
       summaryBrasil:  buildSummary(brasilPedidos,   brasilPagos),
       summaryUruguay: buildSummary(uruguayPedidos,  uruguayPagos),
       summaryParaguay: buildSummary(paraguayPedidos, paraguayPagos),
+      summaryCaixaRel: buildSummary(caixaRelPedidos, caixaRelPagos),
       cotacaoUYU: UYU_TO_BRL,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

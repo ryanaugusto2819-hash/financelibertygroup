@@ -31,7 +31,7 @@ const PAYMENT_SOURCE_LABELS: Record<string, string> = {
 };
 
 interface ExpensesProps {
-  country?: "brasil" | "uruguay" | "paraguay";
+  country?: "brasil" | "uruguay" | "paraguay" | "caixarel";
 }
 
 const Expenses = ({ country }: ExpensesProps = {}) => {
@@ -53,7 +53,7 @@ const Expenses = ({ country }: ExpensesProps = {}) => {
   })).filter(c => c.value > 0);
 
   return (
-    <DashboardLayout title={country === "brasil" ? "🇧🇷 Despesas Brasil" : country === "uruguay" ? "🇺🇾 Despesas Uruguay" : country === "paraguay" ? "🇵🇾 Despesas Paraguay" : "Custos & Despesas"} subtitle="Controle detalhado de gastos" hideCountryFilter={!!country}>
+    <DashboardLayout title={country === "brasil" ? "🇧🇷 Despesas Brasil" : country === "uruguay" ? "🇺🇾 Despesas Uruguay" : country === "paraguay" ? "🇵🇾 Despesas Paraguay" : country === "caixarel" ? "🏦 Despesas CAIXA REL" : "Custos & Despesas"} subtitle="Controle detalhado de gastos" hideCountryFilter={!!country}>
       <div className="flex items-center justify-between mb-6">
         <DateFilter />
         <div className="flex gap-2">
@@ -193,7 +193,7 @@ function EditExpenseDialog({ expense, onSave }: { expense: Expense; onSave: (id:
     const result = await onSave(expense.id, {
       description, amount: parseFloat(amount), category, type, status, date,
       paymentSource: paymentSource || undefined,
-      country: (country || undefined) as "brasil" | "uruguay" | "paraguay" | undefined,
+      country: (country || undefined) as "brasil" | "uruguay" | "paraguay" | "caixarel" | undefined,
     });
 
     if (!result.success) {
@@ -288,6 +288,7 @@ function EditExpenseDialog({ expense, onSave }: { expense: Expense; onSave: (id:
                   <SelectItem value="brasil">🇧🇷 Brasil</SelectItem>
                   <SelectItem value="uruguay">🇺🇾 Uruguay</SelectItem>
                   <SelectItem value="paraguay">🇵🇾 Paraguay</SelectItem>
+                  <SelectItem value="caixarel">🏦 CAIXA REL</SelectItem>
                 </SelectContent>
               </Select>
             </div>

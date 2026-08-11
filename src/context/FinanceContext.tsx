@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { fetchFinanceManualValues, saveFinanceManualValue, type FinanceManualValueKey } from "@/lib/finance-manual-values";
 import { useAuth } from "@/context/AuthContext";
 
-export type CountryFilter = "todos" | "brasil" | "uruguay" | "paraguay";
+export type CountryFilter = "todos" | "brasil" | "uruguay" | "paraguay" | "caixarel";
 
 interface FinanceContextType {
   expenses: Expense[];
@@ -45,6 +45,12 @@ interface FinanceContextType {
   setManualAdsUY: (value: number | null) => void;
   manualAdsPY: number | null;
   setManualAdsPY: (value: number | null) => void;
+  manualCashREL: number | null;
+  setManualCashREL: (value: number | null) => void;
+  manualSaqueREL: number | null;
+  setManualSaqueREL: (value: number | null) => void;
+  manualAdsREL: number | null;
+  setManualAdsREL: (value: number | null) => void;
 }
 
 const FinanceContext = createContext<FinanceContextType | undefined>(undefined);
@@ -101,6 +107,9 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   const [manualAdsBR, setManualAdsBRState] = useState<number | null>(() => readStoredNumber("manualAdsBR"));
   const [manualAdsUY, setManualAdsUYState] = useState<number | null>(() => readStoredNumber("manualAdsUY"));
   const [manualAdsPY, setManualAdsPYState] = useState<number | null>(() => readStoredNumber("manualAdsPY"));
+  const [manualCashREL, setManualCashRELState] = useState<number | null>(() => readStoredNumber("manualCashREL"));
+  const [manualSaqueREL, setManualSaqueRELState] = useState<number | null>(() => readStoredNumber("manualSaqueREL"));
+  const [manualAdsREL, setManualAdsRELState] = useState<number | null>(() => readStoredNumber("manualAdsREL"));
 
   useEffect(() => {
     if (!session) return;
@@ -132,6 +141,9 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
         manualCashPY: readStoredNumber("manualCashPY"),
         manualSaquePY: readStoredNumber("manualSaquePY"),
         manualAdsPY: readStoredNumber("manualAdsPY"),
+        manualCashREL: readStoredNumber("manualCashREL"),
+        manualSaqueREL: readStoredNumber("manualSaqueREL"),
+        manualAdsREL: readStoredNumber("manualAdsREL"),
         fbAdsPaid: readStoredNumber("fbAdsPaid") ?? 0,
       };
 
@@ -149,6 +161,9 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
         const resolvedManualCashPY = remoteValues.manualCashPY ?? localValues.manualCashPY;
         const resolvedManualSaquePY = remoteValues.manualSaquePY ?? localValues.manualSaquePY;
         const resolvedManualAdsPY = remoteValues.manualAdsPY ?? localValues.manualAdsPY;
+        const resolvedManualCashREL = remoteValues.manualCashREL ?? localValues.manualCashREL;
+        const resolvedManualSaqueREL = remoteValues.manualSaqueREL ?? localValues.manualSaqueREL;
+        const resolvedManualAdsREL = remoteValues.manualAdsREL ?? localValues.manualAdsREL;
         const resolvedFbAdsPaid = remoteValues.fbAdsPaid ?? localValues.fbAdsPaid;
 
         setManualCashState(resolvedManualCash ?? null);
@@ -161,6 +176,9 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
         setManualCashPYState(resolvedManualCashPY ?? null);
         setManualSaquePYState(resolvedManualSaquePY ?? null);
         setManualAdsPYState(resolvedManualAdsPY ?? null);
+        setManualCashRELState(resolvedManualCashREL ?? null);
+        setManualSaqueRELState(resolvedManualSaqueREL ?? null);
+        setManualAdsRELState(resolvedManualAdsREL ?? null);
         setFbAdsPaidState(resolvedFbAdsPaid ?? 0);
 
         syncStoredNumber("manualCash", resolvedManualCash ?? null);
@@ -173,6 +191,9 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
         syncStoredNumber("manualCashPY", resolvedManualCashPY ?? null);
         syncStoredNumber("manualSaquePY", resolvedManualSaquePY ?? null);
         syncStoredNumber("manualAdsPY", resolvedManualAdsPY ?? null);
+        syncStoredNumber("manualCashREL", resolvedManualCashREL ?? null);
+        syncStoredNumber("manualSaqueREL", resolvedManualSaqueREL ?? null);
+        syncStoredNumber("manualAdsREL", resolvedManualAdsREL ?? null);
         syncStoredNumber("fbAdsPaid", resolvedFbAdsPaid ?? 0);
 
         const migrationTasks: Promise<unknown>[] = [];
@@ -253,6 +274,18 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   const setManualSaquePY = (value: number | null) => {
     setManualSaquePYState(value);
     persistManualValue("manualSaquePY", value);
+  };
+  const setManualCashREL = (value: number | null) => {
+    setManualCashRELState(value);
+    persistManualValue("manualCashREL", value);
+  };
+  const setManualSaqueREL = (value: number | null) => {
+    setManualSaqueRELState(value);
+    persistManualValue("manualSaqueREL", value);
+  };
+  const setManualAdsREL = (value: number | null) => {
+    setManualAdsRELState(value);
+    persistManualValue("manualAdsREL", value);
   };
   const setManualAdsPY = (value: number | null) => {
     setManualAdsPYState(value);
@@ -392,6 +425,9 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       manualCashPY, setManualCashPY,
       manualSaquePY, setManualSaquePY,
       manualAdsPY, setManualAdsPY,
+      manualCashREL, setManualCashREL,
+      manualSaqueREL, setManualSaqueREL,
+      manualAdsREL, setManualAdsREL,
     }}>
       {children}
     </FinanceContext.Provider>
