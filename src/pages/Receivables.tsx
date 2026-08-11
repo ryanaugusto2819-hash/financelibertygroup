@@ -34,6 +34,7 @@ interface ReceivablesProps {
 const Receivables = ({ country }: ReceivablesProps = {}) => {
   const { dateRange, setCountryFilter } = useFinance();
   const queryClient = useQueryClient();
+  const isCaixaRel = country === "caixarel";
 
   // Sync country prop to context
   React.useEffect(() => {
@@ -62,6 +63,16 @@ const Receivables = ({ country }: ReceivablesProps = {}) => {
       return data ?? [];
     },
   });
+
+  const handleMarkReal = async (id: string) => {
+    const { error } = await supabase.from("revenues").update({ status: "pago" }).eq("id", id);
+    if (error) {
+      toast.error("Erro ao converter para Real.");
+      return;
+    }
+    toast.success("Entrada convertida para REAL.");
+    queryClient.invalidateQueries({ queryKey: ["revenues"] });
+  };
 
   const handleDeleteRevenue = async (id: string) => {
     const { error } = await supabase.from("revenues").delete().eq("id", id);
@@ -125,7 +136,9 @@ const Receivables = ({ country }: ReceivablesProps = {}) => {
       <div className="glass-card p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-semibold text-foreground">Receitas ({manualRevenues.length})</h3>
-          <AddRevenueDialog onAdded={() => queryClient.invalidateQueries({ queryKey: ["revenues"] })} />
+          {isCaixaRel && (
+            <AddRevenueDialog lockCountry="caixarel" onAdded={() => queryClient.invalidateQueries({ queryKey: ["revenues"] })} />
+          )}
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
@@ -149,9 +162,19 @@ const Receivables = ({ country }: ReceivablesProps = {}) => {
                   <td className="py-3 font-mono text-muted-foreground">{formatDate(r.date)}</td>
                   <td className="py-3 text-right font-mono font-medium text-foreground">{formatCurrency(Number(r.amount))}</td>
                   <td className="py-3 text-center">
-                    <Badge variant={statusBadgeVariant(r.status)} className="text-[10px]">{r.status}</Badge>
+                    <Badge variant={statusBadgeVariant(r.status)} className="text-[10px]">
+                      {isCaixaRel ? (r.status === "pago" ? "REAL" : r.status === "pendente" ? "AGENDADA" : r.status) : r.status}
+                    </Badge>
                   </td>
                   <td className="py-3 text-center">
+                    {isCaixaRel && r.status === "pendente" && (
+                      <button
+                        onClick={() => handleMarkReal(r.id)}
+                        className="mr-2 text-[10px] px-2 py-1 rounded-md bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                      >
+                        Marcar Real
+                      </button>
+                    )}
                     <button onClick={() => handleDeleteRevenue(r.id)} className="text-muted-foreground hover:text-destructive transition-colors p-1">
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
