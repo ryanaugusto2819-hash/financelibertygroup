@@ -694,7 +694,7 @@ const Index = ({ country }: IndexProps = {}) => {
               </button>
             </div>
           )
-        ) : (
+        ) : countryFilter === "uruguay" ? (
           editingSaqueUY ? (
             <div className="glass-card p-4 flex flex-col gap-2">
               <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Saque 🇺🇾 Uruguay</span>
@@ -717,6 +717,30 @@ const Index = ({ country }: IndexProps = {}) => {
               </button>
             </div>
           )
+        ) : (
+          editingSaquePY ? (
+            <div className="glass-card p-4 flex flex-col gap-2">
+              <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Saque 🇵🇾 Paraguay</span>
+              <div className="flex items-center gap-2">
+                <Input type="text" value={saquePYInput} onChange={e => setSaquePYInput(e.target.value)}
+                  onKeyDown={e => { if (e.key === "Enter") handleSaveSaquePY(); if (e.key === "Escape") handleCancelEditSaquePY(); }}
+                  className="h-8 text-sm font-mono" autoFocus />
+                <button onClick={handleSaveSaquePY} className="text-chart-positive hover:opacity-80"><Check className="h-4 w-4" /></button>
+                <button onClick={handleCancelEditSaquePY} className="text-destructive hover:opacity-80"><X className="h-4 w-4" /></button>
+              </div>
+            </div>
+          ) : (
+            <div className="relative group">
+              <KPICard label="Saque 🇵🇾 Paraguay" value={saqueDisponPY} prefix="R$" icon={Banknote} index={3} variant="positive">
+                <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">Cartão + Boleto</span><span className="text-[10px] font-mono font-semibold text-chart-positive">{formatCurrency(countryPayments.cartaoBolPY)}</span></div>
+                {(manualSaquePY ?? 0) !== 0 && <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">Saldo Base</span><span className="text-[10px] font-mono font-semibold text-chart-positive">{formatCurrency(manualSaquePY ?? 0)}</span></div>}
+              </KPICard>
+              <button onClick={handleStartEditSaquePY} className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-muted">
+                <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+              </button>
+            </div>
+          )
+
         )}
       </div>
 
