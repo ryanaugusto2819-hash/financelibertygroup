@@ -28,12 +28,12 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 
 // Product cost per unit by country
-const PRODUCT_COST = { brasil: 13, uruguay: 5 };
+const PRODUCT_COST = { brasil: 13, uruguay: 5, paraguay: 5 };
 // Fixed shipping for Uruguay per unit
 const FRETE_FIXO_UY = 35;
 
 interface IndexProps {
-  country?: "brasil" | "uruguay";
+  country?: "brasil" | "uruguay" | "paraguay";
 }
 
 const Index = ({ country }: IndexProps = {}) => {
@@ -46,6 +46,9 @@ const Index = ({ country }: IndexProps = {}) => {
     manualSaqueUY, setManualSaqueUY,
     manualAdsBR, setManualAdsBR,
     manualAdsUY, setManualAdsUY,
+    manualCashPY, setManualCashPY,
+    manualSaquePY, setManualSaquePY,
+    manualAdsPY, setManualAdsPY,
   } = useFinance();
 
   // Sync country prop to context filter
@@ -70,6 +73,10 @@ const Index = ({ country }: IndexProps = {}) => {
   const [editingSaqueBR, setEditingSaqueBR] = useState(false);
   const [saqueBRInput, setSaqueBRInput] = useState("");
   const [editingSaqueUY, setEditingSaqueUY] = useState(false);
+  const [editingCashPY, setEditingCashPY] = useState(false);
+  const [cashPYInput, setCashPYInput] = useState("");
+  const [editingSaquePY, setEditingSaquePY] = useState(false);
+  const [saquePYInput, setSaquePYInput] = useState("");
   const [expandPayable, setExpandPayable] = useState(false);
   const [expandEntradas, setExpandEntradas] = useState(false);
   const [expandSaidas, setExpandSaidas] = useState(false);
@@ -81,6 +88,7 @@ const Index = ({ country }: IndexProps = {}) => {
     if (!libertyData) return undefined;
     if (countryFilter === "brasil") return libertyData.summaryBrasil;
     if (countryFilter === "uruguay") return libertyData.summaryUruguay;
+    if (countryFilter === "paraguay") return libertyData.summaryParaguay;
     return libertyData.summary;
   }, [libertyData, countryFilter]);
 
@@ -89,6 +97,7 @@ const Index = ({ country }: IndexProps = {}) => {
     if (!libertyDataTotal) return undefined;
     if (countryFilter === "brasil") return libertyDataTotal.summaryBrasil;
     if (countryFilter === "uruguay") return libertyDataTotal.summaryUruguay;
+    if (countryFilter === "paraguay") return libertyDataTotal.summaryParaguay;
     return libertyDataTotal.summary;
   }, [libertyDataTotal, countryFilter]);
 
@@ -99,6 +108,7 @@ const Index = ({ country }: IndexProps = {}) => {
       const pais = (p.pais || "").toLowerCase();
       if (countryFilter === "brasil") return pais === "br" || pais === "brasil";
       if (countryFilter === "uruguay") return pais === "uy" || pais === "uruguay";
+      if (countryFilter === "paraguay") return pais === "py" || pais === "paraguay" || pais === "paraguai";
       return false;
     });
   }, [libertyData, countryFilter]);
@@ -106,9 +116,11 @@ const Index = ({ country }: IndexProps = {}) => {
   // Ads manual values per country
   const adsBRManual = manualAdsBR ?? 0;
   const adsUYManual = manualAdsUY ?? 0;
+  const adsPYManual = manualAdsPY ?? 0;
   const currentAdsSpend = countryFilter === "brasil" ? adsBRManual
     : countryFilter === "uruguay" ? adsUYManual
-    : adsBRManual + adsUYManual;
+    : countryFilter === "paraguay" ? adsPYManual
+    : adsBRManual + adsUYManual + adsPYManual;
 
   // Load manual revenues filtered by date range
   const { data: manualRevenues = [] } = useQuery({
@@ -122,6 +134,7 @@ const Index = ({ country }: IndexProps = {}) => {
         .order("created_at", { ascending: false });
       if (countryFilter === "brasil") query = query.eq("country", "brasil");
       else if (countryFilter === "uruguay") query = query.eq("country", "uruguay");
+      else if (countryFilter === "paraguay") query = query.eq("country", "paraguay");
       const { data, error } = await query;
       if (error) throw error;
       return data ?? [];
@@ -171,6 +184,7 @@ const Index = ({ country }: IndexProps = {}) => {
         const pais = (p.pais || "").toLowerCase();
         if (countryFilter === "brasil" && pais !== "br" && pais !== "brasil") return false;
         if (countryFilter === "uruguay" && pais !== "uy" && pais !== "uruguay") return false;
+        if (countryFilter === "paraguay" && pais !== "py" && pais !== "paraguay" && pais !== "paraguai") return false;
       }
       return true;
     });
@@ -192,7 +206,7 @@ const Index = ({ country }: IndexProps = {}) => {
   const countryPayments = useMemo(() => {
     const allPedidos = libertyDataTotal?.pedidos ?? [];
     const toDateBR = (ts: string | null) => ts ? ts.substring(0, 10) : null;
-    let pixBR = 0, cartaoBolBR = 0, pixUY = 0, cartaoBolUY = 0;
+    let pixBR = 0, cartaoBolBR = 0, pixUY = 0, cartaoBolUY = 0, pixPY = 0, cartaoBolPY = 0;
     for (const p of allPedidos) {
       if (p.status_pagamento !== "pago") continue;
       const d = toDateBR(p.data_pagamento);
@@ -206,9 +220,12 @@ const Index = ({ country }: IndexProps = {}) => {
       } else if (pais === "uy" || pais === "uruguay") {
         if (forma === "pix") pixUY += valor;
         else cartaoBolUY += valor;
+      } else if (pais === "py" || pais === "paraguay" || pais === "paraguai") {
+        if (forma === "pix") pixPY += valor;
+        else cartaoBolPY += valor;
       }
     }
-    return { pixBR, cartaoBolBR, pixUY, cartaoBolUY };
+    return { pixBR, cartaoBolBR, pixUY, cartaoBolUY, pixPY, cartaoBolPY };
   }, [libertyDataTotal, dateRange]);
 
   const totalPayable = getTotalAccountsPayable();
@@ -222,23 +239,30 @@ const Index = ({ country }: IndexProps = {}) => {
   const totalFreteBR = libertyData?.summaryBrasil?.totalFrete ?? 0;
   const totalQuantidadeUY = libertyData?.summaryUruguay?.totalQuantidadePagos ?? 0;
   const totalFreteUY = totalQuantidadeUY * FRETE_FIXO_UY;
+  const totalFretePY = libertyData?.summaryParaguay?.totalFrete ?? 0;
   const totalFrete = countryFilter === "brasil" ? totalFreteBR
     : countryFilter === "uruguay" ? totalFreteUY
-    : totalFreteBR + totalFreteUY;
+    : countryFilter === "paraguay" ? totalFretePY
+    : totalFreteBR + totalFreteUY + totalFretePY;
 
   // Product cost per country
   const quantidadeBR = libertyData?.summaryBrasil?.totalQuantidadePagos ?? 0;
   const quantidadeUY = libertyData?.summaryUruguay?.totalQuantidadePagos ?? 0;
   const custoProdutosBR = quantidadeBR * PRODUCT_COST.brasil;
   const custoProdutosUY = quantidadeUY * PRODUCT_COST.uruguay;
+  const quantidadePY = libertyData?.summaryParaguay?.totalQuantidadePagos ?? 0;
+  const custoProdutosPY = quantidadePY * PRODUCT_COST.paraguay;
   const totalQuantidadePagos = countryFilter === "brasil" ? quantidadeBR
     : countryFilter === "uruguay" ? quantidadeUY
-    : quantidadeBR + quantidadeUY;
+    : countryFilter === "paraguay" ? quantidadePY
+    : quantidadeBR + quantidadeUY + quantidadePY;
   const custoProdutos = countryFilter === "brasil" ? custoProdutosBR
     : countryFilter === "uruguay" ? custoProdutosUY
-    : custoProdutosBR + custoProdutosUY;
+    : countryFilter === "paraguay" ? custoProdutosPY
+    : custoProdutosBR + custoProdutosUY + custoProdutosPY;
   const custoUnitarioLabel = countryFilter === "brasil" ? "R$ 13,00"
     : countryFilter === "uruguay" ? "R$ 5,00"
+    : countryFilter === "paraguay" ? "R$ 5,00"
     : "misto";
 
   // Salários: filter by country
@@ -258,20 +282,24 @@ const Index = ({ country }: IndexProps = {}) => {
   // Saque = saldo base (manual) + Cartão/Boleto do período
   const saqueDisponBR = manualSaqueBR ?? 0;
   const saqueDisponUY = manualSaqueUY ?? 0;
+  const saqueDisponPY = manualSaquePY ?? 0;
 
   // Combined or filtered saque
   const saqueDisponivel = countryFilter === "brasil" ? saqueDisponBR
     : countryFilter === "uruguay" ? saqueDisponUY
-    : saqueDisponBR + saqueDisponUY;
+    : countryFilter === "paraguay" ? saqueDisponPY
+    : saqueDisponBR + saqueDisponUY + saqueDisponPY;
 
   // Saídas por país e Caixa automático (PIX - Saídas)
   const adsBR = adsBRManual;
   const adsUY = adsUYManual;
   const currentCashBR = manualCashBR ?? 0;
   const currentCashUY = manualCashUY ?? 0;
+  const currentCashPY = manualCashPY ?? 0;
   const currentCash = countryFilter === "brasil" ? currentCashBR
     : countryFilter === "uruguay" ? currentCashUY
-    : currentCashBR + currentCashUY;
+    : countryFilter === "paraguay" ? currentCashPY
+    : currentCashBR + currentCashUY + currentCashPY;
 
   // Edit cash handlers (combined - "todos" view)
   const handleStartEditCash = () => { setCashInput(String(currentCash)); setEditingCash(true); };
@@ -318,13 +346,31 @@ const Index = ({ country }: IndexProps = {}) => {
   };
   const handleCancelEditSaqueUY = () => setEditingSaqueUY(false);
 
+  // Edit cash PY handlers
+  const handleStartEditCashPY = () => { setCashPYInput(String(manualCashPY ?? 0)); setEditingCashPY(true); };
+  const handleSaveCashPY = () => {
+    const val = parseFloat(cashPYInput.replace(/[^\d.,\-]/g, "").replace(",", "."));
+    if (!isNaN(val)) setManualCashPY(val);
+    setEditingCashPY(false);
+  };
+  const handleCancelEditCashPY = () => setEditingCashPY(false);
+
+  // Edit saque PY handlers
+  const handleStartEditSaquePY = () => { setSaquePYInput(String(manualSaquePY ?? 0)); setEditingSaquePY(true); };
+  const handleSaveSaquePY = () => {
+    const val = parseFloat(saquePYInput.replace(/[^\d.,\-]/g, "").replace(",", "."));
+    if (!isNaN(val)) setManualSaquePY(val);
+    setEditingSaquePY(false);
+  };
+  const handleCancelEditSaquePY = () => setEditingSaquePY(false);
+
   const isSingleDay = dateRange.from === dateRange.to;
   const periodLabel = isSingleDay ? formatDate(dateRange.from) : `${formatDate(dateRange.from)} — ${formatDate(dateRange.to)}`;
 
   const adsSpendForScenario = currentAdsSpend;
 
   return (
-    <DashboardLayout title={country === "brasil" ? "🇧🇷 Brasil" : country === "uruguay" ? "🇺🇾 Uruguay" : "Painel Financeiro"} subtitle={country ? "Controle financeiro" : "Controle financeiro executivo"} hideCountryFilter={!!country}>
+    <DashboardLayout title={country === "brasil" ? "🇧🇷 Brasil" : country === "uruguay" ? "🇺🇾 Uruguay" : country === "paraguay" ? "🇵🇾 Paraguay" : "Painel Financeiro"} subtitle={country ? "Controle financeiro" : "Controle financeiro executivo"} hideCountryFilter={!!country}>
       <div className="flex items-center justify-between mb-6">
         <DateFilter />
         <div className="flex items-center gap-2">
