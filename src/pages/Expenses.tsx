@@ -116,6 +116,7 @@ const Expenses = ({ country }: ExpensesProps = {}) => {
                   <th className="text-left pb-3 font-medium">Categoria</th>
                   <th className="text-left pb-3 font-medium">Tipo</th>
                   <th className="text-left pb-3 font-medium">Fonte</th>
+                  {isCaixaRel && <th className="text-left pb-3 font-medium">Origem</th>}
                   <th className="text-right pb-3 font-medium">Valor</th>
                   <th className="text-center pb-3 font-medium">Status</th>
                   <th className="text-center pb-3 font-medium">Ações</th>
@@ -133,6 +134,11 @@ const Expenses = ({ country }: ExpensesProps = {}) => {
                     <td className="py-2.5 text-[10px] text-muted-foreground">
                       {e.paymentSource ? PAYMENT_SOURCE_LABELS[e.paymentSource] : "—"}
                     </td>
+                    {isCaixaRel && (
+                      <td className="py-2.5 text-[10px] text-muted-foreground">
+                        {e.originCountry === "brasil" ? "🇧🇷 Brasil" : e.originCountry === "uruguay" ? "🇺🇾 Uruguay" : e.originCountry === "paraguay" ? "🇵🇾 Paraguay" : "—"}
+                      </td>
+                    )}
                     <td className="py-2.5 text-right font-mono font-bold text-chart-negative">{formatCurrency(e.amount)}</td>
                     <td className="py-2.5 text-center">
                       <Badge variant={e.status === "pago" ? "default" : e.status === "agendado" ? "outline" : "secondary"} className="text-[9px]">
