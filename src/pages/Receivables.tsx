@@ -87,7 +87,7 @@ const Receivables = ({ country }: ReceivablesProps = {}) => {
 
   return (
     <DashboardLayout
-      title={country === "brasil" ? "🇧🇷 Receitas Brasil" : country === "uruguay" ? "🇺🇾 Receitas Uruguay" : country === "paraguay" ? "🇵🇾 Receitas Paraguay" : "Capital em Giro"}
+      title={country === "brasil" ? "🇧🇷 Receitas Brasil" : country === "uruguay" ? "🇺🇾 Receitas Uruguay" : country === "paraguay" ? "🇵🇾 Receitas Paraguay" : country === "caixarel" ? "🏦 Receitas CAIXA REL" : "Capital em Giro"}
       subtitle="Receitas cadastradas manualmente"
       hideCountryFilter={!!country}
     >
@@ -145,7 +145,7 @@ const Receivables = ({ country }: ReceivablesProps = {}) => {
                 <tr key={r.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
                   <td className="py-3 font-medium text-foreground">{r.client}</td>
                   <td className="py-3 text-muted-foreground">{r.description}</td>
-                  <td className="py-3 text-muted-foreground">{r.country === "brasil" ? "🇧🇷" : r.country === "uruguay" ? "🇺🇾" : r.country === "paraguay" ? "🇵🇾" : "—"}</td>
+                  <td className="py-3 text-muted-foreground">{r.country === "brasil" ? "🇧🇷" : r.country === "uruguay" ? "🇺🇾" : r.country === "paraguay" ? "🇵🇾" : r.country === "caixarel" ? "🏦" : "—"}</td>
                   <td className="py-3 font-mono text-muted-foreground">{formatDate(r.date)}</td>
                   <td className="py-3 text-right font-mono font-medium text-foreground">{formatCurrency(Number(r.amount))}</td>
                   <td className="py-3 text-center">
