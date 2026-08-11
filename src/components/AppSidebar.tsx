@@ -35,9 +35,12 @@ export function AppSidebar() {
 
   const isBrasilActive = location.pathname.startsWith("/brasil");
   const isUruguayActive = location.pathname.startsWith("/uruguay");
+  const isParaguayActive = location.pathname.startsWith("/paraguay");
 
-  const showBrasil  = countryAccess !== "uruguay";
-  const showGlobal  = !countryAccess;
+  const showBrasil   = !countryAccess || countryAccess === "brasil";
+  const showUruguay  = !countryAccess || countryAccess === "uruguay";
+  const showParaguay = !countryAccess || countryAccess === "paraguay";
+  const showGlobal   = !countryAccess;
 
   return (
     <Sidebar collapsible="icon">
@@ -115,7 +118,7 @@ export function AppSidebar() {
               </Collapsible>}
 
               {/* Uruguay */}
-              <Collapsible defaultOpen={isUruguayActive} className="group/collapsible">
+              {showUruguay && <Collapsible defaultOpen={isUruguayActive} className="group/collapsible">
                 <SidebarMenuItem>
                   <CollapsibleTrigger asChild>
                     <SidebarMenuButton className={`hover:bg-muted/50 ${isUruguayActive ? "bg-primary/10 text-primary font-medium" : ""}`}>
@@ -157,7 +160,52 @@ export function AppSidebar() {
                     </SidebarMenuSub>
                   </CollapsibleContent>
                 </SidebarMenuItem>
-              </Collapsible>
+              </Collapsible>}
+
+              {/* Paraguay */}
+              {showParaguay && <Collapsible defaultOpen={isParaguayActive} className="group/collapsible">
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton className={`hover:bg-muted/50 ${isParaguayActive ? "bg-primary/10 text-primary font-medium" : ""}`}>
+                      <DollarSign className="mr-2 h-4 w-4" />
+                      {!collapsed && (
+                        <>
+                          <span className="flex-1">🇵🇾 Paraguay</span>
+                          <ChevronDown className="ml-auto h-3.5 w-3.5 transition-transform group-data-[state=open]/collapsible:rotate-180" />
+                        </>
+                      )}
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton asChild>
+                          <NavLink to="/paraguay" end className="hover:bg-muted/50" activeClassName="bg-primary/10 text-primary font-medium">
+                            <LayoutDashboard className="mr-2 h-3.5 w-3.5" />
+                            Dashboard
+                          </NavLink>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton asChild>
+                          <NavLink to="/paraguay/recebiveis" className="hover:bg-muted/50" activeClassName="bg-primary/10 text-primary font-medium">
+                            <Wallet className="mr-2 h-3.5 w-3.5" />
+                            Receitas
+                          </NavLink>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton asChild>
+                          <NavLink to="/paraguay/despesas" className="hover:bg-muted/50" activeClassName="bg-primary/10 text-primary font-medium">
+                            <ArrowLeftRight className="mr-2 h-3.5 w-3.5" />
+                            Despesas
+                          </NavLink>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              </Collapsible>}
 
               {/* Global pages — apenas para acesso total */}
               {showGlobal && <>

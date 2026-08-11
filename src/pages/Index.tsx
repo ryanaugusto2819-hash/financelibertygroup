@@ -767,7 +767,7 @@ const Index = ({ country }: IndexProps = {}) => {
             Projeção de Receita — Cenários de Pagamento
             {countryFilter !== "todos" && (
               <span className="ml-2 text-primary">
-                {countryFilter === "brasil" ? "🇧🇷 Brasil" : "🇺🇾 Uruguay"}
+                {countryFilter === "brasil" ? "🇧🇷 Brasil" : countryFilter === "uruguay" ? "🇺🇾 Uruguay" : "🇵🇾 Paraguay"}
               </span>
             )}
           </h3>
@@ -791,6 +791,18 @@ const Index = ({ country }: IndexProps = {}) => {
                   type="number"
                   value={manualAdsUY ?? ""}
                   onChange={(e) => setManualAdsUY(e.target.value === "" ? null : Number(e.target.value))}
+                  placeholder="0"
+                  className="h-7 w-24 text-xs font-mono"
+                />
+              </div>
+            )}
+            {(countryFilter === "todos" || countryFilter === "paraguay") && (
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">🇵🇾 Ads PY</span>
+                <Input
+                  type="number"
+                  value={manualAdsPY ?? ""}
+                  onChange={(e) => setManualAdsPY(e.target.value === "" ? null : Number(e.target.value))}
                   placeholder="0"
                   className="h-7 w-24 text-xs font-mono"
                 />
