@@ -216,6 +216,7 @@ function EditExpenseDialog({ expense, onSave }: { expense: Expense; onSave: (id:
   const [date, setDate] = useState(expense.date);
   const [paymentSource, setPaymentSource] = useState<PaymentSource | "">(expense.paymentSource || "");
   const [country, setCountry] = useState(expense.country || "");
+  const [originCountry, setOriginCountry] = useState<string>(expense.originCountry || "");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -223,6 +224,7 @@ function EditExpenseDialog({ expense, onSave }: { expense: Expense; onSave: (id:
       description, amount: parseFloat(amount), category, type, status, date,
       paymentSource: paymentSource || undefined,
       country: (country || undefined) as "brasil" | "uruguay" | "paraguay" | "caixarel" | undefined,
+      originCountry: (originCountry || undefined) as "brasil" | "uruguay" | "paraguay" | undefined,
     });
 
     if (!result.success) {
@@ -305,6 +307,18 @@ function EditExpenseDialog({ expense, onSave }: { expense: Expense; onSave: (id:
                   <SelectItem value="caixa">Caixa</SelectItem>
                   <SelectItem value="saque">Saque</SelectItem>
                   <SelectItem value="nao_paga">Não Paga</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Origem do Custo</Label>
+              <Select value={originCountry || "none"} onValueChange={v => setOriginCountry(v === "none" ? "" : v)}>
+                <SelectTrigger><SelectValue placeholder="Sem origem" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Sem origem</SelectItem>
+                  <SelectItem value="brasil">🇧🇷 Brasil</SelectItem>
+                  <SelectItem value="uruguay">🇺🇾 Uruguay</SelectItem>
+                  <SelectItem value="paraguay">🇵🇾 Paraguay</SelectItem>
                 </SelectContent>
               </Select>
             </div>

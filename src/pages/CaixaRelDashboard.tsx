@@ -122,6 +122,7 @@ const CaixaRelDashboard = () => {
                   <th className="text-left pb-3 font-medium">Data</th>
                   <th className="text-left pb-3 font-medium">Descrição</th>
                   <th className="text-left pb-3 font-medium">Categoria</th>
+                  <th className="text-left pb-3 font-medium">Origem</th>
                   <th className="text-right pb-3 font-medium">Valor</th>
                   <th className="text-center pb-3 font-medium">Status</th>
                   <th className="text-right pb-3 font-medium">Ação</th>
@@ -133,6 +134,7 @@ const CaixaRelDashboard = () => {
                     <td className="py-2.5 text-muted-foreground">{formatDate(e.date)}</td>
                     <td className="py-2.5 text-foreground">{e.description}</td>
                     <td className="py-2.5 text-muted-foreground">{e.category}</td>
+                    <td className="py-2.5 text-muted-foreground">{e.originCountry === "brasil" ? "🇧🇷 Brasil" : e.originCountry === "uruguay" ? "🇺🇾 Uruguay" : e.originCountry === "paraguay" ? "🇵🇾 Paraguay" : "—"}</td>
                     <td className="py-2.5 text-right font-mono text-chart-negative">{formatCurrency(e.amount)}</td>
                     <td className="py-2.5 text-center"><Badge variant="outline" className="text-[9px]">AGENDADA</Badge></td>
                     <td className="py-2.5 text-right">
