@@ -92,6 +92,7 @@ export type Database = {
           date: string
           description: string
           id: string
+          origin_country: string | null
           payment_method: string | null
           status: string
         }
@@ -103,6 +104,7 @@ export type Database = {
           date: string
           description: string
           id?: string
+          origin_country?: string | null
           payment_method?: string | null
           status?: string
         }
@@ -114,6 +116,7 @@ export type Database = {
           date?: string
           description?: string
           id?: string
+          origin_country?: string | null
           payment_method?: string | null
           status?: string
         }

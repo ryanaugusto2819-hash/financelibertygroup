@@ -1,0 +1,1 @@
+ALTER TABLE public.revenues ADD COLUMN IF NOT EXISTS origin_country text;
