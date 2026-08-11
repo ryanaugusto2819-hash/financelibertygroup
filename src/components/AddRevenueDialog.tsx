@@ -11,9 +11,10 @@ import { toast } from "sonner";
 
 interface AddRevenueDialogProps {
   onAdded: () => void;
+  lockCountry?: string;
 }
 
-export function AddRevenueDialog({ onAdded }: AddRevenueDialogProps) {
+export function AddRevenueDialog({ onAdded, lockCountry }: AddRevenueDialogProps) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
@@ -22,7 +23,7 @@ export function AddRevenueDialog({ onAdded }: AddRevenueDialogProps) {
     amount: "",
     date: getTodayBR(),
     status: "pendente" as string,
-    country: "" as string,
+    country: (lockCountry ?? "") as string,
     payment_method: "" as string,
   });
 
@@ -44,7 +45,7 @@ export function AddRevenueDialog({ onAdded }: AddRevenueDialogProps) {
       amount,
       date: form.date,
       status: form.status,
-      country: form.country || null,
+      country: lockCountry ?? (form.country || null),
       payment_method: form.payment_method || null,
     });
     setLoading(false);
@@ -55,7 +56,7 @@ export function AddRevenueDialog({ onAdded }: AddRevenueDialogProps) {
     }
 
     toast.success("Receita adicionada!");
-    setForm({ client: "", description: "", amount: "", date: getTodayBR(), status: "pendente", country: "", payment_method: "" });
+    setForm({ client: "", description: "", amount: "", date: getTodayBR(), status: "pendente", country: lockCountry ?? "", payment_method: "" });
     setOpen(false);
     onAdded();
   };
@@ -92,15 +93,16 @@ export function AddRevenueDialog({ onAdded }: AddRevenueDialogProps) {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label className="text-xs">Status</Label>
+              <Label className="text-xs">{lockCountry ? "Tipo de Entrada" : "Status"}</Label>
               <Select value={form.status} onValueChange={v => setForm(f => ({ ...f, status: v }))}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="pendente">Pendente</SelectItem>
-                  <SelectItem value="pago">Pago</SelectItem>
+                  <SelectItem value="pendente">{lockCountry ? "🕓 Agendada" : "Pendente"}</SelectItem>
+                  <SelectItem value="pago">{lockCountry ? "✅ Real" : "Pago"}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
+            {!lockCountry && (
             <div>
               <Label className="text-xs">País</Label>
               <Select value={form.country} onValueChange={v => setForm(f => ({ ...f, country: v }))}>
@@ -113,6 +115,7 @@ export function AddRevenueDialog({ onAdded }: AddRevenueDialogProps) {
                 </SelectContent>
               </Select>
             </div>
+            )}
           </div>
           <div>
             <Label className="text-xs">Método de Pagamento</Label>
