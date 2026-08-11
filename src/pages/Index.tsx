@@ -668,7 +668,7 @@ const Index = ({ country }: IndexProps = {}) => {
               </div>
             </div>
           </div>
-          </div>
+
         ) : countryFilter === "brasil" ? (
           editingSaqueBR ? (
             <div className="glass-card p-4 flex flex-col gap-2">
