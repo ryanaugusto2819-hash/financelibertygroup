@@ -7,6 +7,7 @@ import { FinanceProvider } from "@/context/FinanceContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
+import CaixaRelDashboard from "./pages/CaixaRelDashboard";
 import Receivables from "./pages/Receivables";
 import Expenses from "./pages/Expenses";
 import Projections from "./pages/Projections";
@@ -32,7 +33,7 @@ const App = () => (
               <Route path="/brasil" element={<ProtectedRoute country="brasil"><Index country="brasil" /></ProtectedRoute>} />
               <Route path="/uruguay" element={<ProtectedRoute country="uruguay"><Index country="uruguay" /></ProtectedRoute>} />
               <Route path="/paraguay" element={<ProtectedRoute country="paraguay"><Index country="paraguay" /></ProtectedRoute>} />
-              <Route path="/caixarel" element={<ProtectedRoute country="caixarel"><Index country="caixarel" /></ProtectedRoute>} />
+              <Route path="/caixarel" element={<ProtectedRoute country="caixarel"><CaixaRelDashboard /></ProtectedRoute>} />
 
               <Route path="/recebiveis" element={<ProtectedRoute><Receivables /></ProtectedRoute>} />
               <Route path="/brasil/recebiveis" element={<ProtectedRoute country="brasil"><Receivables country="brasil" /></ProtectedRoute>} />
