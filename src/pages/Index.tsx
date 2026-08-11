@@ -416,7 +416,7 @@ const Index = ({ country }: IndexProps = {}) => {
   const adsSpendForScenario = currentAdsSpend;
 
   return (
-    <DashboardLayout title={country === "brasil" ? "🇧🇷 Brasil" : country === "uruguay" ? "🇺🇾 Uruguay" : country === "paraguay" ? "🇵🇾 Paraguay" : "Painel Financeiro"} subtitle={country ? "Controle financeiro" : "Controle financeiro executivo"} hideCountryFilter={!!country}>
+    <DashboardLayout title={country === "brasil" ? "🇧🇷 Brasil" : country === "uruguay" ? "🇺🇾 Uruguay" : country === "paraguay" ? "🇵🇾 Paraguay" : country === "caixarel" ? "🏦 CAIXA REL" : "Painel Financeiro"} subtitle={country ? "Controle financeiro" : "Controle financeiro executivo"} hideCountryFilter={!!country}>
       <div className="flex items-center justify-between mb-6">
         <DateFilter />
         <div className="flex items-center gap-2">
@@ -507,6 +507,25 @@ const Index = ({ country }: IndexProps = {}) => {
                   )}
                 </div>
                 <div className="flex justify-between items-center">
+                  <span className="text-[10px] text-muted-foreground">🏦 CAIXA REL</span>
+                  {editingCashREL ? (
+                    <div className="flex items-center gap-1">
+                      <Input type="text" value={cashRELInput} onChange={e => setCashRELInput(e.target.value)}
+                        onKeyDown={e => { if (e.key === "Enter") handleSaveCashREL(); if (e.key === "Escape") handleCancelEditCashREL(); }}
+                        className="h-6 w-24 text-xs font-mono" autoFocus />
+                      <button onClick={handleSaveCashREL} className="text-chart-positive hover:opacity-80"><Check className="h-3.5 w-3.5" /></button>
+                      <button onClick={handleCancelEditCashREL} className="text-destructive hover:opacity-80"><X className="h-3.5 w-3.5" /></button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1">
+                      <span className="text-xs font-mono font-semibold text-foreground">{formatCurrency(currentCashREL)}</span>
+                      <button onClick={handleStartEditCashREL} className="p-0.5 rounded hover:bg-muted">
+                        <Pencil className="h-2.5 w-2.5 text-muted-foreground" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+                <div className="flex justify-between items-center">
                   <span className="text-[10px] text-muted-foreground">🇵🇾 Paraguay</span>
                   {editingCashPY ? (
                     <div className="flex items-center gap-1">
@@ -531,6 +550,7 @@ const Index = ({ country }: IndexProps = {}) => {
                   <div className="flex justify-between items-center"><span className="text-[10px] text-muted-foreground">🇧🇷 Brasil</span><span className="text-[10px] font-mono font-semibold text-foreground">{formatCurrency(currentCashBR)}</span></div>
                   <div className="flex justify-between items-center"><span className="text-[10px] text-muted-foreground">🇺🇾 Uruguay</span><span className="text-[10px] font-mono font-semibold text-foreground">{formatCurrency(currentCashUY)}</span></div>
                   <div className="flex justify-between items-center"><span className="text-[10px] text-muted-foreground">🇵🇾 Paraguay</span><span className="text-[10px] font-mono font-semibold text-foreground">{formatCurrency(currentCashPY)}</span></div>
+                  <div className="flex justify-between items-center"><span className="text-[10px] text-muted-foreground">🏦 CAIXA REL</span><span className="text-[10px] font-mono font-semibold text-foreground">{formatCurrency(currentCashREL)}</span></div>
                 </div>
               )}
             </div>
@@ -577,7 +597,7 @@ const Index = ({ country }: IndexProps = {}) => {
               </button>
             </div>
           )
-        ) : (
+        ) : countryFilter === "paraguay" ? (
           editingCashPY ? (
             <div className="glass-card p-4 flex flex-col gap-2">
               <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Receita em Caixa 🇵🇾</span>
@@ -594,6 +614,27 @@ const Index = ({ country }: IndexProps = {}) => {
               <KPICard label="Receita em Caixa 🇵🇾" value={currentCashPY} prefix="R$" icon={Wallet} index={0} variant="positive">
               </KPICard>
               <button onClick={handleStartEditCashPY} className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-muted">
+                <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+              </button>
+            </div>
+          )
+        ) : (
+          editingCashREL ? (
+            <div className="glass-card p-4 flex flex-col gap-2">
+              <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Receita em Caixa 🏦 CAIXA REL</span>
+              <div className="flex items-center gap-2">
+                <Input type="text" value={cashRELInput} onChange={e => setCashRELInput(e.target.value)}
+                  onKeyDown={e => { if (e.key === "Enter") handleSaveCashREL(); if (e.key === "Escape") handleCancelEditCashREL(); }}
+                  className="h-8 text-sm font-mono" autoFocus />
+                <button onClick={handleSaveCashREL} className="text-chart-positive hover:opacity-80"><Check className="h-4 w-4" /></button>
+                <button onClick={handleCancelEditCashREL} className="text-destructive hover:opacity-80"><X className="h-4 w-4" /></button>
+              </div>
+            </div>
+          ) : (
+            <div className="relative group">
+              <KPICard label="Receita em Caixa 🏦 CAIXA REL" value={currentCashREL} prefix="R$" icon={Wallet} index={0} variant="positive">
+              </KPICard>
+              <button onClick={handleStartEditCashREL} className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-muted">
                 <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
               </button>
             </div>
@@ -763,7 +804,7 @@ const Index = ({ country }: IndexProps = {}) => {
               </button>
             </div>
           )
-        ) : (
+        ) : countryFilter === "paraguay" ? (
           editingSaquePY ? (
             <div className="glass-card p-4 flex flex-col gap-2">
               <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Saque 🇵🇾 Paraguay</span>
@@ -786,7 +827,29 @@ const Index = ({ country }: IndexProps = {}) => {
               </button>
             </div>
           )
-
+        ) : (
+          editingSaqueREL ? (
+            <div className="glass-card p-4 flex flex-col gap-2">
+              <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Saque 🏦 CAIXA REL</span>
+              <div className="flex items-center gap-2">
+                <Input type="text" value={saqueRELInput} onChange={e => setSaqueRELInput(e.target.value)}
+                  onKeyDown={e => { if (e.key === "Enter") handleSaveSaqueREL(); if (e.key === "Escape") handleCancelEditSaqueREL(); }}
+                  className="h-8 text-sm font-mono" autoFocus />
+                <button onClick={handleSaveSaqueREL} className="text-chart-positive hover:opacity-80"><Check className="h-4 w-4" /></button>
+                <button onClick={handleCancelEditSaqueREL} className="text-destructive hover:opacity-80"><X className="h-4 w-4" /></button>
+              </div>
+            </div>
+          ) : (
+            <div className="relative group">
+              <KPICard label="Saque 🏦 CAIXA REL" value={saqueDisponREL} prefix="R$" icon={Banknote} index={3} variant="positive">
+                <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">Cartão + Boleto</span><span className="text-[10px] font-mono font-semibold text-chart-positive">{formatCurrency(countryPayments.cartaoBolREL)}</span></div>
+                {(manualSaqueREL ?? 0) !== 0 && <div className="flex justify-between items-center"><span className="text-[10px] text-foreground">Saldo Base</span><span className="text-[10px] font-mono font-semibold text-chart-positive">{formatCurrency(manualSaqueREL ?? 0)}</span></div>}
+              </KPICard>
+              <button onClick={handleStartEditSaqueREL} className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-muted">
+                <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+              </button>
+            </div>
+          )
         )}
       </div>
 
@@ -813,7 +876,7 @@ const Index = ({ country }: IndexProps = {}) => {
             Projeção de Receita — Cenários de Pagamento
             {countryFilter !== "todos" && (
               <span className="ml-2 text-primary">
-                {countryFilter === "brasil" ? "🇧🇷 Brasil" : countryFilter === "uruguay" ? "🇺🇾 Uruguay" : "🇵🇾 Paraguay"}
+                {countryFilter === "brasil" ? "🇧🇷 Brasil" : countryFilter === "uruguay" ? "🇺🇾 Uruguay" : countryFilter === "paraguay" ? "🇵🇾 Paraguay" : "🏦 CAIXA REL"}
               </span>
             )}
           </h3>
@@ -837,6 +900,18 @@ const Index = ({ country }: IndexProps = {}) => {
                   type="number"
                   value={manualAdsUY ?? ""}
                   onChange={(e) => setManualAdsUY(e.target.value === "" ? null : Number(e.target.value))}
+                  placeholder="0"
+                  className="h-7 w-24 text-xs font-mono"
+                />
+              </div>
+            )}
+            {(countryFilter === "todos" || countryFilter === "caixarel") && (
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">🏦 Ads CAIXA REL</span>
+                <Input
+                  type="number"
+                  value={manualAdsREL ?? ""}
+                  onChange={(e) => setManualAdsREL(e.target.value === "" ? null : Number(e.target.value))}
                   placeholder="0"
                   className="h-7 w-24 text-xs font-mono"
                 />
