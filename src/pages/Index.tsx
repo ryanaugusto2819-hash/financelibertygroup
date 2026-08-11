@@ -28,12 +28,12 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 
 // Product cost per unit by country
-const PRODUCT_COST = { brasil: 13, uruguay: 5, paraguay: 5 };
+const PRODUCT_COST = { brasil: 13, uruguay: 5, paraguay: 5, caixarel: 5 };
 // Fixed shipping for Uruguay per unit
 const FRETE_FIXO_UY = 35;
 
 interface IndexProps {
-  country?: "brasil" | "uruguay" | "paraguay";
+  country?: "brasil" | "uruguay" | "paraguay" | "caixarel";
 }
 
 const Index = ({ country }: IndexProps = {}) => {
@@ -49,6 +49,9 @@ const Index = ({ country }: IndexProps = {}) => {
     manualCashPY, setManualCashPY,
     manualSaquePY, setManualSaquePY,
     manualAdsPY, setManualAdsPY,
+    manualCashREL, setManualCashREL,
+    manualSaqueREL, setManualSaqueREL,
+    manualAdsREL, setManualAdsREL,
   } = useFinance();
 
   // Sync country prop to context filter
@@ -82,6 +85,10 @@ const Index = ({ country }: IndexProps = {}) => {
   const [expandSaidas, setExpandSaidas] = useState(false);
   const [expandCaixa, setExpandCaixa] = useState(false);
   const [saqueUYInput, setSaqueUYInput] = useState("");
+  const [editingCashREL, setEditingCashREL] = useState(false);
+  const [cashRELInput, setCashRELInput] = useState("");
+  const [editingSaqueREL, setEditingSaqueREL] = useState(false);
+  const [saqueRELInput, setSaqueRELInput] = useState("");
 
   // Select summary based on country filter
   const summary = useMemo(() => {
@@ -89,6 +96,7 @@ const Index = ({ country }: IndexProps = {}) => {
     if (countryFilter === "brasil") return libertyData.summaryBrasil;
     if (countryFilter === "uruguay") return libertyData.summaryUruguay;
     if (countryFilter === "paraguay") return libertyData.summaryParaguay;
+    if (countryFilter === "caixarel") return libertyData.summaryCaixaRel;
     return libertyData.summary;
   }, [libertyData, countryFilter]);
 
@@ -98,6 +106,7 @@ const Index = ({ country }: IndexProps = {}) => {
     if (countryFilter === "brasil") return libertyDataTotal.summaryBrasil;
     if (countryFilter === "uruguay") return libertyDataTotal.summaryUruguay;
     if (countryFilter === "paraguay") return libertyDataTotal.summaryParaguay;
+    if (countryFilter === "caixarel") return libertyDataTotal.summaryCaixaRel;
     return libertyDataTotal.summary;
   }, [libertyDataTotal, countryFilter]);
 
@@ -109,6 +118,7 @@ const Index = ({ country }: IndexProps = {}) => {
       if (countryFilter === "brasil") return pais === "br" || pais === "brasil";
       if (countryFilter === "uruguay") return pais === "uy" || pais === "uruguay";
       if (countryFilter === "paraguay") return pais === "py" || pais === "paraguay" || pais === "paraguai";
+      if (countryFilter === "caixarel") return pais === "caixarel" || pais === "caixa rel" || pais === "rel";
       return false;
     });
   }, [libertyData, countryFilter]);
@@ -117,10 +127,12 @@ const Index = ({ country }: IndexProps = {}) => {
   const adsBRManual = manualAdsBR ?? 0;
   const adsUYManual = manualAdsUY ?? 0;
   const adsPYManual = manualAdsPY ?? 0;
+  const adsRELManual = manualAdsREL ?? 0;
   const currentAdsSpend = countryFilter === "brasil" ? adsBRManual
     : countryFilter === "uruguay" ? adsUYManual
     : countryFilter === "paraguay" ? adsPYManual
-    : adsBRManual + adsUYManual + adsPYManual;
+    : countryFilter === "caixarel" ? adsRELManual
+    : adsBRManual + adsUYManual + adsPYManual + adsRELManual;
 
   // Load manual revenues filtered by date range
   const { data: manualRevenues = [] } = useQuery({
@@ -135,6 +147,7 @@ const Index = ({ country }: IndexProps = {}) => {
       if (countryFilter === "brasil") query = query.eq("country", "brasil");
       else if (countryFilter === "uruguay") query = query.eq("country", "uruguay");
       else if (countryFilter === "paraguay") query = query.eq("country", "paraguay");
+      else if (countryFilter === "caixarel") query = query.eq("country", "caixarel");
       const { data, error } = await query;
       if (error) throw error;
       return data ?? [];
@@ -185,6 +198,7 @@ const Index = ({ country }: IndexProps = {}) => {
         if (countryFilter === "brasil" && pais !== "br" && pais !== "brasil") return false;
         if (countryFilter === "uruguay" && pais !== "uy" && pais !== "uruguay") return false;
         if (countryFilter === "paraguay" && pais !== "py" && pais !== "paraguay" && pais !== "paraguai") return false;
+        if (countryFilter === "caixarel" && pais !== "caixarel" && pais !== "caixa rel" && pais !== "rel") return false;
       }
       return true;
     });
@@ -206,7 +220,7 @@ const Index = ({ country }: IndexProps = {}) => {
   const countryPayments = useMemo(() => {
     const allPedidos = libertyDataTotal?.pedidos ?? [];
     const toDateBR = (ts: string | null) => ts ? ts.substring(0, 10) : null;
-    let pixBR = 0, cartaoBolBR = 0, pixUY = 0, cartaoBolUY = 0, pixPY = 0, cartaoBolPY = 0;
+    let pixBR = 0, cartaoBolBR = 0, pixUY = 0, cartaoBolUY = 0, pixPY = 0, cartaoBolPY = 0, pixREL = 0, cartaoBolREL = 0;
     for (const p of allPedidos) {
       if (p.status_pagamento !== "pago") continue;
       const d = toDateBR(p.data_pagamento);
@@ -223,9 +237,12 @@ const Index = ({ country }: IndexProps = {}) => {
       } else if (pais === "py" || pais === "paraguay" || pais === "paraguai") {
         if (forma === "pix") pixPY += valor;
         else cartaoBolPY += valor;
+      } else if (pais === "caixarel" || pais === "caixa rel" || pais === "rel") {
+        if (forma === "pix") pixREL += valor;
+        else cartaoBolREL += valor;
       }
     }
-    return { pixBR, cartaoBolBR, pixUY, cartaoBolUY, pixPY, cartaoBolPY };
+    return { pixBR, cartaoBolBR, pixUY, cartaoBolUY, pixPY, cartaoBolPY, pixREL, cartaoBolREL };
   }, [libertyDataTotal, dateRange]);
 
   const totalPayable = getTotalAccountsPayable();
@@ -240,10 +257,12 @@ const Index = ({ country }: IndexProps = {}) => {
   const totalQuantidadeUY = libertyData?.summaryUruguay?.totalQuantidadePagos ?? 0;
   const totalFreteUY = totalQuantidadeUY * FRETE_FIXO_UY;
   const totalFretePY = libertyData?.summaryParaguay?.totalFrete ?? 0;
+  const totalFreteREL = libertyData?.summaryCaixaRel?.totalFrete ?? 0;
   const totalFrete = countryFilter === "brasil" ? totalFreteBR
     : countryFilter === "uruguay" ? totalFreteUY
     : countryFilter === "paraguay" ? totalFretePY
-    : totalFreteBR + totalFreteUY + totalFretePY;
+    : countryFilter === "caixarel" ? totalFreteREL
+    : totalFreteBR + totalFreteUY + totalFretePY + totalFreteREL;
 
   // Product cost per country
   const quantidadeBR = libertyData?.summaryBrasil?.totalQuantidadePagos ?? 0;
@@ -252,17 +271,22 @@ const Index = ({ country }: IndexProps = {}) => {
   const custoProdutosUY = quantidadeUY * PRODUCT_COST.uruguay;
   const quantidadePY = libertyData?.summaryParaguay?.totalQuantidadePagos ?? 0;
   const custoProdutosPY = quantidadePY * PRODUCT_COST.paraguay;
+  const quantidadeREL = libertyData?.summaryCaixaRel?.totalQuantidadePagos ?? 0;
+  const custoProdutosREL = quantidadeREL * PRODUCT_COST.caixarel;
   const totalQuantidadePagos = countryFilter === "brasil" ? quantidadeBR
     : countryFilter === "uruguay" ? quantidadeUY
     : countryFilter === "paraguay" ? quantidadePY
-    : quantidadeBR + quantidadeUY + quantidadePY;
+    : countryFilter === "caixarel" ? quantidadeREL
+    : quantidadeBR + quantidadeUY + quantidadePY + quantidadeREL;
   const custoProdutos = countryFilter === "brasil" ? custoProdutosBR
     : countryFilter === "uruguay" ? custoProdutosUY
     : countryFilter === "paraguay" ? custoProdutosPY
-    : custoProdutosBR + custoProdutosUY + custoProdutosPY;
+    : countryFilter === "caixarel" ? custoProdutosREL
+    : custoProdutosBR + custoProdutosUY + custoProdutosPY + custoProdutosREL;
   const custoUnitarioLabel = countryFilter === "brasil" ? "R$ 13,00"
     : countryFilter === "uruguay" ? "R$ 5,00"
     : countryFilter === "paraguay" ? "R$ 5,00"
+    : countryFilter === "caixarel" ? "R$ 5,00"
     : "misto";
 
   // Salários: filter by country
@@ -283,12 +307,14 @@ const Index = ({ country }: IndexProps = {}) => {
   const saqueDisponBR = manualSaqueBR ?? 0;
   const saqueDisponUY = manualSaqueUY ?? 0;
   const saqueDisponPY = manualSaquePY ?? 0;
+  const saqueDisponREL = manualSaqueREL ?? 0;
 
   // Combined or filtered saque
   const saqueDisponivel = countryFilter === "brasil" ? saqueDisponBR
     : countryFilter === "uruguay" ? saqueDisponUY
     : countryFilter === "paraguay" ? saqueDisponPY
-    : saqueDisponBR + saqueDisponUY + saqueDisponPY;
+    : countryFilter === "caixarel" ? saqueDisponREL
+    : saqueDisponBR + saqueDisponUY + saqueDisponPY + saqueDisponREL;
 
   // Saídas por país e Caixa automático (PIX - Saídas)
   const adsBR = adsBRManual;
@@ -296,10 +322,12 @@ const Index = ({ country }: IndexProps = {}) => {
   const currentCashBR = manualCashBR ?? 0;
   const currentCashUY = manualCashUY ?? 0;
   const currentCashPY = manualCashPY ?? 0;
+  const currentCashREL = manualCashREL ?? 0;
   const currentCash = countryFilter === "brasil" ? currentCashBR
     : countryFilter === "uruguay" ? currentCashUY
     : countryFilter === "paraguay" ? currentCashPY
-    : currentCashBR + currentCashUY + currentCashPY;
+    : countryFilter === "caixarel" ? currentCashREL
+    : currentCashBR + currentCashUY + currentCashPY + currentCashREL;
 
   // Edit cash handlers (combined - "todos" view)
   const handleStartEditCash = () => { setCashInput(String(currentCash)); setEditingCash(true); };
@@ -363,6 +391,24 @@ const Index = ({ country }: IndexProps = {}) => {
     setEditingSaquePY(false);
   };
   const handleCancelEditSaquePY = () => setEditingSaquePY(false);
+
+  // Edit cash CAIXA REL handlers
+  const handleStartEditCashREL = () => { setCashRELInput(String(manualCashREL ?? 0)); setEditingCashREL(true); };
+  const handleSaveCashREL = () => {
+    const val = parseFloat(cashRELInput.replace(/[^\d.,\-]/g, "").replace(",", "."));
+    if (!isNaN(val)) setManualCashREL(val);
+    setEditingCashREL(false);
+  };
+  const handleCancelEditCashREL = () => setEditingCashREL(false);
+
+  // Edit saque CAIXA REL handlers
+  const handleStartEditSaqueREL = () => { setSaqueRELInput(String(manualSaqueREL ?? 0)); setEditingSaqueREL(true); };
+  const handleSaveSaqueREL = () => {
+    const val = parseFloat(saqueRELInput.replace(/[^\d.,\-]/g, "").replace(",", "."));
+    if (!isNaN(val)) setManualSaqueREL(val);
+    setEditingSaqueREL(false);
+  };
+  const handleCancelEditSaqueREL = () => setEditingSaqueREL(false);
 
   const isSingleDay = dateRange.from === dateRange.to;
   const periodLabel = isSingleDay ? formatDate(dateRange.from) : `${formatDate(dateRange.from)} — ${formatDate(dateRange.to)}`;
