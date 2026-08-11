@@ -23,6 +23,7 @@ export function AddExpenseDialog({ lockCountry }: { lockCountry?: string } = {})
     status: "pendente" as "pago" | "pendente" | "agendado",
     paymentSource: "nao_paga" as "caixa" | "saque" | "nao_paga",
     country: (lockCountry ?? "") as "" | "brasil" | "uruguay" | "paraguay" | "caixarel",
+    originCountry: "" as "" | "brasil" | "uruguay" | "paraguay",
   });
 
   const [salaryForm, setSalaryForm] = useState({
@@ -50,6 +51,7 @@ export function AddExpenseDialog({ lockCountry }: { lockCountry?: string } = {})
       status: form.status,
       paymentSource: form.paymentSource,
       country: ((lockCountry ?? form.country) || undefined) as any,
+      originCountry: (form.originCountry || undefined) as any,
     });
 
     if (!result.success) {
@@ -59,7 +61,7 @@ export function AddExpenseDialog({ lockCountry }: { lockCountry?: string } = {})
 
     toast.success("Custo lançado com sucesso!");
     setOpen(false);
-    setForm({ description: "", category: "", amount: "", date: new Date().toISOString().split("T")[0], type: "variavel", status: "pendente", paymentSource: "nao_paga", country: (lockCountry ?? "") as any });
+    setForm({ description: "", category: "", amount: "", date: new Date().toISOString().split("T")[0], type: "variavel", status: "pendente", paymentSource: "nao_paga", country: (lockCountry ?? "") as any, originCountry: "" });
   };
 
   const handleSalarySubmit = async (e: React.FormEvent) => {
@@ -191,6 +193,20 @@ export function AddExpenseDialog({ lockCountry }: { lockCountry?: string } = {})
                     </SelectContent>
                   </Select>
                 </div>
+                {lockCountry ? (
+                  <div className="space-y-2">
+                    <Label>Origem do Custo</Label>
+                    <Select value={form.originCountry || "none"} onValueChange={v => setForm(f => ({ ...f, originCountry: v === "none" ? "" : v as any }))}>
+                      <SelectTrigger><SelectValue placeholder="País" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Sem origem</SelectItem>
+                        <SelectItem value="brasil">🇧🇷 Brasil</SelectItem>
+                        <SelectItem value="uruguay">🇺🇾 Uruguay</SelectItem>
+                        <SelectItem value="paraguay">🇵🇾 Paraguay</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                ) : (
                 <div className="space-y-2">
                   <Label>País</Label>
                   <Select value={form.country || "none"} onValueChange={v => setForm(f => ({ ...f, country: v === "none" ? "" : v as any }))}>
@@ -204,6 +220,8 @@ export function AddExpenseDialog({ lockCountry }: { lockCountry?: string } = {})
                     </SelectContent>
                   </Select>
                 </div>
+                )}
+
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">

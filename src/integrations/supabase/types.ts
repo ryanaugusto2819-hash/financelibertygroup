@@ -24,6 +24,7 @@ export type Database = {
           description: string
           id: string
           is_auto_generated: boolean
+          origin_country: string | null
           payment_source: string | null
           status: string
           type: string
@@ -37,6 +38,7 @@ export type Database = {
           description: string
           id?: string
           is_auto_generated?: boolean
+          origin_country?: string | null
           payment_source?: string | null
           status?: string
           type?: string
@@ -50,6 +52,7 @@ export type Database = {
           description?: string
           id?: string
           is_auto_generated?: boolean
+          origin_country?: string | null
           payment_source?: string | null
           status?: string
           type?: string

@@ -116,6 +116,7 @@ const Expenses = ({ country }: ExpensesProps = {}) => {
                   <th className="text-left pb-3 font-medium">Categoria</th>
                   <th className="text-left pb-3 font-medium">Tipo</th>
                   <th className="text-left pb-3 font-medium">Fonte</th>
+                  {isCaixaRel && <th className="text-left pb-3 font-medium">Origem</th>}
                   <th className="text-right pb-3 font-medium">Valor</th>
                   <th className="text-center pb-3 font-medium">Status</th>
                   <th className="text-center pb-3 font-medium">Ações</th>
@@ -133,6 +134,11 @@ const Expenses = ({ country }: ExpensesProps = {}) => {
                     <td className="py-2.5 text-[10px] text-muted-foreground">
                       {e.paymentSource ? PAYMENT_SOURCE_LABELS[e.paymentSource] : "—"}
                     </td>
+                    {isCaixaRel && (
+                      <td className="py-2.5 text-[10px] text-muted-foreground">
+                        {e.originCountry === "brasil" ? "🇧🇷 Brasil" : e.originCountry === "uruguay" ? "🇺🇾 Uruguay" : e.originCountry === "paraguay" ? "🇵🇾 Paraguay" : "—"}
+                      </td>
+                    )}
                     <td className="py-2.5 text-right font-mono font-bold text-chart-negative">{formatCurrency(e.amount)}</td>
                     <td className="py-2.5 text-center">
                       <Badge variant={e.status === "pago" ? "default" : e.status === "agendado" ? "outline" : "secondary"} className="text-[9px]">
@@ -210,6 +216,7 @@ function EditExpenseDialog({ expense, onSave }: { expense: Expense; onSave: (id:
   const [date, setDate] = useState(expense.date);
   const [paymentSource, setPaymentSource] = useState<PaymentSource | "">(expense.paymentSource || "");
   const [country, setCountry] = useState(expense.country || "");
+  const [originCountry, setOriginCountry] = useState<string>(expense.originCountry || "");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -217,6 +224,7 @@ function EditExpenseDialog({ expense, onSave }: { expense: Expense; onSave: (id:
       description, amount: parseFloat(amount), category, type, status, date,
       paymentSource: paymentSource || undefined,
       country: (country || undefined) as "brasil" | "uruguay" | "paraguay" | "caixarel" | undefined,
+      originCountry: (originCountry || undefined) as "brasil" | "uruguay" | "paraguay" | undefined,
     });
 
     if (!result.success) {
@@ -299,6 +307,18 @@ function EditExpenseDialog({ expense, onSave }: { expense: Expense; onSave: (id:
                   <SelectItem value="caixa">Caixa</SelectItem>
                   <SelectItem value="saque">Saque</SelectItem>
                   <SelectItem value="nao_paga">Não Paga</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Origem do Custo</Label>
+              <Select value={originCountry || "none"} onValueChange={v => setOriginCountry(v === "none" ? "" : v)}>
+                <SelectTrigger><SelectValue placeholder="Sem origem" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Sem origem</SelectItem>
+                  <SelectItem value="brasil">🇧🇷 Brasil</SelectItem>
+                  <SelectItem value="uruguay">🇺🇾 Uruguay</SelectItem>
+                  <SelectItem value="paraguay">🇵🇾 Paraguay</SelectItem>
                 </SelectContent>
               </Select>
             </div>
