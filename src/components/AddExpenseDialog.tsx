@@ -191,6 +191,20 @@ export function AddExpenseDialog({ lockCountry }: { lockCountry?: string } = {})
                     </SelectContent>
                   </Select>
                 </div>
+                {lockCountry ? (
+                  <div className="space-y-2">
+                    <Label>Origem do Custo</Label>
+                    <Select value={form.originCountry || "none"} onValueChange={v => setForm(f => ({ ...f, originCountry: v === "none" ? "" : v as any }))}>
+                      <SelectTrigger><SelectValue placeholder="País" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Sem origem</SelectItem>
+                        <SelectItem value="brasil">🇧🇷 Brasil</SelectItem>
+                        <SelectItem value="uruguay">🇺🇾 Uruguay</SelectItem>
+                        <SelectItem value="paraguay">🇵🇾 Paraguay</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                ) : (
                 <div className="space-y-2">
                   <Label>País</Label>
                   <Select value={form.country || "none"} onValueChange={v => setForm(f => ({ ...f, country: v === "none" ? "" : v as any }))}>
@@ -204,6 +218,8 @@ export function AddExpenseDialog({ lockCountry }: { lockCountry?: string } = {})
                     </SelectContent>
                   </Select>
                 </div>
+                )}
+
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
