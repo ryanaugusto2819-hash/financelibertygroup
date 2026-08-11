@@ -10,11 +10,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { ArrowUpRight, ArrowDownRight, Scale, Wallet, CalendarClock, Landmark } from "lucide-react";
 import { toast } from "sonner";
 
 const CaixaRelDashboard = () => {
-  const { dateRange, allExpenses, updateExpense, setCountryFilter } = useFinance();
+  const { dateRange, allExpenses, updateExpense, setCountryFilter, manualCashREL, setManualCashREL } = useFinance();
   const queryClient = useQueryClient();
 
   React.useEffect(() => { setCountryFilter("caixarel"); }, [setCountryFilter]);
@@ -64,7 +65,8 @@ const CaixaRelDashboard = () => {
     () => relExpenses.filter(e => e.status === "pago").reduce((s, e) => s + e.amount, 0),
     [relExpenses]
   );
-  const saldoGeral = entradasTotais - saidasTotais;
+  const saldoCalculado = entradasTotais - saidasTotais;
+  const saldoGeral = manualCashREL !== null ? manualCashREL : saldoCalculado;
 
   // Despesas futuras (agendadas / pendentes)
   const futuras = useMemo(
@@ -73,6 +75,27 @@ const CaixaRelDashboard = () => {
   );
   const despesasFuturas = futuras.reduce((s, e) => s + e.amount, 0);
   const saldoAposFuturas = saldoGeral - despesasFuturas;
+
+  const [manualInput, setManualInput] = React.useState<string>(manualCashREL !== null ? String(manualCashREL) : "");
+  React.useEffect(() => {
+    setManualInput(manualCashREL !== null ? String(manualCashREL) : "");
+  }, [manualCashREL]);
+
+  const commitManual = () => {
+    const raw = manualInput.trim();
+    if (raw === "") {
+      if (manualCashREL !== null) setManualCashREL(null);
+      return;
+    }
+    const parsed = Number(raw.replace(/[^\d,.-]/g, "").replace(/\.(?=\d{3}\b)/g, "").replace(",", "."));
+    if (Number.isNaN(parsed)) {
+      toast.error("Valor inválido.");
+      setManualInput(manualCashREL !== null ? String(manualCashREL) : "");
+      return;
+    }
+    setManualCashREL(parsed);
+    toast.success("Saldo em caixa atualizado manualmente.");
+  };
 
   const handleMarkPaid = async (id: string) => {
     const result = await updateExpense(id, { status: "pago" });
@@ -103,6 +126,24 @@ const CaixaRelDashboard = () => {
         <KPICard label="Saldo em Caixa Geral" value={saldoGeral} prefix="R$" icon={Wallet} index={3} variant={saldoGeral >= 0 ? "positive" : "negative"}>
           <div className="flex justify-between items-center"><span className="text-[10px] text-muted-foreground">Entradas reais</span><span className="text-[10px] font-mono text-chart-positive">{formatCurrency(entradasTotais)}</span></div>
           <div className="flex justify-between items-center"><span className="text-[10px] text-muted-foreground">Saídas pagas</span><span className="text-[10px] font-mono text-chart-negative">{formatCurrency(saidasTotais)}</span></div>
+          <div className="flex items-center gap-2 pt-2 mt-1 border-t border-border/50">
+            <span className="text-[10px] text-muted-foreground whitespace-nowrap">Saldo manual</span>
+            <Input
+              type="text"
+              inputMode="decimal"
+              placeholder={formatCurrency(saldoCalculado)}
+              value={manualInput}
+              onChange={(ev) => setManualInput(ev.target.value)}
+              onBlur={commitManual}
+              onKeyDown={(ev) => { if (ev.key === "Enter") (ev.target as HTMLInputElement).blur(); }}
+              className="h-6 text-[10px] font-mono px-2"
+            />
+            {manualCashREL !== null && (
+              <Button size="sm" variant="ghost" className="h-6 text-[10px] px-2" onClick={() => { setManualCashREL(null); setManualInput(""); toast.success("Saldo voltou ao cálculo automático."); }}>
+                Auto
+              </Button>
+            )}
+          </div>
         </KPICard>
         <KPICard label="Despesas Futuras" value={despesasFuturas} prefix="R$" icon={CalendarClock} index={4} variant="warning">
           <div className="flex justify-between items-center"><span className="text-[10px] text-muted-foreground">Lançamentos agendados</span><span className="text-[10px] font-mono text-foreground">{futuras.length}</span></div>
