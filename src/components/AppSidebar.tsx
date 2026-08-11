@@ -36,10 +36,12 @@ export function AppSidebar() {
   const isBrasilActive = location.pathname.startsWith("/brasil");
   const isUruguayActive = location.pathname.startsWith("/uruguay");
   const isParaguayActive = location.pathname.startsWith("/paraguay");
+  const isCaixaRelActive = location.pathname.startsWith("/caixarel");
 
   const showBrasil   = !countryAccess || countryAccess === "brasil";
   const showUruguay  = !countryAccess || countryAccess === "uruguay";
   const showParaguay = !countryAccess || countryAccess === "paraguay";
+  const showCaixaRel = !countryAccess || countryAccess === "caixarel";
   const showGlobal   = !countryAccess;
 
   return (
@@ -197,6 +199,51 @@ export function AppSidebar() {
                       <SidebarMenuSubItem>
                         <SidebarMenuSubButton asChild>
                           <NavLink to="/paraguay/despesas" className="hover:bg-muted/50" activeClassName="bg-primary/10 text-primary font-medium">
+                            <ArrowLeftRight className="mr-2 h-3.5 w-3.5" />
+                            Despesas
+                          </NavLink>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              </Collapsible>}
+
+              {/* CAIXA REL */}
+              {showCaixaRel && <Collapsible defaultOpen={isCaixaRelActive} className="group/collapsible">
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton className={`hover:bg-muted/50 ${isCaixaRelActive ? "bg-primary/10 text-primary font-medium" : ""}`}>
+                      <DollarSign className="mr-2 h-4 w-4" />
+                      {!collapsed && (
+                        <>
+                          <span className="flex-1">🏦 CAIXA REL</span>
+                          <ChevronDown className="ml-auto h-3.5 w-3.5 transition-transform group-data-[state=open]/collapsible:rotate-180" />
+                        </>
+                      )}
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton asChild>
+                          <NavLink to="/caixarel" end className="hover:bg-muted/50" activeClassName="bg-primary/10 text-primary font-medium">
+                            <LayoutDashboard className="mr-2 h-3.5 w-3.5" />
+                            Dashboard
+                          </NavLink>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton asChild>
+                          <NavLink to="/caixarel/recebiveis" className="hover:bg-muted/50" activeClassName="bg-primary/10 text-primary font-medium">
+                            <Wallet className="mr-2 h-3.5 w-3.5" />
+                            Receitas
+                          </NavLink>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton asChild>
+                          <NavLink to="/caixarel/despesas" className="hover:bg-muted/50" activeClassName="bg-primary/10 text-primary font-medium">
                             <ArrowLeftRight className="mr-2 h-3.5 w-3.5" />
                             Despesas
                           </NavLink>
