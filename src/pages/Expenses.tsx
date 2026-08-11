@@ -31,7 +31,7 @@ const PAYMENT_SOURCE_LABELS: Record<string, string> = {
 };
 
 interface ExpensesProps {
-  country?: "brasil" | "uruguay" | "paraguay";
+  country?: "brasil" | "uruguay" | "paraguay" | "caixarel";
 }
 
 const Expenses = ({ country }: ExpensesProps = {}) => {
@@ -193,7 +193,7 @@ function EditExpenseDialog({ expense, onSave }: { expense: Expense; onSave: (id:
     const result = await onSave(expense.id, {
       description, amount: parseFloat(amount), category, type, status, date,
       paymentSource: paymentSource || undefined,
-      country: (country || undefined) as "brasil" | "uruguay" | "paraguay" | undefined,
+      country: (country || undefined) as "brasil" | "uruguay" | "paraguay" | "caixarel" | undefined,
     });
 
     if (!result.success) {

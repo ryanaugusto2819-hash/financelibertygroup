@@ -28,7 +28,7 @@ const statusBadgeVariant = (status: string) => {
 };
 
 interface ReceivablesProps {
-  country?: "brasil" | "uruguay" | "paraguay";
+  country?: "brasil" | "uruguay" | "paraguay" | "caixarel";
 }
 
 const Receivables = ({ country }: ReceivablesProps = {}) => {

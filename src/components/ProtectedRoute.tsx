@@ -4,7 +4,7 @@ import { Loader2 } from "lucide-react";
 
 interface Props {
   children: React.ReactNode;
-  country?: "brasil" | "uruguay" | "paraguay";
+  country?: "brasil" | "uruguay" | "paraguay" | "caixarel";
 }
 
 export function ProtectedRoute({ children, country }: Props) {
