@@ -64,16 +64,6 @@ const Receivables = ({ country }: ReceivablesProps = {}) => {
     },
   });
 
-  const handleMarkReal = async (id: string) => {
-    const { error } = await supabase.from("revenues").update({ status: "pago" }).eq("id", id);
-    if (error) {
-      toast.error("Erro ao converter para Real.");
-      return;
-    }
-    toast.success("Entrada convertida para REAL.");
-    queryClient.invalidateQueries({ queryKey: ["revenues"] });
-  };
-
   const handleDeleteRevenue = async (id: string) => {
     const { error } = await supabase.from("revenues").delete().eq("id", id);
     if (error) {
@@ -103,14 +93,17 @@ const Receivables = ({ country }: ReceivablesProps = {}) => {
       hideCountryFilter={!!country}
     >
       {/* KPIs */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-        <KPICard label="Receita Total" value={totalGeral} prefix="R$" icon={DollarSign} index={0} />
+      <div className={`grid gap-3 mb-6 ${isCaixaRel ? "grid-cols-1" : "grid-cols-2 md:grid-cols-4"}`}>
+        <KPICard label={isCaixaRel ? "Entradas do Período" : "Receita Total"} value={totalGeral} prefix="R$" icon={DollarSign} index={0} variant={isCaixaRel ? "positive" : "default"} />
+        {!isCaixaRel && (<>
         <KPICard label="Recebido" value={totalPago} prefix="R$" icon={Wallet} index={1} variant="positive" />
         <KPICard label="Pendente" value={totalPendente} prefix="R$" icon={Clock} index={2} variant="warning" />
         <KPICard label="Cancelado / Reembolso" value={totalCancelado} prefix="R$" icon={XCircle} index={3} variant="negative" />
+        </>)}
       </div>
 
       {/* Gráfico por status */}
+      {!isCaixaRel && (
       <div className="glass-card p-6 mb-6">
         <h3 className="text-sm font-semibold text-foreground mb-4">Receita por Status</h3>
         <ResponsiveContainer width="100%" height={220}>
@@ -131,6 +124,7 @@ const Receivables = ({ country }: ReceivablesProps = {}) => {
           </BarChart>
         </ResponsiveContainer>
       </div>
+      )}
 
       {/* Tabela de receitas manuais */}
       <div className="glass-card p-6">
@@ -144,37 +138,33 @@ const Receivables = ({ country }: ReceivablesProps = {}) => {
           <table className="w-full text-xs">
             <thead>
               <tr className="border-b border-border text-muted-foreground">
-                <th className="text-left pb-3 font-medium">Cliente</th>
-                <th className="text-left pb-3 font-medium">Descrição</th>
-                <th className="text-left pb-3 font-medium">País</th>
+                {!isCaixaRel && <th className="text-left pb-3 font-medium">Cliente</th>}
+                {!isCaixaRel && <th className="text-left pb-3 font-medium">Descrição</th>}
+                <th className="text-left pb-3 font-medium">{isCaixaRel ? "Origem" : "País"}</th>
                 <th className="text-left pb-3 font-medium">Data</th>
                 <th className="text-right pb-3 font-medium">Valor</th>
-                <th className="text-center pb-3 font-medium">Status</th>
+                {!isCaixaRel && <th className="text-center pb-3 font-medium">Status</th>}
                 <th className="text-center pb-3 font-medium"></th>
               </tr>
             </thead>
             <tbody>
               {manualRevenues.map(r => (
                 <tr key={r.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
-                  <td className="py-3 font-medium text-foreground">{r.client}</td>
-                  <td className="py-3 text-muted-foreground">{r.description}</td>
-                  <td className="py-3 text-muted-foreground">{r.country === "brasil" ? "🇧🇷" : r.country === "uruguay" ? "🇺🇾" : r.country === "paraguay" ? "🇵🇾" : r.country === "caixarel" ? "🏦" : "—"}</td>
+                  {!isCaixaRel && <td className="py-3 font-medium text-foreground">{r.client}</td>}
+                  {!isCaixaRel && <td className="py-3 text-muted-foreground">{r.description}</td>}
+                  <td className="py-3 text-muted-foreground">
+                    {isCaixaRel
+                      ? (r.origin_country === "brasil" ? "🇧🇷 Brasil" : r.origin_country === "uruguay" ? "🇺🇾 Uruguay" : r.origin_country === "paraguay" ? "🇵🇾 Paraguay" : "—")
+                      : (r.country === "brasil" ? "🇧🇷" : r.country === "uruguay" ? "🇺🇾" : r.country === "paraguay" ? "🇵🇾" : r.country === "caixarel" ? "🏦" : "—")}
+                  </td>
                   <td className="py-3 font-mono text-muted-foreground">{formatDate(r.date)}</td>
                   <td className="py-3 text-right font-mono font-medium text-foreground">{formatCurrency(Number(r.amount))}</td>
+                  {!isCaixaRel && (
+                    <td className="py-3 text-center">
+                      <Badge variant={statusBadgeVariant(r.status)} className="text-[10px]">{r.status}</Badge>
+                    </td>
+                  )}
                   <td className="py-3 text-center">
-                    <Badge variant={statusBadgeVariant(r.status)} className="text-[10px]">
-                      {isCaixaRel ? (r.status === "pago" ? "REAL" : r.status === "pendente" ? "AGENDADA" : r.status) : r.status}
-                    </Badge>
-                  </td>
-                  <td className="py-3 text-center">
-                    {isCaixaRel && r.status === "pendente" && (
-                      <button
-                        onClick={() => handleMarkReal(r.id)}
-                        className="mr-2 text-[10px] px-2 py-1 rounded-md bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
-                      >
-                        Marcar Real
-                      </button>
-                    )}
                     <button onClick={() => handleDeleteRevenue(r.id)} className="text-muted-foreground hover:text-destructive transition-colors p-1">
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
