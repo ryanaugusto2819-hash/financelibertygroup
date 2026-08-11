@@ -460,11 +460,31 @@ const Index = ({ country }: IndexProps = {}) => {
                     </div>
                   )}
                 </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] text-muted-foreground">🇵🇾 Paraguay</span>
+                  {editingCashPY ? (
+                    <div className="flex items-center gap-1">
+                      <Input type="text" value={cashPYInput} onChange={e => setCashPYInput(e.target.value)}
+                        onKeyDown={e => { if (e.key === "Enter") handleSaveCashPY(); if (e.key === "Escape") handleCancelEditCashPY(); }}
+                        className="h-6 w-24 text-xs font-mono" autoFocus />
+                      <button onClick={handleSaveCashPY} className="text-chart-positive hover:opacity-80"><Check className="h-3.5 w-3.5" /></button>
+                      <button onClick={handleCancelEditCashPY} className="text-destructive hover:opacity-80"><X className="h-3.5 w-3.5" /></button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1">
+                      <span className="text-xs font-mono font-semibold text-foreground">{formatCurrency(currentCashPY)}</span>
+                      <button onClick={handleStartEditCashPY} className="p-0.5 rounded hover:bg-muted">
+                        <Pencil className="h-2.5 w-2.5 text-muted-foreground" />
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
               {expandCaixa && (
                 <div className="mt-3 pt-3 border-t border-border/50 space-y-1.5" onClick={e => e.stopPropagation()}>
                   <div className="flex justify-between items-center"><span className="text-[10px] text-muted-foreground">🇧🇷 Brasil</span><span className="text-[10px] font-mono font-semibold text-foreground">{formatCurrency(currentCashBR)}</span></div>
                   <div className="flex justify-between items-center"><span className="text-[10px] text-muted-foreground">🇺🇾 Uruguay</span><span className="text-[10px] font-mono font-semibold text-foreground">{formatCurrency(currentCashUY)}</span></div>
+                  <div className="flex justify-between items-center"><span className="text-[10px] text-muted-foreground">🇵🇾 Paraguay</span><span className="text-[10px] font-mono font-semibold text-foreground">{formatCurrency(currentCashPY)}</span></div>
                 </div>
               )}
             </div>
@@ -490,7 +510,7 @@ const Index = ({ country }: IndexProps = {}) => {
               </button>
             </div>
           )
-        ) : (
+        ) : countryFilter === "uruguay" ? (
           editingCashUY ? (
             <div className="glass-card p-4 flex flex-col gap-2">
               <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Receita em Caixa 🇺🇾</span>
@@ -507,6 +527,27 @@ const Index = ({ country }: IndexProps = {}) => {
               <KPICard label="Receita em Caixa 🇺🇾" value={currentCashUY} prefix="R$" icon={Wallet} index={0} variant="positive">
               </KPICard>
               <button onClick={handleStartEditCashUY} className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-muted">
+                <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+              </button>
+            </div>
+          )
+        ) : (
+          editingCashPY ? (
+            <div className="glass-card p-4 flex flex-col gap-2">
+              <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Receita em Caixa 🇵🇾</span>
+              <div className="flex items-center gap-2">
+                <Input type="text" value={cashPYInput} onChange={e => setCashPYInput(e.target.value)}
+                  onKeyDown={e => { if (e.key === "Enter") handleSaveCashPY(); if (e.key === "Escape") handleCancelEditCashPY(); }}
+                  className="h-8 text-sm font-mono" autoFocus />
+                <button onClick={handleSaveCashPY} className="text-chart-positive hover:opacity-80"><Check className="h-4 w-4" /></button>
+                <button onClick={handleCancelEditCashPY} className="text-destructive hover:opacity-80"><X className="h-4 w-4" /></button>
+              </div>
+            </div>
+          ) : (
+            <div className="relative group">
+              <KPICard label="Receita em Caixa 🇵🇾" value={currentCashPY} prefix="R$" icon={Wallet} index={0} variant="positive">
+              </KPICard>
+              <button onClick={handleStartEditCashPY} className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-muted">
                 <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
               </button>
             </div>
@@ -606,7 +647,27 @@ const Index = ({ country }: IndexProps = {}) => {
                   </div>
                 )}
               </div>
+              <div className="flex justify-between items-center">
+                <span className="text-[10px] text-muted-foreground">🇵🇾 Paraguay</span>
+                {editingSaquePY ? (
+                  <div className="flex items-center gap-1">
+                    <Input type="text" value={saquePYInput} onChange={e => setSaquePYInput(e.target.value)}
+                      onKeyDown={e => { if (e.key === "Enter") handleSaveSaquePY(); if (e.key === "Escape") handleCancelEditSaquePY(); }}
+                      className="h-6 w-24 text-xs font-mono" autoFocus />
+                    <button onClick={handleSaveSaquePY} className="text-chart-positive hover:opacity-80"><Check className="h-3.5 w-3.5" /></button>
+                    <button onClick={handleCancelEditSaquePY} className="text-destructive hover:opacity-80"><X className="h-3.5 w-3.5" /></button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs font-mono font-semibold text-foreground">{formatCurrency(saqueDisponPY)}</span>
+                    <button onClick={handleStartEditSaquePY} className="p-0.5 rounded hover:bg-muted">
+                      <Pencil className="h-2.5 w-2.5 text-muted-foreground" />
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
+          </div>
           </div>
         ) : countryFilter === "brasil" ? (
           editingSaqueBR ? (
