@@ -287,6 +287,7 @@ function EditExpenseDialog({ expense, onSave }: { expense: Expense; onSave: (id:
                   <SelectItem value="none">Todos</SelectItem>
                   <SelectItem value="brasil">🇧🇷 Brasil</SelectItem>
                   <SelectItem value="uruguay">🇺🇾 Uruguay</SelectItem>
+                  <SelectItem value="paraguay">🇵🇾 Paraguay</SelectItem>
                 </SelectContent>
               </Select>
             </div>

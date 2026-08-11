@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { fetchFinanceManualValues, saveFinanceManualValue, type FinanceManualValueKey } from "@/lib/finance-manual-values";
 import { useAuth } from "@/context/AuthContext";
 
-export type CountryFilter = "todos" | "brasil" | "uruguay";
+export type CountryFilter = "todos" | "brasil" | "uruguay" | "paraguay";
 
 interface FinanceContextType {
   expenses: Expense[];
@@ -31,14 +31,20 @@ interface FinanceContextType {
   setManualCashBR: (value: number | null) => void;
   manualCashUY: number | null;
   setManualCashUY: (value: number | null) => void;
+  manualCashPY: number | null;
+  setManualCashPY: (value: number | null) => void;
   manualSaqueBR: number | null;
   setManualSaqueBR: (value: number | null) => void;
   manualSaqueUY: number | null;
   setManualSaqueUY: (value: number | null) => void;
+  manualSaquePY: number | null;
+  setManualSaquePY: (value: number | null) => void;
   manualAdsBR: number | null;
   setManualAdsBR: (value: number | null) => void;
   manualAdsUY: number | null;
   setManualAdsUY: (value: number | null) => void;
+  manualAdsPY: number | null;
+  setManualAdsPY: (value: number | null) => void;
 }
 
 const FinanceContext = createContext<FinanceContextType | undefined>(undefined);
@@ -88,10 +94,13 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   const [manualCash, setManualCashState] = useState<number | null>(() => readStoredNumber("manualCash"));
   const [manualCashBR, setManualCashBRState] = useState<number | null>(() => readStoredNumber("manualCashBR"));
   const [manualCashUY, setManualCashUYState] = useState<number | null>(() => readStoredNumber("manualCashUY"));
+  const [manualCashPY, setManualCashPYState] = useState<number | null>(() => readStoredNumber("manualCashPY"));
   const [manualSaqueBR, setManualSaqueBRState] = useState<number | null>(() => readStoredNumber("manualSaqueBR"));
   const [manualSaqueUY, setManualSaqueUYState] = useState<number | null>(() => readStoredNumber("manualSaqueUY"));
+  const [manualSaquePY, setManualSaquePYState] = useState<number | null>(() => readStoredNumber("manualSaquePY"));
   const [manualAdsBR, setManualAdsBRState] = useState<number | null>(() => readStoredNumber("manualAdsBR"));
   const [manualAdsUY, setManualAdsUYState] = useState<number | null>(() => readStoredNumber("manualAdsUY"));
+  const [manualAdsPY, setManualAdsPYState] = useState<number | null>(() => readStoredNumber("manualAdsPY"));
 
   useEffect(() => {
     if (!session) return;
@@ -120,6 +129,9 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
         manualSaqueUY: readStoredNumber("manualSaqueUY"),
         manualAdsBR: readStoredNumber("manualAdsBR"),
         manualAdsUY: readStoredNumber("manualAdsUY"),
+        manualCashPY: readStoredNumber("manualCashPY"),
+        manualSaquePY: readStoredNumber("manualSaquePY"),
+        manualAdsPY: readStoredNumber("manualAdsPY"),
         fbAdsPaid: readStoredNumber("fbAdsPaid") ?? 0,
       };
 
@@ -134,6 +146,9 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
         const resolvedManualSaqueUY = remoteValues.manualSaqueUY ?? localValues.manualSaqueUY;
         const resolvedManualAdsBR = remoteValues.manualAdsBR ?? localValues.manualAdsBR;
         const resolvedManualAdsUY = remoteValues.manualAdsUY ?? localValues.manualAdsUY;
+        const resolvedManualCashPY = remoteValues.manualCashPY ?? localValues.manualCashPY;
+        const resolvedManualSaquePY = remoteValues.manualSaquePY ?? localValues.manualSaquePY;
+        const resolvedManualAdsPY = remoteValues.manualAdsPY ?? localValues.manualAdsPY;
         const resolvedFbAdsPaid = remoteValues.fbAdsPaid ?? localValues.fbAdsPaid;
 
         setManualCashState(resolvedManualCash ?? null);
@@ -143,6 +158,9 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
         setManualSaqueUYState(resolvedManualSaqueUY ?? null);
         setManualAdsBRState(resolvedManualAdsBR ?? null);
         setManualAdsUYState(resolvedManualAdsUY ?? null);
+        setManualCashPYState(resolvedManualCashPY ?? null);
+        setManualSaquePYState(resolvedManualSaquePY ?? null);
+        setManualAdsPYState(resolvedManualAdsPY ?? null);
         setFbAdsPaidState(resolvedFbAdsPaid ?? 0);
 
         syncStoredNumber("manualCash", resolvedManualCash ?? null);
@@ -152,6 +170,9 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
         syncStoredNumber("manualSaqueUY", resolvedManualSaqueUY ?? null);
         syncStoredNumber("manualAdsBR", resolvedManualAdsBR ?? null);
         syncStoredNumber("manualAdsUY", resolvedManualAdsUY ?? null);
+        syncStoredNumber("manualCashPY", resolvedManualCashPY ?? null);
+        syncStoredNumber("manualSaquePY", resolvedManualSaquePY ?? null);
+        syncStoredNumber("manualAdsPY", resolvedManualAdsPY ?? null);
         syncStoredNumber("fbAdsPaid", resolvedFbAdsPaid ?? 0);
 
         const migrationTasks: Promise<unknown>[] = [];
@@ -224,6 +245,18 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   const setManualAdsUY = (value: number | null) => {
     setManualAdsUYState(value);
     persistManualValue("manualAdsUY", value);
+  };
+  const setManualCashPY = (value: number | null) => {
+    setManualCashPYState(value);
+    persistManualValue("manualCashPY", value);
+  };
+  const setManualSaquePY = (value: number | null) => {
+    setManualSaquePYState(value);
+    persistManualValue("manualSaquePY", value);
+  };
+  const setManualAdsPY = (value: number | null) => {
+    setManualAdsPYState(value);
+    persistManualValue("manualAdsPY", value);
   };
 
   const expenses = useMemo(() => {
@@ -356,6 +389,9 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
       manualSaqueUY, setManualSaqueUY,
       manualAdsBR, setManualAdsBR,
       manualAdsUY, setManualAdsUY,
+      manualCashPY, setManualCashPY,
+      manualSaquePY, setManualSaquePY,
+      manualAdsPY, setManualAdsPY,
     }}>
       {children}
     </FinanceContext.Provider>
