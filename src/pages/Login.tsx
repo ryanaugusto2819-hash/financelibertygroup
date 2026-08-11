@@ -28,7 +28,7 @@ export default function Login() {
 
     setTimeout(() => {
       const access = countryAccess;
-      if (access === "uruguay") navigate("/uruguay");
+      if (access) navigate(`/${access}`);
       else navigate("/");
     }, 300);
   }

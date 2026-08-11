@@ -4,7 +4,7 @@ import { Loader2 } from "lucide-react";
 
 interface Props {
   children: React.ReactNode;
-  country?: "brasil" | "uruguay";
+  country?: "brasil" | "uruguay" | "paraguay";
 }
 
 export function ProtectedRoute({ children, country }: Props) {
@@ -20,14 +20,9 @@ export function ProtectedRoute({ children, country }: Props) {
 
   if (!user) return <Navigate to="/login" replace />;
 
-  // Se o usuário tem acesso restrito ao Uruguay e está tentando acessar Brasil → redireciona
-  if (countryAccess === "uruguay" && country === "brasil") {
-    return <Navigate to="/uruguay" replace />;
-  }
-
-  // Se o usuário tem acesso restrito ao Uruguay e está na raiz → redireciona para /uruguay
-  if (countryAccess === "uruguay" && !country) {
-    return <Navigate to="/uruguay" replace />;
+  // Acesso restrito a um país: qualquer rota de outro país (ou global) redireciona
+  if (countryAccess && country !== countryAccess) {
+    return <Navigate to={`/${countryAccess}`} replace />;
   }
 
   return <>{children}</>;

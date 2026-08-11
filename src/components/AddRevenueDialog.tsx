@@ -108,6 +108,7 @@ export function AddRevenueDialog({ onAdded }: AddRevenueDialogProps) {
                 <SelectContent>
                   <SelectItem value="brasil">🇧🇷 Brasil</SelectItem>
                   <SelectItem value="uruguay">🇺🇾 Uruguay</SelectItem>
+                  <SelectItem value="paraguay">🇵🇾 Paraguay</SelectItem>
                 </SelectContent>
               </Select>
             </div>

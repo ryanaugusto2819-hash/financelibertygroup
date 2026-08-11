@@ -22,7 +22,7 @@ export function AddExpenseDialog() {
     type: "variavel" as "fixa" | "variavel" | "extraordinaria",
     status: "pendente" as "pago" | "pendente" | "agendado",
     paymentSource: "nao_paga" as "caixa" | "saque" | "nao_paga",
-    country: "" as "" | "brasil" | "uruguay",
+    country: "" as "" | "brasil" | "uruguay" | "paraguay",
   });
 
   const [salaryForm, setSalaryForm] = useState({
@@ -31,7 +31,7 @@ export function AddExpenseDialog() {
     amount: "",
     date: new Date().toISOString().split("T")[0],
     status: "pendente" as "pago" | "pendente" | "agendado",
-    country: "ambos" as "brasil" | "uruguay" | "ambos",
+    country: "ambos" as "brasil" | "uruguay" | "paraguay" | "ambos",
     frequency: "mensal" as "mensal" | "quinzenal",
   });
 
@@ -68,7 +68,7 @@ export function AddExpenseDialog() {
       toast.error("Preencha nome e valor do salário");
       return;
     }
-    const countryLabel = salaryForm.country === "brasil" ? "🇧🇷" : salaryForm.country === "uruguay" ? "🇺🇾" : "🇧🇷🇺🇾";
+    const countryLabel = salaryForm.country === "brasil" ? "🇧🇷" : salaryForm.country === "uruguay" ? "🇺🇾" : salaryForm.country === "paraguay" ? "🇵🇾" : "🇧🇷🇺🇾🇵🇾";
     const baseName = salaryForm.role
       ? `Salário - ${salaryForm.employeeName} (${salaryForm.role}) ${countryLabel}`
       : `Salário - ${salaryForm.employeeName} ${countryLabel}`;
@@ -199,6 +199,7 @@ export function AddExpenseDialog() {
                       <SelectItem value="none">Todos</SelectItem>
                       <SelectItem value="brasil">🇧🇷 Brasil</SelectItem>
                       <SelectItem value="uruguay">🇺🇾 Uruguay</SelectItem>
+                      <SelectItem value="paraguay">🇵🇾 Paraguay</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -271,6 +272,7 @@ export function AddExpenseDialog() {
                       <SelectItem value="ambos">🇧🇷🇺🇾 Ambos</SelectItem>
                       <SelectItem value="brasil">🇧🇷 Brasil</SelectItem>
                       <SelectItem value="uruguay">🇺🇾 Uruguay</SelectItem>
+                      <SelectItem value="paraguay">🇵🇾 Paraguay</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
