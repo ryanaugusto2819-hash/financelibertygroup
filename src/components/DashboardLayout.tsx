@@ -19,7 +19,7 @@ export function DashboardLayout({ children, title, subtitle, hideCountryFilter }
     : "?";
 
   // País label do usuário restrito
-  const countryLabel = countryAccess === "uruguay" ? "🇺🇾 UY" : countryAccess === "brasil" ? "🇧🇷 BR" : null;
+  const countryLabel = countryAccess === "uruguay" ? "🇺🇾 UY" : countryAccess === "brasil" ? "🇧🇷 BR" : countryAccess === "paraguay" ? "🇵🇾 PY" : null;
 
   return (
     <SidebarProvider>

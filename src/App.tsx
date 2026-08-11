@@ -31,14 +31,17 @@ const App = () => (
               <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
               <Route path="/brasil" element={<ProtectedRoute country="brasil"><Index country="brasil" /></ProtectedRoute>} />
               <Route path="/uruguay" element={<ProtectedRoute country="uruguay"><Index country="uruguay" /></ProtectedRoute>} />
+              <Route path="/paraguay" element={<ProtectedRoute country="paraguay"><Index country="paraguay" /></ProtectedRoute>} />
 
               <Route path="/recebiveis" element={<ProtectedRoute><Receivables /></ProtectedRoute>} />
               <Route path="/brasil/recebiveis" element={<ProtectedRoute country="brasil"><Receivables country="brasil" /></ProtectedRoute>} />
               <Route path="/uruguay/recebiveis" element={<ProtectedRoute country="uruguay"><Receivables country="uruguay" /></ProtectedRoute>} />
+              <Route path="/paraguay/recebiveis" element={<ProtectedRoute country="paraguay"><Receivables country="paraguay" /></ProtectedRoute>} />
 
               <Route path="/despesas" element={<ProtectedRoute><Expenses /></ProtectedRoute>} />
               <Route path="/brasil/despesas" element={<ProtectedRoute country="brasil"><Expenses country="brasil" /></ProtectedRoute>} />
               <Route path="/uruguay/despesas" element={<ProtectedRoute country="uruguay"><Expenses country="uruguay" /></ProtectedRoute>} />
+              <Route path="/paraguay/despesas" element={<ProtectedRoute country="paraguay"><Expenses country="paraguay" /></ProtectedRoute>} />
 
               <Route path="/projecoes" element={<ProtectedRoute><Projections /></ProtectedRoute>} />
 

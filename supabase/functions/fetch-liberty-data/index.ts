@@ -151,11 +151,21 @@ serve(async (req) => {
       return pais === "uy" || pais === "uruguay";
     });
 
+    const paraguayPedidos = allPedidos.filter(p => {
+      const pais = (p.pais || "").toLowerCase();
+      return pais === "py" || pais === "paraguay" || pais === "paraguai";
+    });
+    const paraguayPagos = allPagos.filter(p => {
+      const pais = (p.pais || "").toLowerCase();
+      return pais === "py" || pais === "paraguay" || pais === "paraguai";
+    });
+
     return new Response(JSON.stringify({
       pedidos: allPedidos,
       summary:        buildSummary(allPedidos,      allPagos),
       summaryBrasil:  buildSummary(brasilPedidos,   brasilPagos),
       summaryUruguay: buildSummary(uruguayPedidos,  uruguayPagos),
+      summaryParaguay: buildSummary(paraguayPedidos, paraguayPagos),
       cotacaoUYU: UYU_TO_BRL,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

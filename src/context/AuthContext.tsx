@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 interface AuthContextType {
   user: User | null;
   session: Session | null;
-  countryAccess: "brasil" | "uruguay" | null; // null = acesso total
+  countryAccess: "brasil" | "uruguay" | "paraguay" | null; // null = acesso total
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
@@ -16,7 +16,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser]               = useState<User | null>(null);
   const [session, setSession]         = useState<Session | null>(null);
-  const [countryAccess, setCountryAccess] = useState<"brasil" | "uruguay" | null>(null);
+  const [countryAccess, setCountryAccess] = useState<"brasil" | "uruguay" | "paraguay" | null>(null);
   const [loading, setLoading]         = useState(true);
 
   async function loadProfile(userId: string) {
