@@ -49,7 +49,7 @@ export function AddExpenseDialog({ lockCountry }: { lockCountry?: string } = {})
       type: form.type,
       status: form.status,
       paymentSource: form.paymentSource,
-      country: (lockCountry ?? form.country) || undefined,
+      country: ((lockCountry ?? form.country) || undefined) as any,
     });
 
     if (!result.success) {
