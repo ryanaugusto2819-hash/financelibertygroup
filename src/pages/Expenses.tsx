@@ -46,6 +46,17 @@ const Expenses = ({ country }: ExpensesProps = {}) => {
     }
   }, [country, setCountryFilter]);
 
+  const isCaixaRel = country === "caixarel";
+
+  const handleMarkReal = async (id: string) => {
+    const result = await updateExpense(id, { status: "pago" });
+    if (!result.success) {
+      toast.error(result.error || "Erro ao converter para Real.");
+      return;
+    }
+    toast.success("Lançamento convertido para REAL.");
+  };
+
   const totalMonth = expenses.reduce((s, e) => s + e.amount, 0);
   const totalDay = expenses.filter(e => e.date === selectedDate).reduce((s, e) => s + e.amount, 0);
   const byCategory = expenseCategories.map(cat => ({
@@ -56,10 +67,12 @@ const Expenses = ({ country }: ExpensesProps = {}) => {
     <DashboardLayout title={country === "brasil" ? "🇧🇷 Despesas Brasil" : country === "uruguay" ? "🇺🇾 Despesas Uruguay" : country === "paraguay" ? "🇵🇾 Despesas Paraguay" : country === "caixarel" ? "🏦 Despesas CAIXA REL" : "Custos & Despesas"} subtitle="Controle detalhado de gastos" hideCountryFilter={!!country}>
       <div className="flex items-center justify-between mb-6">
         <DateFilter />
-        <div className="flex gap-2">
-          <AIExpenseImportDialog />
-          <AddExpenseDialog />
-        </div>
+        {isCaixaRel && (
+          <div className="flex gap-2">
+            <AIExpenseImportDialog />
+            <AddExpenseDialog lockCountry="caixarel" />
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
@@ -122,10 +135,20 @@ const Expenses = ({ country }: ExpensesProps = {}) => {
                     </td>
                     <td className="py-2.5 text-right font-mono font-bold text-chart-negative">{formatCurrency(e.amount)}</td>
                     <td className="py-2.5 text-center">
-                      <Badge variant={e.status === "pago" ? "default" : e.status === "agendado" ? "outline" : "secondary"} className="text-[9px]">{e.status}</Badge>
+                      <Badge variant={e.status === "pago" ? "default" : e.status === "agendado" ? "outline" : "secondary"} className="text-[9px]">
+                        {isCaixaRel ? (e.status === "pago" ? "REAL" : e.status === "agendado" ? "AGENDADA" : e.status) : e.status}
+                      </Badge>
                     </td>
                     <td className="py-2.5 text-center">
                       <div className="flex items-center justify-center gap-1">
+                        {isCaixaRel && e.status !== "pago" && (
+                          <button
+                            onClick={() => handleMarkReal(e.id)}
+                            className="text-[10px] px-2 py-1 rounded-md bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                          >
+                            Marcar Real
+                          </button>
+                        )}
                         <EditExpenseDialog expense={e} onSave={updateExpense} />
                         <AlertDialog>
                           <AlertDialogTrigger asChild>

@@ -10,7 +10,7 @@ import { useFinance } from "@/context/FinanceContext";
 import { expenseCategories } from "@/lib/finance-data";
 import { toast } from "sonner";
 
-export function AddExpenseDialog() {
+export function AddExpenseDialog({ lockCountry }: { lockCountry?: string } = {}) {
   const { addExpense } = useFinance();
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState("custo");
@@ -22,7 +22,7 @@ export function AddExpenseDialog() {
     type: "variavel" as "fixa" | "variavel" | "extraordinaria",
     status: "pendente" as "pago" | "pendente" | "agendado",
     paymentSource: "nao_paga" as "caixa" | "saque" | "nao_paga",
-    country: "" as "" | "brasil" | "uruguay" | "paraguay" | "caixarel",
+    country: (lockCountry ?? "") as "" | "brasil" | "uruguay" | "paraguay" | "caixarel",
   });
 
   const [salaryForm, setSalaryForm] = useState({
@@ -31,7 +31,7 @@ export function AddExpenseDialog() {
     amount: "",
     date: new Date().toISOString().split("T")[0],
     status: "pendente" as "pago" | "pendente" | "agendado",
-    country: "ambos" as "brasil" | "uruguay" | "paraguay" | "caixarel" | "ambos",
+    country: (lockCountry ?? "ambos") as "brasil" | "uruguay" | "paraguay" | "caixarel" | "ambos",
     frequency: "mensal" as "mensal" | "quinzenal",
   });
 
@@ -49,7 +49,7 @@ export function AddExpenseDialog() {
       type: form.type,
       status: form.status,
       paymentSource: form.paymentSource,
-      country: form.country || undefined,
+      country: (lockCountry ?? form.country) || undefined,
     });
 
     if (!result.success) {
@@ -59,7 +59,7 @@ export function AddExpenseDialog() {
 
     toast.success("Custo lançado com sucesso!");
     setOpen(false);
-    setForm({ description: "", category: "", amount: "", date: new Date().toISOString().split("T")[0], type: "variavel", status: "pendente", paymentSource: "nao_paga", country: "" });
+    setForm({ description: "", category: "", amount: "", date: new Date().toISOString().split("T")[0], type: "variavel", status: "pendente", paymentSource: "nao_paga", country: (lockCountry ?? "") as any });
   };
 
   const handleSalarySubmit = async (e: React.FormEvent) => {
@@ -130,7 +130,7 @@ export function AddExpenseDialog() {
       toast.success("Salário lançado com sucesso!");
     }
     setOpen(false);
-    setSalaryForm({ employeeName: "", role: "", amount: "", date: new Date().toISOString().split("T")[0], status: "pendente", country: "ambos", frequency: "mensal" });
+    setSalaryForm({ employeeName: "", role: "", amount: "", date: new Date().toISOString().split("T")[0], status: "pendente", country: (lockCountry ?? "ambos") as any, frequency: "mensal" });
   };
 
   return (
@@ -207,13 +207,13 @@ export function AddExpenseDialog() {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
-                  <Label>Status</Label>
+                  <Label>{lockCountry ? "Tipo de Lançamento" : "Status"}</Label>
                   <Select value={form.status} onValueChange={v => setForm(f => ({ ...f, status: v as any }))}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="pago">Pago</SelectItem>
+                      <SelectItem value="pago">{lockCountry ? "✅ Real" : "Pago"}</SelectItem>
                       <SelectItem value="pendente">Pendente</SelectItem>
-                      <SelectItem value="agendado">Agendado</SelectItem>
+                      <SelectItem value="agendado">{lockCountry ? "🕓 Agendada" : "Agendado"}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -255,13 +255,13 @@ export function AddExpenseDialog() {
                   <Input id="salaryDate" type="date" value={salaryForm.date} onChange={e => setSalaryForm(f => ({ ...f, date: e.target.value }))} />
                 </div>
                 <div className="space-y-2">
-                  <Label>Status</Label>
+                  <Label>{lockCountry ? "Tipo de Lançamento" : "Status"}</Label>
                   <Select value={salaryForm.status} onValueChange={v => setSalaryForm(f => ({ ...f, status: v as any }))}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="pago">Pago</SelectItem>
+                      <SelectItem value="pago">{lockCountry ? "✅ Real" : "Pago"}</SelectItem>
                       <SelectItem value="pendente">Pendente</SelectItem>
-                      <SelectItem value="agendado">Agendado</SelectItem>
+                      <SelectItem value="agendado">{lockCountry ? "🕓 Agendada" : "Agendado"}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
